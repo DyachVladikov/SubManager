@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '@/shared/config/supabase'
+import styles from './AuthPage.module.scss'
 
 export function AuthPage() {
   const [email, setEmail] = useState('')
@@ -43,32 +44,38 @@ export function AuthPage() {
   }
 
   return (
-    <div>
-      <h1>{isLogin ? 'Вход' : 'Регистрация'}</h1>
-      <form onSubmit={handleAuth}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Пароль"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? 'Загрузка...' : isLogin ? 'Войти' : 'Зарегистрироваться'}
+    <div className={styles.page}>
+      <div className={styles.card}>
+        <h1 className={styles.title}>{isLogin ? 'Вход' : 'Регистрация'}</h1>
+        <form className={styles.form} onSubmit={handleAuth}>
+          <input
+            className={styles.input}
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            className={styles.input}
+            type="password"
+            placeholder="Пароль"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button className={styles.button} type="submit" disabled={loading}>
+            {loading ? 'Загрузка...' : isLogin ? 'Войти' : 'Зарегистрироваться'}
+          </button>
+        </form>
+        <button className={styles.buttonSecondary} onClick={handleGoogle}>
+          Войти через Google
         </button>
-      </form>
-      <button onClick={handleGoogle}>Войти через Google</button>
-      <button onClick={() => setIsLogin(!isLogin)}>
-        {isLogin ? 'Нет аккаунта? Зарегистрируйся' : 'Уже есть аккаунт? Войди'}
-      </button>
-      {message && <p>{message}</p>}
+        <button className={styles.buttonSecondary} onClick={() => setIsLogin(!isLogin)}>
+          {isLogin ? 'Нет аккаунта? Зарегистрируйся' : 'Уже есть аккаунт? Войди'}
+        </button>
+        {message && <p className={styles.message}>{message}</p>}
+      </div>
     </div>
   )
 }

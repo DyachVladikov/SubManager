@@ -1,11 +1,18 @@
 import { useAuth } from '@/features/auth'
 import { AuthPage } from '@/features/auth'
+import styles from './App.module.scss'
 
 function App() {
   const { session, loading, signOut } = useAuth()
 
   if (loading) {
-    return <div>Загрузка...</div>
+    return (
+      <div className={styles.page}>
+        <div className={styles.card}>
+          <p className={styles.text}>Загрузка...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!session) {
@@ -13,10 +20,14 @@ function App() {
   }
 
   return (
-    <div>
-      <h1>SubManager</h1>
-      <p>Добро пожаловать, {session.user.email}</p>
-      <button onClick={signOut}>Выйти</button>
+    <div className={styles.page}>
+      <div className={styles.card}>
+        <h1 className={styles.title}>SubManager</h1>
+        <p className={styles.text}>Добро пожаловать, {session.user.email}</p>
+        <button className={styles.button} onClick={signOut}>
+          Выйти
+        </button>
+      </div>
     </div>
   )
 }

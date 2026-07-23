@@ -1,0 +1,94 @@
+@use '@/shared/styles/helpers/index.scss' as *;
+
+.page {
+  @include flex-center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+  padding: 32px;
+  background: var(--color-gray-10);
+  border: var(--border);
+  border-radius: var(--border-radius-s);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.title {
+  @include fluid-text(28, 24);
+  text-align: center;
+  margin: 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--color-gray-15);
+  border: 1px solid var(--color-gray-20);
+  border-radius: var(--border-radius-xs);
+  color: var(--color-white);
+  font-size: 16px;
+  transition-duration: var(--transition-duration);
+
+  &::placeholder {
+    color: var(--color-gray-50);
+  }
+
+  &:focus {
+    border-color: var(--color-purple-60);
+    outline: none;
+  }
+}
+
+.button {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--color-purple-60);
+  border: none;
+  border-radius: var(--border-radius-xs);
+  color: var(--color-white);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition-duration: var(--transition-duration);
+
+  @include hover {
+    background: var(--color-purple-65);
+  }
+
+  &:disabled {
+    @include disabled;
+  }
+}
+
+.buttonSecondary {
+  width: 100%;
+  padding: 12px 16px;
+  background: transparent;
+  border: 1px solid var(--color-gray-20);
+  border-radius: var(--border-radius-xs);
+  color: var(--color-white);
+  font-size: 16px;
+  cursor: pointer;
+  transition-duration: var(--transition-duration);
+
+  @include hover {
+    background: var(--color-gray-15);
+  }
+}
+
+.message {
+  text-align: center;
+  color: var(--color-gray-60);
+  margin: 0;
+}

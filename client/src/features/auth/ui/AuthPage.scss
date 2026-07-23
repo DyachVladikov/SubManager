@@ -1,12 +1,12 @@
 @use '@/shared/styles/helpers/index.scss' as *;
 
-.page {
+.auth-page {
   @include flex-center;
   min-height: 100vh;
   padding: 20px;
 }
 
-.card {
+.auth-card {
   width: 100%;
   max-width: 420px;
   padding: 32px;
@@ -18,19 +18,19 @@
   gap: 24px;
 }
 
-.title {
+.auth-title {
   @include fluid-text(28, 24);
   text-align: center;
   margin: 0;
 }
 
-.form {
+.auth-form {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.input {
+.auth-input {
   width: 100%;
   padding: 12px 16px;
   background: var(--color-gray-15);
@@ -50,7 +50,7 @@
   }
 }
 
-.button {
+.auth-button {
   width: 100%;
   padding: 12px 16px;
   background: var(--color-purple-60);
@@ -71,7 +71,7 @@
   }
 }
 
-.buttonSecondary {
+.auth-button-secondary {
   width: 100%;
   padding: 12px 16px;
   background: transparent;
@@ -87,7 +87,7 @@
   }
 }
 
-.message {
+.auth-message {
   text-align: center;
   color: var(--color-gray-60);
   margin: 0;

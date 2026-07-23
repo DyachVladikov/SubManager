@@ -1,15 +1,15 @@
 import { useAuth } from '@/features/auth'
 import { AuthPage } from '@/features/auth'
-import styles from './App.module.scss'
+import './App.scss'
 
 function App() {
   const { session, loading, signOut } = useAuth()
 
   if (loading) {
     return (
-      <div className={styles.page}>
-        <div className={styles.card}>
-          <p className={styles.text}>Загрузка...</p>
+      <div className="app-page">
+        <div className="app-card">
+          <p className="app-text">Загрузка...</p>
         </div>
       </div>
     )
@@ -20,11 +20,11 @@ function App() {
   }
 
   return (
-    <div className={styles.page}>
-      <div className={styles.card}>
-        <h1 className={styles.title}>SubManager</h1>
-        <p className={styles.text}>Добро пожаловать, {session.user.email}</p>
-        <button className={styles.button} onClick={signOut}>
+    <div className="app-page">
+      <div className="app-card">
+        <h1 className="app-title">SubManager</h1>
+        <p className="app-text">Добро пожаловать, {session.user.email}</p>
+        <button className="app-button" onClick={signOut}>
           Выйти
         </button>
       </div>

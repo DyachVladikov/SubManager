@@ -1,6 +1,6 @@
 @use '@/shared/styles/helpers/index.scss' as *;
 
-.page {
+.app-page {
   @include flex-center;
   min-height: 100vh;
   padding: 20px;
@@ -8,7 +8,7 @@
   gap: 24px;
 }
 
-.card {
+.app-card {
   width: 100%;
   max-width: 420px;
   padding: 32px;
@@ -21,17 +21,17 @@
   gap: 16px;
 }
 
-.title {
+.app-title {
   @include fluid-text(28, 24);
   margin: 0;
 }
 
-.text {
+.app-text {
   color: var(--color-gray-60);
   margin: 0;
 }
 
-.button {
+.app-button {
   padding: 12px 24px;
   background: var(--color-purple-60);
   border: none;

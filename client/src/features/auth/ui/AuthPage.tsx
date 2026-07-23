@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '@/shared/config/supabase'
-import styles from './AuthPage.module.scss'
+import './AuthPage.scss'
 
 export function AuthPage() {
   const [email, setEmail] = useState('')
@@ -44,12 +44,12 @@ export function AuthPage() {
   }
 
   return (
-    <div className={styles.page}>
-      <div className={styles.card}>
-        <h1 className={styles.title}>{isLogin ? 'Вход' : 'Регистрация'}</h1>
-        <form className={styles.form} onSubmit={handleAuth}>
+    <div className="auth-page">
+      <div className="auth-card">
+        <h1 className="auth-title">{isLogin ? 'Вход' : 'Регистрация'}</h1>
+        <form className="auth-form" onSubmit={handleAuth}>
           <input
-            className={styles.input}
+            className="auth-input"
             type="email"
             placeholder="Email"
             value={email}
@@ -57,24 +57,24 @@ export function AuthPage() {
             required
           />
           <input
-            className={styles.input}
+            className="auth-input"
             type="password"
             placeholder="Пароль"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <button className={styles.button} type="submit" disabled={loading}>
+          <button className="auth-button" type="submit" disabled={loading}>
             {loading ? 'Загрузка...' : isLogin ? 'Войти' : 'Зарегистрироваться'}
           </button>
         </form>
-        <button className={styles.buttonSecondary} onClick={handleGoogle}>
+        <button className="auth-button-secondary" onClick={handleGoogle}>
           Войти через Google
         </button>
-        <button className={styles.buttonSecondary} onClick={() => setIsLogin(!isLogin)}>
+        <button className="auth-button-secondary" onClick={() => setIsLogin(!isLogin)}>
           {isLogin ? 'Нет аккаунта? Зарегистрируйся' : 'Уже есть аккаунт? Войди'}
         </button>
-        {message && <p className={styles.message}>{message}</p>}
+        {message && <p className="auth-message">{message}</p>}
       </div>
     </div>
   )

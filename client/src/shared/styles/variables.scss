@@ -1,100 +1,28 @@
-@use "./helpers/index.scss" as *;
-
-/*
-
-ExtraBlack – 950
-
-Black – 900
-
-ExtraBold – 800
-
-Bold – 700
-
-SemiBold – 600
-
-Medium – 500
-
-Normal – 400
-
-SemiLight – 350
-
-Light – 300
-
-ExtraLight – 200
-
-Thin – 100 */
+@use './helpers/index.scss' as *;
 
 :root {
-    --color-white: #fff;
-    --color-black: #000;
-    --color-white-transparent-10: rgba(255,255,255,0.2);
+  --bg: #0b0b10;
+  --surface: #14141d;
+  --surface2: #1c1c28;
+  --border: rgba(255, 255, 255, 0.07);
+  --accent: #a78bfa;
+  --accent-deep: #7c5cf0;
+  --text: #f4f4f7;
+  --dim: #8f8fa0;
+  --up: #ef8f8f;
+  --dn: #8fe3b0;
 
-    --color-purple-60: #703BF7; 
-    --color-purple-65: #8254F8; 
-    --color-purple-70: #946CF9;
-    --color-purple-75: #A685FA;
-    --color-purple-90: #DBCEFD;
-    --color-purple-95: #EDE7FE;
-    --color-purple-97: #F4F0FE;
-    --color-purple-99: #FBFAFF;
+  --font-family-main: 'Manrope', sans-serif;
+  --font-family-accent: 'Bebas Neue', sans-serif;
 
-    --color-white-90: #E4E4E7;
-    --color-white-95: #F1F1F3;
-    --color-white-97: #F7F7F8;
-    --color-white-99: #FCFCFD;
+  --border-radius-xl: 100px;
+  --border-radius-l: 75px;
+  --border-radius-m: 28px;
+  --border-radius-s: 12px;
+  --border-radius-xs: 10px;
+  --border-radius-xxs: 8px;
+  --border-radius-xxxs: 4px;
 
-    --color-gray-08: #141414; 
-    --color-gray-10: #1A1A1A; 
-    --color-gray-15: #262626;
-    --color-gray-20: #333333;
-    --color-gray-30: #4D4D4D;
-    --color-gray-40: #666666;
-    --color-gray-50: #808080;
-    --color-gray-60: #999999;
-
-    --color-error: #AB052C;
-
-
-    --border: 1px solid var(--color-gray-15);
-    --border-large: 2px solid rgba(255, 255, 255, 0.27);
-    --border-small: 2px solid rgba(255, 255, 255, 0.45);
-    --border-smaller: 2px solid rgba(255, 255, 255, 0.75);
-    
-    --border-radius-xl: 100px;
-    --border-radius-l: 75px;
-    --border-radius-m: 28px;
-    --border-radius-s: 12px;
-    --border-radius-xs: 10px;
-    --border-radius-xxs: 8px;
-    --border-radius-xxxs: 4px;
-
-    --border-width-l: 4px;
-    --border-width-m: 2px;
-    --border-width-s: 1px;
-
-
-    --font-family-main: 'Urbanist', sans-serif; 
-
-
-    --container-width: #{fluid-to-laptop($container-desktop-width, $container-laptop-width)};
-
-    --container-padding-x: 162px;
-
-    --widthElFrom: #{fluid-from-desktop(311,272)};
-
-    @include desktop{
-        --container-padding-x: 162px;
-    }
-    @include laptop-large{
-        --container-padding-x: #{fluid(80,16)};
-    }
-
-
-    --section-padding-y: #{fluid-from-desktop-to-mobile(162,16)};
-
-    
-
-
-    --transition-duration: 0.2s;
-    --transition-duration-longer: 0.4s;
+  --transition-duration: 0.2s;
+  --transition-duration-longer: 0.4s;
 }

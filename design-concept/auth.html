@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b0b10">
+<title>SubManager — Вход · Концепт</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0b10;
+  --surface:#14141d;
+  --surface2:#1c1c28;
+  --border:rgba(255,255,255,.07);
+  --accent:#a78bfa;
+  --accent-deep:#7c5cf0;
+  --text:#f4f4f7;
+  --dim:#8f8fa0;
+  --up:#ef8f8f;
+  --dn:#8fe3b0;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(167,139,250,.3)}
+body{background:#060608;font-family:'Manrope',sans-serif;color:var(--text);-webkit-font-smoothing:antialiased}
+.app{max-width:390px;margin:0 auto;background:var(--bg);position:relative;overflow:hidden;border-left:1px solid rgba(255,255,255,.04);border-right:1px solid rgba(255,255,255,.04);min-height:100vh;padding-bottom:34px}
+.glow{position:absolute;top:-150px;left:50%;transform:translateX(-50%);width:480px;height:340px;background:radial-gradient(closest-side,rgba(124,92,240,.26),transparent 72%);pointer-events:none}
+.glow2{position:absolute;bottom:-190px;left:-140px;width:380px;height:320px;background:radial-gradient(closest-side,rgba(124,92,240,.13),transparent 72%);pointer-events:none}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.rise{opacity:0;animation:rise .6s cubic-bezier(.2,.7,.3,1) forwards}
+@keyframes swap{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.swap{animation:swap .35s cubic-bezier(.2,.7,.3,1)}
+
+/* ── brand ── */
+.brandwrap{position:relative;display:flex;align-items:center;gap:12px;padding:26px 22px 0}
+.logotile{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent-deep));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:23px;color:#0b0b10;box-shadow:0 8px 24px rgba(124,92,240,.35)}
+.wordmark{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:.09em;text-transform:uppercase;line-height:1}
+.wordmark b{color:var(--accent);font-weight:400}
+.wordmark small{display:block;font-family:'Manrope',sans-serif;font-size:8px;letter-spacing:.22em;color:var(--dim);font-weight:800;margin-top:3px}
+
+/* ── headline ── */
+.head{position:relative;padding:38px 22px 0}
+.head h1{font-family:'Bebas Neue',sans-serif;font-size:47px;line-height:.98;letter-spacing:.03em;text-transform:uppercase}
+.head h1 span{background:linear-gradient(90deg,var(--accent),var(--accent-deep));-webkit-background-clip:text;background-clip:text;color:transparent}
+.head p{margin-top:13px;font-size:12.5px;line-height:1.65;color:var(--dim);font-weight:600;max-width:290px}
+
+/* ── card / form ── */
+.card{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:18px;margin:22px 20px 0}
+.gbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;color:#1d1d24;font-family:inherit;font-weight:800;font-size:13px;padding:13px;border-radius:14px;border:0;cursor:pointer;transition:transform .12s,opacity .2s;position:relative}
+.gbtn:active{transform:scale(.98)}
+.gbtn svg{flex:0 0 auto}
+.gbtn:disabled{opacity:.75;cursor:default}
+.divider{display:flex;align-items:center;gap:12px;margin:16px 2px 14px;color:var(--dim);font-size:9px;font-weight:800;letter-spacing:.18em;text-transform:uppercase}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.frow{margin-bottom:11px}
+.frow label{display:block;font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin:0 0 7px 2px}
+.inp{position:relative}
+.inp input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:13px;padding:13px 14px;color:var(--text);font-family:inherit;font-size:13px;font-weight:600;outline:none;transition:border-color .2s,box-shadow .2s}
+.inp input::placeholder{color:rgba(143,143,160,.55)}
+.inp input:focus{border-color:rgba(167,139,250,.55);box-shadow:0 0 0 3px rgba(167,139,250,.12)}
+.inp .eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:10px;border:0;background:none;color:var(--dim);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.inp .eye:active{transform:translateY(-50%) scale(.88)}
+.hide{display:none}
+.forgot{display:block;text-align:right;font-size:10.5px;font-weight:700;color:var(--dim);margin:-2px 2px 14px;cursor:pointer;text-decoration:none}
+.sbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:9px;background:linear-gradient(135deg,var(--accent),var(--accent-deep));color:#0b0b10;font-family:inherit;font-weight:800;font-size:13.5px;padding:14px;border-radius:14px;border:0;cursor:pointer;transition:transform .12s,opacity .2s;box-shadow:0 10px 26px rgba(124,92,240,.3)}
+.sbtn:active{transform:scale(.98)}
+.sbtn:disabled{opacity:.8;cursor:default}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid rgba(11,11,16,.25);border-top-color:#0b0b10;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.swline{text-align:center;font-size:11.5px;color:var(--dim);font-weight:600;margin-top:15px}
+.swline a{color:var(--accent);font-weight:800;cursor:pointer;text-decoration:none}
+
+/* ── tma note ── */
+.tmanote{position:relative;display:flex;gap:12px;align-items:flex-start;background:linear-gradient(135deg,rgba(167,139,250,.12),var(--surface) 60%);border:1px solid rgba(167,139,250,.28);border-radius:20px;padding:16px;margin:14px 20px 0}
+.tmico{width:40px;height:40px;border-radius:13px;background:rgba(167,139,250,.14);border:1px solid rgba(167,139,250,.35);color:var(--accent);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.tmanote b{display:block;font-size:12.5px;font-weight:800}
+.tmanote span{display:block;font-size:10.5px;color:var(--dim);font-weight:600;line-height:1.55;margin-top:3px}
+
+/* ── terms ── */
+.terms{position:relative;text-align:center;font-size:9.5px;color:rgba(143,143,160,.7);font-weight:600;line-height:1.7;padding:20px 44px 0}
+.terms a{color:var(--dim);text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="glow"></div>
+  <div class="glow2"></div>
+
+  <!-- бренд -->
+  <div class="brandwrap rise" style="animation-delay:.02s">
+    <div class="logotile">S</div>
+    <div class="wordmark">Sub<b>Manager</b><small>subscription tracker</small></div>
+  </div>
+
+  <!-- заголовок -->
+  <div class="head rise" style="animation-delay:.08s">
+    <h1>Все подписки.<br><span>Один взгляд.</span></h1>
+    <p>Сколько уходит на сервисы, когда спишут деньги и кто из друзей ещё не скинул за сплит — в одном месте.</p>
+  </div>
+
+  <!-- форма -->
+  <div class="card rise" id="card" style="animation-delay:.14s">
+    <button class="gbtn" id="gbtn">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="#4285F4"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg>
+      <span id="gtxt">Продолжить с Google</span>
+    </button>
+
+    <div class="divider">или</div>
+
+    <div class="frow">
+      <label>Email</label>
+      <div class="inp"><input type="email" placeholder="vlad@gmail.com" autocomplete="email"></div>
+    </div>
+
+    <div class="frow">
+      <label>Пароль</label>
+      <div class="inp">
+        <input type="password" id="pwd" placeholder="••••••••" autocomplete="current-password">
+        <button class="eye" id="eye" type="button">
+          <svg id="eyeOn" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg id="eyeOff" class="hide" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="frow hide" id="repwdRow">
+      <label>Повторите пароль</label>
+      <div class="inp"><input type="password" placeholder="••••••••" autocomplete="new-password"></div>
+    </div>
+
+    <a class="forgot" id="forgot">Забыл пароль?</a>
+
+    <button class="sbtn" id="sbtn"><span id="sbtnTxt">Войти</span></button>
+
+    <div class="swline" id="swline">Нет аккаунта? <a id="modeLink">Регистрация</a></div>
+  </div>
+
+  <!-- заметка про Telegram Mini App -->
+  <div class="tmanote rise" style="animation-delay:.2s">
+    <div class="tmico">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M9.04 15.51l-.38 5.34c.54 0 .78-.23 1.06-.51l2.55-2.44 5.28 3.87c.97.53 1.66.25 1.92-.9L21.9 4.6c.31-1.42-.51-1.97-1.46-1.63L2.7 9.92c-1.39.54-1.37 1.31-.24 1.66l4.55 1.42 10.57-6.66c.5-.31.95-.14.58.19L9.04 15.51z"/></svg>
+    </div>
+    <div>
+      <b>Открываешь из Telegram?</b>
+      <span>В Mini App вход не нужен — открыл мини-апп, и ты уже внутри. Аккаунт привяжется сам по initData.</span>
+    </div>
+  </div>
+
+  <div class="terms rise" style="animation-delay:.26s">
+    Продолжая, ты принимаешь <a>условия использования</a><br>и <a>политику конфиденциальности</a>
+  </div>
+</div>
+
+<script>
+const pwd=document.getElementById('pwd'),
+      eye=document.getElementById('eye'),
+      eyeOn=document.getElementById('eyeOn'),
+      eyeOff=document.getElementById('eyeOff'),
+      repwdRow=document.getElementById('repwdRow'),
+      forgot=document.getElementById('forgot'),
+      sbtn=document.getElementById('sbtn'),
+      sbtnTxt=document.getElementById('sbtnTxt'),
+      swline=document.getElementById('swline'),
+      gbtn=document.getElementById('gbtn'),
+      gtxt=document.getElementById('gtxt'),
+      card=document.getElementById('card');
+let reg=false;
+
+/* показать/скрыть пароль */
+eye.addEventListener('click',()=>{
+  const show=pwd.type==='password';
+  pwd.type=show?'text':'password';
+  eyeOn.classList.toggle('hide',show);
+  eyeOff.classList.toggle('hide',!show);
+});
+
+/* переключение вход ↔ регистрация (делегирование — ссылка пересоздаётся) */
+swline.addEventListener('click',e=>{
+  if(e.target.id!=='modeLink')return;
+  reg=!reg;
+  repwdRow.classList.toggle('hide',!reg);
+  forgot.style.display=reg?'none':'';
+  sbtnTxt.textContent=reg?'Создать аккаунт':'Войти';
+  swline.innerHTML=reg?'Уже есть аккаунт? <a id="modeLink">Войти</a>':'Нет аккаунта? <a id="modeLink">Регистрация</a>';
+  card.classList.remove('rise');/* у rise базовый opacity:0 — убираем, иначе карточка пропадёт после swap */
+  card.classList.remove('swap');void card.offsetWidth;card.classList.add('swap');
+});
+
+/* сабмит — спиннер и «вход» */
+sbtn.addEventListener('click',()=>{
+  sbtn.disabled=true;
+  sbtn.innerHTML='<span class="spin"></span>';
+  setTimeout(()=>{location.href='index.html'},1000);
+});
+
+/* google — спиннер и «вход» */
+gbtn.addEventListener('click',()=>{
+  gbtn.disabled=true;
+  gtxt.textContent='Подключаем Google…';
+  setTimeout(()=>{location.href='index.html'},1200);
+});
+</script>
+</body>
+</html>

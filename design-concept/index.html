@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b0b10">
+<title>SubManager — Дашборд · Концепт</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0b10;
+  --surface:#14141d;
+  --surface2:#1c1c28;
+  --border:rgba(255,255,255,.07);
+  --accent:#a78bfa;
+  --accent-deep:#7c5cf0;
+  --text:#f4f4f7;
+  --dim:#8f8fa0;
+  --up:#ef8f8f;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(167,139,250,.3)}
+body{background:#060608;font-family:'Manrope',sans-serif;color:var(--text);-webkit-font-smoothing:antialiased}
+.app{max-width:390px;margin:0 auto;background:var(--bg);position:relative;overflow:hidden;border-left:1px solid rgba(255,255,255,.04);border-right:1px solid rgba(255,255,255,.04);padding-bottom:112px}
+.glow{position:absolute;top:-150px;left:50%;transform:translateX(-50%);width:480px;height:340px;background:radial-gradient(closest-side,rgba(124,92,240,.26),transparent 72%);pointer-events:none}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.rise{opacity:0;animation:rise .6s cubic-bezier(.2,.7,.3,1) forwards}
+header{position:relative;display:flex;align-items:center;justify-content:space-between;padding:22px 20px 6px}
+.brand{display:flex;align-items:center;gap:11px}
+.avatar{width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,var(--accent),var(--accent-deep));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:19px;color:#0b0b10}
+.hi small{display:block;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);font-weight:700}
+.hi b{font-size:14px;font-weight:800}
+.iconbtn{width:38px;height:38px;border-radius:13px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;color:var(--dim);position:relative}
+.iconbtn .dot{position:absolute;top:8px;right:9px;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.label{display:flex;align-items:center;gap:8px;font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+.label i{width:3px;height:12px;background:var(--accent);border-radius:2px}
+.card{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:18px;margin:16px 20px 0}
+.hero{padding:18px;overflow:hidden}
+.hero::before{content:'';position:absolute;top:0;left:28px;right:28px;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.65),transparent)}
+.hero .topline{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.segctl{position:relative;display:flex;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:99px;padding:3px;flex:0 0 auto}
+.segctl button{position:relative;z-index:1;border:0;background:none;color:var(--dim);font-family:inherit;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:6px 13px;cursor:pointer;transition:color .25s}
+.segctl button.on{color:#0b0b10}
+.segctl .pill{position:absolute;top:3px;left:3px;width:calc(50% - 3px);bottom:3px;border-radius:99px;background:linear-gradient(135deg,var(--accent),var(--accent-deep));transition:transform .3s cubic-bezier(.6,0,.2,1)}
+.segctl.y .pill{transform:translateX(100%)}
+.sum{display:flex;align-items:flex-end;gap:10px;margin-top:10px}
+.num{font-family:'Bebas Neue',sans-serif;font-size:80px;line-height:.88;letter-spacing:.01em;background:linear-gradient(180deg,#ffffff 25%,#7d7d94);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 22px rgba(167,139,250,.28))}
+.per{font-size:13px;font-weight:600;color:var(--dim);padding-bottom:9px}
+.herorow{display:flex;align-items:center;justify-content:space-between;margin-top:10px;min-height:26px}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;color:var(--up);border:1px solid rgba(239,143,143,.28);background:rgba(239,143,143,.08);padding:5px 10px;border-radius:99px}
+.servs{font-size:11px;font-weight:600;color:var(--dim);text-align:right}
+.mprog{margin-top:16px;border-top:1px solid rgba(255,255,255,.05);padding-top:14px}
+.mprow{display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:600;color:var(--dim)}
+.mprow b{color:var(--text);font-weight:800;font-size:11px}
+.dot{display:inline-block;width:7px;height:7px;border-radius:3px;margin-right:5px}
+.dotA{background:linear-gradient(135deg,var(--accent),var(--accent-deep))}
+.dotB{background:rgba(255,255,255,.16)}
+.mpbar{height:8px;border-radius:99px;background:rgba(255,255,255,.06);margin-top:10px;overflow:hidden}
+.mpbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent-deep),var(--accent));box-shadow:0 0 12px rgba(124,92,240,.5);transition:width .8s cubic-bezier(.2,.7,.3,1)}
+.hchart{position:relative;margin-top:16px;touch-action:none;cursor:crosshair}
+.hchart svg{display:block}
+.xtip{position:absolute;top:-4px;transform:translateX(-50%);background:var(--surface2);border:1px solid rgba(167,139,250,.45);color:var(--text);font-size:10px;font-weight:800;padding:5px 10px;border-radius:99px;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+.xtip.on{opacity:1}
+.mletters{position:relative;height:12px;margin-top:5px}
+.mletters span{position:absolute;top:0;font-size:8px;font-weight:800;color:var(--dim);transform:translateX(-50%)}
+.mletters span.f{transform:none}
+.mletters span.l{transform:translateX(-100%)}
+.range{display:flex;justify-content:space-between;margin-top:5px;font-size:8px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);opacity:.75}
+.donutwrap{display:flex;flex-direction:column;align-items:center}
+.donut{position:relative;width:196px;height:196px}
+.donut .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none}
+.donut .c b{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:.02em}
+.donut .c .cl{font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-top:3px;max-width:110px}
+.donut .c .cp{font-size:10px;font-weight:800;letter-spacing:.14em;color:var(--accent);text-transform:uppercase;margin-bottom:2px}
+@keyframes swap{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.donut .c.swap{animation:swap .3s ease}
+.seg{transition:stroke-dasharray .9s cubic-bezier(.3,.7,.3,1),stroke-width .3s,opacity .3s,filter .3s;cursor:pointer}
+.seg.dim{opacity:.18}
+.seg.big{stroke-width:25;filter:drop-shadow(0 0 9px var(--gc))}
+.donut svg g{transform-box:fill-box;transform-origin:center;animation:din 1.15s cubic-bezier(.25,.7,.25,1) both}
+@keyframes din{from{transform:rotate(-155deg)}to{transform:rotate(-90deg)}}
+.mark{position:absolute;width:10px;height:10px;border-radius:50%;opacity:0;transform:translate(-50%,-50%) scale(.4);transition:opacity .3s,transform .3s,left .4s cubic-bezier(.3,.7,.3,1),top .4s cubic-bezier(.3,.7,.3,1);pointer-events:none}
+.mark.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+a.tab{text-decoration:none}
+.lgrid{display:flex;flex-direction:column;gap:6px;margin-top:18px;width:100%}
+.lrow{display:flex;align-items:center;gap:9px;font-size:12px;font-weight:600;padding:9px 11px;border-radius:12px;border:1px solid transparent;cursor:pointer;transition:background .2s,border-color .2s,transform .12s}
+.lrow:active{transform:scale(.98)}
+.lrow.on{background:var(--surface2);border-color:rgba(167,139,250,.38)}
+.lrow .d{width:8px;height:8px;border-radius:3px;flex:0 0 auto}
+.lrow .pc{margin-left:auto;color:var(--dim);font-size:11px}
+.lrow b{font-weight:800;font-size:12px}
+.sec{display:flex;align-items:center;justify-content:space-between;padding:24px 20px 12px}
+.sec h2{display:flex;align-items:center;gap:9px;font-family:'Bebas Neue',sans-serif;font-size:21px;font-weight:400;letter-spacing:.06em;text-transform:uppercase}
+.sec h2 i{width:3px;height:14px;background:var(--accent);border-radius:2px}
+.more{font-size:11px;font-weight:700;color:var(--dim);display:flex;align-items:center;gap:5px}
+.rail{display:flex;gap:10px;overflow-x:auto;padding:2px 20px 4px;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.tcard{flex:0 0 auto;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:10px 14px 10px 10px;cursor:pointer;transition:transform .12s,border-color .2s}
+.tcard:active{transform:scale(.97)}
+.tcard .date{text-align:center;min-width:32px}
+.tcard .date b{display:block;font-family:'Bebas Neue',sans-serif;font-size:22px;line-height:1;font-weight:400}
+.tcard .date span{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--dim)}
+.tcard .sep{width:1px;height:30px;background:var(--border)}
+.logo{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#fff;flex:0 0 auto;position:relative;overflow:hidden}
+.logo .bi{position:absolute;inset:0;margin:auto;width:58%;height:58%;fill:currentColor}
+.tcard .nm{font-size:11px;font-weight:700}
+.tcard .am{font-size:12px;font-weight:800;margin-top:1px}
+.tcard.hot{border-color:rgba(167,139,250,.5);background:linear-gradient(180deg,rgba(167,139,250,.12),var(--surface) 70%)}
+.badge{display:block;font-size:8px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:2px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:2px 20px 0}
+.sub{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:14px;cursor:pointer;transition:transform .12s,border-color .2s}
+.sub:active{transform:scale(.97)}
+.sub .top{display:flex;align-items:center;justify-content:space-between}
+.sub .logo{width:34px;height:34px;border-radius:11px;font-size:17px}
+.split{display:flex;align-items:center;gap:3px;font-size:8px;font-weight:800;letter-spacing:.08em;color:var(--accent);background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.28);padding:3px 6px;border-radius:99px;text-transform:uppercase}
+.sub h3{font-size:13px;font-weight:800;margin-top:10px}
+.sub .pr{font-size:12px;margin-top:2px}
+.sub .pr b{font-weight:800}
+.sub .pr span{color:var(--dim);font-size:11px;font-weight:600}
+.sub .dl{display:flex;justify-content:space-between;font-size:10px;font-weight:600;color:var(--dim);margin-top:9px}
+.bar{height:3px;border-radius:99px;background:rgba(255,255,255,.06);margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent-deep),var(--accent))}
+.sub.add{border:1px dashed rgba(255,255,255,.16);background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;color:var(--dim);min-height:138px}
+.sub.add .plus{width:34px;height:34px;border-radius:11px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--accent)}
+.sub.add span{font-size:11px;font-weight:700}
+.tabbar{position:absolute;left:14px;right:14px;bottom:16px;background:rgba(20,20,29,.92);backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:24px;display:flex;align-items:flex-end;justify-content:space-around;padding:10px 10px 12px}
+.tab{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--dim);font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;width:56px;cursor:pointer}
+.tab.on{color:var(--accent)}
+.tab .pip{width:4px;height:4px;border-radius:50%;background:currentColor}
+.fab{width:52px;height:52px;border-radius:18px;background:linear-gradient(135deg,var(--accent),var(--accent-deep));display:flex;align-items:center;justify-content:center;color:#0b0b10;box-shadow:0 10px 26px rgba(124,92,240,.5);margin-top:-30px;border:4px solid var(--bg);flex:0 0 auto;cursor:pointer;transition:transform .15s}
+.fab:active{transform:scale(.92)}
+.detail{position:absolute;inset:0;background:var(--bg);z-index:15;transform:translateX(102%);transition:transform .4s cubic-bezier(.3,.8,.3,1);overflow-y:auto;padding-bottom:44px;scrollbar-width:none}
+.detail::-webkit-scrollbar{display:none}
+.detail.on{transform:translateX(0)}
+.dglow{position:absolute;top:-140px;left:50%;transform:translateX(-50%);width:460px;height:320px;background:radial-gradient(closest-side,var(--bc,#7c5cf0),transparent 72%);opacity:.26;pointer-events:none}
+.dhead{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 4px;position:relative;z-index:1}
+.dhead .lbl{font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.dlogo{width:64px;height:64px;border-radius:20px;margin:16px auto 0;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:32px;color:#fff;position:relative;overflow:hidden}
+.dlogo .bi{position:absolute;inset:0;margin:auto;width:56%;height:56%;fill:currentColor}
+.dname{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.05em;margin-top:12px;text-transform:uppercase;text-align:center}
+.dprice{font-size:13px;color:var(--dim);font-weight:600;margin-top:3px;text-align:center}
+.dchips{display:flex;justify-content:center;gap:8px;margin-top:12px;position:relative}
+.dchip2{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:800;padding:5px 10px;border-radius:99px;border:1px solid var(--border);background:var(--surface);color:var(--dim)}
+.dchip2.ok{color:var(--dn);border-color:rgba(143,227,176,.3);background:rgba(143,227,176,.08)}
+.dchip2 i{width:6px;height:6px;border-radius:50%;background:currentColor}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px 20px 0}
+.dstat{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:13px}
+.dstat .sl{font-size:8px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.dstat .sv{font-family:'Bebas Neue',sans-serif;font-size:22px;margin-top:5px;letter-spacing:.02em}
+.dcard{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px;margin:14px 20px 0}
+.dsplit-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.dcnt{font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--dim);letter-spacing:.05em}
+.drow{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.drow:last-of-type{border-bottom:0;padding-bottom:0}
+.dav{width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#0b0b10;flex:0 0 auto}
+.dnm{flex:1;font-size:13px;font-weight:700;min-width:0}
+.dnm small{display:block;font-size:10px;color:var(--dim);font-weight:600}
+.dam{font-size:13px;font-weight:800;text-align:right;line-height:1.2}
+.st{font-size:9px;font-weight:800;padding:3px 8px;border-radius:99px;display:inline-block;margin-top:4px}
+.st.p{color:var(--up);background:rgba(239,143,143,.1);border:1px solid rgba(239,143,143,.3)}
+.st.o{color:var(--dn);background:rgba(143,227,176,.1);border:1px solid rgba(143,227,176,.3)}
+.dfoot{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.06)}
+.dfoot .t{font-size:11px;font-weight:700;color:var(--dim)}
+.dfoot b{font-size:13px;font-weight:800}
+.ctaico{width:44px;height:44px;border-radius:15px;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.3);color:var(--accent);display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.dcta-t{font-size:14px;font-weight:800}
+.dcta-s{font-size:11px;color:var(--dim);margin-top:5px;line-height:1.55}
+.dcta-b{margin-top:14px;width:100%;background:linear-gradient(135deg,var(--accent),var(--accent-deep));color:#0b0b10;font-family:inherit;font-weight:800;font-size:12px;padding:13px;border-radius:14px;border:0;cursor:pointer;transition:transform .12s}
+.dcta-b:active{transform:scale(.97)}
+.dlock{display:flex;align-items:center;justify-content:center;gap:5px;font-size:9px;font-weight:700;color:var(--dim);margin-top:9px}
+.hrow{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;font-weight:600}
+.hrow:last-child{border-bottom:0;padding-bottom:0}
+.hrow .hd{color:var(--dim)}
+.hrow b{font-weight:800;display:flex;align-items:center;gap:6px}
+.hrow b svg{color:var(--dn)}
+.setrow{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700}
+.setrow small{display:block;font-size:10px;color:var(--dim);font-weight:600;margin-top:2px}
+.sw{width:42px;height:24px;border-radius:99px;background:rgba(255,255,255,.12);position:relative;cursor:pointer;transition:background .2s;flex:0 0 auto}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s}
+.sw.on{background:var(--accent)}
+.sw.on::after{transform:translateX(18px)}
+.dact{display:flex;gap:10px;padding:16px 20px 0}
+.ebtn{flex:1;padding:13px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:inherit;font-weight:800;font-size:12px;cursor:pointer;transition:transform .12s}
+.ebtn:active{transform:scale(.96)}
+.rbtn2{flex:1;padding:13px;border-radius:14px;border:1px solid rgba(239,143,143,.35);background:rgba(239,143,143,.08);color:var(--up);font-family:inherit;font-weight:800;font-size:12px;cursor:pointer;transition:transform .12s}
+.rbtn2:active{transform:scale(.96)}
+.overlay{position:absolute;inset:0;background:rgba(5,5,8,.62);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .3s;z-index:20}
+.overlay.on{opacity:1;pointer-events:auto}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#12121a;border:1px solid var(--border);border-bottom:0;border-radius:26px 26px 0 0;padding:10px 20px 26px;transform:translateY(105%);transition:transform .4s cubic-bezier(.3,.8,.3,1);z-index:21;max-height:74vh;overflow-y:auto;scrollbar-width:none}
+.sheet::-webkit-scrollbar{display:none}
+.sheet.on{transform:translateY(0)}
+.grab{width:38px;height:4px;border-radius:99px;background:rgba(255,255,255,.14);margin:2px auto 14px}
+.step.hide{display:none}
+.shhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.shtitle{display:flex;align-items:center;gap:9px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.06em;text-transform:uppercase}
+.shtitle i{width:3px;height:14px;background:var(--accent);border-radius:2px}
+.xbtn{width:32px;height:32px;border-radius:11px;border:1px solid var(--border);background:var(--surface);color:var(--dim);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .12s}
+.xbtn:active{transform:scale(.9)}
+.presets{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.preset{display:flex;flex-direction:column;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:12px 4px 10px;cursor:pointer;transition:transform .12s,border-color .2s}
+.preset:active{transform:scale(.93);border-color:rgba(167,139,250,.4)}
+.preset .logo{width:34px;height:34px;border-radius:11px;font-size:17px}
+.preset span{font-size:9px;font-weight:700;color:var(--dim);text-align:center;line-height:1.25}
+.shdiv{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--dim);font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.shdiv::before,.shdiv::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.06)}
+.custombtn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;border:1px dashed rgba(255,255,255,.18);background:transparent;color:var(--dim);font-family:inherit;font-weight:700;font-size:12px;padding:13px;border-radius:16px;cursor:pointer;transition:transform .12s}
+.custombtn:active{transform:scale(.98)}
+.selhead{display:flex;align-items:center;gap:11px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:11px 13px}
+.selhead .logo{width:36px;height:36px;border-radius:12px;font-size:18px;transition:background .2s}
+.selhead b{font-size:14px;font-weight:800;display:block}
+.selhead span{font-size:10px;color:var(--dim);font-weight:600;display:block;margin-top:1px}
+.frow{margin-top:13px}
+.flabel{display:block;font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:7px}
+.finput{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:12px 13px;color:var(--text);font-family:inherit;font-size:13px;font-weight:600;outline:none;transition:border-color .2s}
+.finput:focus{border-color:rgba(167,139,250,.55)}
+input[type="date"]{color-scheme:dark}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.fchip{padding:8px 12px;border-radius:99px;border:1px solid var(--border);background:var(--surface);color:var(--dim);font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s}
+.fchip.on{background:rgba(167,139,250,.14);border-color:rgba(167,139,250,.5);color:var(--accent)}
+.colors{display:flex;gap:9px}
+.cdot{width:30px;height:30px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .12s,border-color .2s}
+.cdot.on{border-color:#fff;transform:scale(1.12)}
+.addbtn{width:100%;margin-top:18px;background:linear-gradient(135deg,var(--accent),var(--accent-deep));color:#0b0b10;font-family:inherit;font-weight:800;font-size:14px;padding:15px;border-radius:16px;border:0;cursor:pointer;transition:transform .12s;box-shadow:0 8px 24px rgba(124,92,240,.4)}
+.addbtn:active{transform:scale(.97)}
+.succ{display:flex;flex-direction:column;align-items:center;text-align:center;padding:22px 0 10px}
+.succ .okc{width:64px;height:64px;border-radius:50%;background:rgba(143,227,176,.12);border:1px solid rgba(143,227,176,.4);color:var(--dn);display:flex;align-items:center;justify-content:center;animation:pop .45s cubic-bezier(.3,1.5,.5,1) both}
+@keyframes pop{from{transform:scale(.4);opacity:0}}
+.succ b{font-size:16px;font-weight:800;margin-top:14px}
+.succ span{font-size:11px;color:var(--dim);font-weight:600;margin-top:5px}
+svg.ic{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="glow"></div>
+
+  <header class="rise">
+    <div class="brand">
+      <div class="avatar">В</div>
+      <div class="hi">
+        <small>Добрый вечер</small>
+        <b>Влад</b>
+      </div>
+    </div>
+    <div class="iconbtn">
+      <svg class="ic" width="19" height="19" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      <span class="dot"></span>
+    </div>
+  </header>
+
+  <div class="card hero rise" style="animation-delay:.06s">
+    <div class="topline">
+      <div class="label"><i></i><span id="hlabel">Расходы · Июль</span></div>
+      <div class="segctl" id="segctl">
+        <span class="pill"></span>
+        <button class="on" data-k="m">Месяц</button>
+        <button data-k="y">Год</button>
+      </div>
+    </div>
+    <div class="sum">
+      <div class="num" id="num" data-v="0">0</div>
+      <div class="per">₽</div>
+    </div>
+    <div class="herorow">
+      <span class="chip">
+        <svg class="ic" width="11" height="11" viewBox="0 0 24 24"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+        <span id="delta">+12% к июню</span>
+      </span>
+      <span class="servs" id="servs">7 активных сервисов</span>
+    </div>
+    <div class="hchart" id="hchart">
+      <svg id="hsvg" width="100%" height="64" viewBox="0 0 350 64" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#a78bfa" stop-opacity=".3"/>
+            <stop offset="1" stop-color="#a78bfa" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <line x1="0" y1="20" x2="350" y2="20" stroke="rgba(255,255,255,.05)" stroke-dasharray="3 5"/>
+        <line x1="0" y1="44" x2="350" y2="44" stroke="rgba(255,255,255,.05)" stroke-dasharray="3 5"/>
+        <path id="harea" fill="url(#sg)"/>
+        <path id="hfc" fill="none" stroke="#7c5cf0" stroke-width="2" stroke-dasharray="4 5" stroke-linecap="round" opacity=".55" style="display:none"/>
+        <path id="hline" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/>
+        <line id="hx" y1="4" y2="64" stroke="rgba(255,255,255,.25)" stroke-dasharray="2 4" style="display:none"/>
+        <circle id="hendO" r="7" fill="#a78bfa" opacity=".18"/>
+        <circle id="hend" r="3" fill="#a78bfa"/>
+        <circle id="hdot" r="4" fill="#a78bfa" style="display:none;filter:drop-shadow(0 0 6px #a78bfa)"/>
+      </svg>
+      <div class="xtip" id="xtip"></div>
+      <div class="range"><span id="rl0">Янв</span><span id="rl1">Июл</span></div>
+    </div>
+    <div class="mprog">
+      <div class="mprow">
+        <span><i class="dot dotA"></i><span id="mpl1">Списано в июле</span> · <b id="mpv1">2 906 ₽</b></span>
+        <span><i class="dot dotB"></i><span id="mpl2">Осталось</span> · <b id="mpv2">1 198 ₽</b></span>
+      </div>
+      <div class="mpbar"><i id="mpfill" style="width:0"></i></div>
+    </div>
+  </div>
+
+  <div class="card rise" style="animation-delay:.12s">
+    <div class="label"><i></i>По категориям</div>
+    <div class="donutwrap" style="margin-top:16px">
+      <div class="donut">
+        <svg width="196" height="196" viewBox="0 0 148 148">
+          <defs>
+            <linearGradient id="dg0" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b49ffb"/><stop offset="1" stop-color="#8f76f2"/></linearGradient>
+            <linearGradient id="dg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8c6df6"/><stop offset="1" stop-color="#6947e6"/></linearGradient>
+            <linearGradient id="dg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6d5cc2"/><stop offset="1" stop-color="#493e8c"/></linearGradient>
+            <linearGradient id="dg3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4c448a"/><stop offset="1" stop-color="#332d5e"/></linearGradient>
+            <linearGradient id="dg4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#352e5c"/><stop offset="1" stop-color="#221e3f"/></linearGradient>
+          </defs>
+          <circle cx="74" cy="74" r="66.5" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="1.6" stroke-dasharray="1.5 8.36"/>
+          <g>
+            <circle cx="74" cy="74" r="54" fill="none" stroke="#1c1c28" stroke-width="17"/>
+            <circle class="seg" data-i="0" style="--gc:#a78bfa" cx="74" cy="74" r="54" fill="none" stroke="url(#dg0)" stroke-width="17" stroke-dasharray="163 400" stroke-dashoffset="0"/>
+            <circle class="seg" data-i="1" style="--gc:#7c5cf0" cx="74" cy="74" r="54" fill="none" stroke="url(#dg1)" stroke-width="17" stroke-dasharray="105.7 400" stroke-dashoffset="-164.6"/>
+            <circle class="seg" data-i="2" style="--gc:#5a4ea6" cx="74" cy="74" r="54" fill="none" stroke="url(#dg2)" stroke-width="17" stroke-dasharray="31.4 400" stroke-dashoffset="-271.8"/>
+            <circle class="seg" data-i="3" style="--gc:#3f3870" cx="74" cy="74" r="54" fill="none" stroke="url(#dg3)" stroke-width="17" stroke-dasharray="20.9 400" stroke-dashoffset="-304.7"/>
+            <circle class="seg" data-i="4" style="--gc:#28254a" cx="74" cy="74" r="54" fill="none" stroke="url(#dg4)" stroke-width="17" stroke-dasharray="10.7 400" stroke-dashoffset="-327.1"/>
+          </g>
+        </svg>
+        <div class="c" id="cc"><span class="cp" id="cp"></span><b id="cv">4&nbsp;104&nbsp;₽</b><span class="cl" id="cl">в месяц</span></div>
+        <div class="mark" id="mark"></div>
+      </div>
+      <div class="lgrid">
+        <div class="lrow" data-i="0"><span class="d" style="background:#a78bfa"></span><span class="nm">Нейросети</span><span class="pc">48%</span><b>1&nbsp;990&nbsp;₽</b></div>
+        <div class="lrow" data-i="1"><span class="d" style="background:#7c5cf0"></span><span class="nm">Видео</span><span class="pc">32%</span><b>1&nbsp;297&nbsp;₽</b></div>
+        <div class="lrow" data-i="2"><span class="d" style="background:#5a4ea6"></span><span class="nm">Другое</span><span class="pc">10%</span><b>399&nbsp;₽</b></div>
+        <div class="lrow" data-i="3"><span class="d" style="background:#3f3870"></span><span class="nm">Музыка</span><span class="pc">7%</span><b>269&nbsp;₽</b></div>
+        <div class="lrow" data-i="4"><span class="d" style="background:#28254a"></span><span class="nm">Облако</span><span class="pc">4%</span><b>149&nbsp;₽</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec rise" style="animation-delay:.18s">
+    <h2><i></i>Ближайшие списания</h2>
+    <span class="more">все
+      <svg class="ic" width="11" height="11" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+    </span>
+  </div>
+  <div class="rail rise" style="animation-delay:.22s">
+    <div class="tcard hot">
+      <div class="date"><span class="badge">завтра</span><b>25</b><span>июл</span></div>
+      <div class="sep"></div>
+      <div class="logo" style="background:#ffd34d;color:#1a1a1a">Я</div>
+      <div><div class="nm">Яндекс Плюс</div><div class="am">399&nbsp;₽</div></div>
+    </div>
+    <div class="tcard">
+      <div class="date"><b style="padding-top:12px">28</b><span>июл</span></div>
+      <div class="sep"></div>
+      <div class="logo" style="background:#e50914"><svg class="bi" viewBox="0 0 24 24"><path d="M5.398 0v.006c3.028 8.556 5.37 15.175 8.348 23.596 2.344.058 4.85.398 4.854.398-2.8-7.924-5.923-16.747-8.487-24zm8.489 0v9.63L18.6 22.951c-.043-7.86-.004-15.913.002-22.95zM5.398 1.05V24c1.873-.225 2.81-.312 4.715-.398v-9.22z"/></svg></div>
+      <div><div class="nm">Netflix</div><div class="am">799&nbsp;₽</div></div>
+    </div>
+    <div class="tcard">
+      <div class="date"><b style="padding-top:12px">01</b><span>авг</span></div>
+      <div class="sep"></div>
+      <div class="logo" style="background:#10a37f"><svg class="bi" viewBox="0 0 24 24"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z"/></svg></div>
+      <div><div class="nm">ChatGPT</div><div class="am">1&nbsp;990&nbsp;₽</div></div>
+    </div>
+    <div class="tcard">
+      <div class="date"><b style="padding-top:12px">03</b><span>авг</span></div>
+      <div class="sep"></div>
+      <div class="logo" style="background:#1db954"><svg class="bi" viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg></div>
+      <div><div class="nm">Spotify</div><div class="am">269&nbsp;₽</div></div>
+    </div>
+    <div class="tcard">
+      <div class="date"><b style="padding-top:12px">10</b><span>авг</span></div>
+      <div class="sep"></div>
+      <div class="logo" style="background:#3a9bf0"><svg class="bi" viewBox="0 0 24 24"><path d="M13.762 4.29a6.51 6.51 0 0 0-5.669 3.332 3.571 3.571 0 0 0-1.558-.36 3.571 3.571 0 0 0-3.516 3A4.918 4.918 0 0 0 0 14.796a4.918 4.918 0 0 0 4.92 4.914 4.93 4.93 0 0 0 .617-.045h14.42c2.305-.272 4.041-2.258 4.043-4.589v-.009a4.594 4.594 0 0 0-3.727-4.508 6.51 6.51 0 0 0-6.511-6.27z"/></svg></div>
+      <div><div class="nm">iCloud</div><div class="am">149&nbsp;₽</div></div>
+    </div>
+  </div>
+
+  <div class="sec rise" style="animation-delay:.26s">
+    <h2><i></i>Мои подписки</h2>
+    <span class="more">все
+      <svg class="ic" width="11" height="11" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+    </span>
+  </div>
+  <div class="grid rise" style="animation-delay:.3s">
+    <div class="sub" data-k="netflix">
+      <div class="top">
+        <div class="logo" style="background:#e50914"><svg class="bi" viewBox="0 0 24 24"><path d="M5.398 0v.006c3.028 8.556 5.37 15.175 8.348 23.596 2.344.058 4.85.398 4.854.398-2.8-7.924-5.923-16.747-8.487-24zm8.489 0v9.63L18.6 22.951c-.043-7.86-.004-15.913.002-22.95zM5.398 1.05V24c1.873-.225 2.81-.312 4.715-.398v-9.22z"/></svg></div>
+        <span class="split"><svg class="ic" width="9" height="9" viewBox="0 0 24 24"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg>2</span>
+      </div>
+      <h3>Netflix</h3>
+      <div class="pr"><b>799&nbsp;₽</b> <span>/ мес</span></div>
+      <div class="dl"><span>28 июля</span><span>через 4 дн</span></div>
+      <div class="bar"><i style="width:87%"></i></div>
+    </div>
+    <div class="sub" data-k="yandex">
+      <div class="top">
+        <div class="logo" style="background:#ffd34d;color:#1a1a1a">Я</div>
+      </div>
+      <h3>Яндекс Плюс</h3>
+      <div class="pr"><b>399&nbsp;₽</b> <span>/ мес</span></div>
+      <div class="dl"><span>25 июля</span><span>завтра</span></div>
+      <div class="bar"><i style="width:97%"></i></div>
+    </div>
+    <div class="sub" data-k="gpt">
+      <div class="top">
+        <div class="logo" style="background:#10a37f"><svg class="bi" viewBox="0 0 24 24"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z"/></svg></div>
+      </div>
+      <h3>ChatGPT Plus</h3>
+      <div class="pr"><b>1&nbsp;990&nbsp;₽</b> <span>/ мес</span></div>
+      <div class="dl"><span>1 авг</span><span>через 8 дн</span></div>
+      <div class="bar"><i style="width:73%"></i></div>
+    </div>
+    <div class="sub" data-k="spotify">
+      <div class="top">
+        <div class="logo" style="background:#1db954"><svg class="bi" viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg></div>
+        <span class="split"><svg class="ic" width="9" height="9" viewBox="0 0 24 24"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg>3</span>
+      </div>
+      <h3>Spotify Family</h3>
+      <div class="pr"><b>269&nbsp;₽</b> <span>/ мес</span></div>
+      <div class="dl"><span>3 авг</span><span>через 10 дн</span></div>
+      <div class="bar"><i style="width:67%"></i></div>
+    </div>
+    <div class="sub" data-k="icloud">
+      <div class="top">
+        <div class="logo" style="background:#3a9bf0"><svg class="bi" viewBox="0 0 24 24"><path d="M13.762 4.29a6.51 6.51 0 0 0-5.669 3.332 3.571 3.571 0 0 0-1.558-.36 3.571 3.571 0 0 0-3.516 3A4.918 4.918 0 0 0 0 14.796a4.918 4.918 0 0 0 4.92 4.914 4.93 4.93 0 0 0 .617-.045h14.42c2.305-.272 4.041-2.258 4.043-4.589v-.009a4.594 4.594 0 0 0-3.727-4.508 6.51 6.51 0 0 0-6.511-6.27z"/></svg></div>
+      </div>
+      <h3>iCloud+</h3>
+      <div class="pr"><b>149&nbsp;₽</b> <span>/ мес</span></div>
+      <div class="dl"><span>10 авг</span><span>через 17 дн</span></div>
+      <div class="bar"><i style="width:43%"></i></div>
+    </div>
+    <div class="sub" data-k="youtube">
+      <div class="top">
+        <div class="logo" style="background:#ff0033"><svg class="bi" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></div>
+      </div>
+      <h3>YouTube Premium</h3>
+      <div class="pr"><b>299&nbsp;₽</b> <span>/ мес</span></div>
+      <div class="dl"><span>15 авг</span><span>через 22 дн</span></div>
+      <div class="bar"><i style="width:27%"></i></div>
+    </div>
+    <div class="sub" data-k="kion">
+      <div class="top">
+        <div class="logo" style="background:#ff5a3c">K</div>
+      </div>
+      <h3>Kion</h3>
+      <div class="pr"><b>199&nbsp;₽</b> <span>/ мес</span></div>
+      <div class="dl"><span>20 авг</span><span>через 27 дн</span></div>
+      <div class="bar"><i style="width:10%"></i></div>
+    </div>
+    <div class="sub add">
+      <div class="plus">
+        <svg class="ic" width="16" height="16" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+      </div>
+      <span>Добавить</span>
+    </div>
+  </div>
+
+  <div class="tabbar rise" style="animation-delay:.36s">
+    <div class="tab on">
+      <svg class="ic" width="20" height="20" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
+      Главная
+      <span class="pip"></span>
+    </div>
+    <a class="tab" href="analytics.html">
+      <svg class="ic" width="20" height="20" viewBox="0 0 24 24"><line x1="6" y1="20" x2="6" y2="14"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="18" y1="20" x2="18" y2="4"/></svg>
+      Аналитика
+    </a>
+    <div class="fab" id="fabMain">
+      <svg class="ic" width="24" height="24" viewBox="0 0 24 24" style="stroke-width:2.2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+    </div>
+    <a class="tab" href="friends.html">
+      <svg class="ic" width="20" height="20" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Друзья
+    </a>
+    <a class="tab" href="profile.html">
+      <svg class="ic" width="20" height="20" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Профиль
+    </a>
+  </div>
+
+  <div class="detail" id="detail">
+    <div class="dglow" id="dglow"></div>
+    <div class="dhead drise">
+      <div class="xbtn" id="dback"><svg class="ic" width="15" height="15" viewBox="0 0 24 24"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></div>
+      <span class="lbl">Подписка</span>
+      <div class="xbtn"><svg class="ic" width="14" height="14" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></div>
+    </div>
+    <div class="dlogo drise" id="dlogo" style="background:#e50914">N</div>
+    <div class="dname drise" id="dname">Netflix</div>
+    <div class="dprice drise" id="dprice">799 ₽ / мес</div>
+    <div class="dchips drise">
+      <span class="dchip2 ok"><i></i>активна</span>
+      <span class="dchip2" id="dnext"><i></i>28 июля · через 4 дня</span>
+    </div>
+    <div class="dgrid drise">
+      <div class="dstat"><div class="sl">В год</div><div class="sv"><span id="dyear">9 588</span> ₽</div></div>
+      <div class="dstat"><div class="sl">Категория</div><div class="sv" id="dcat" style="font-size:19px;padding-top:2px">Видео</div></div>
+    </div>
+    <div class="dcard drise" id="dsplit"></div>
+    <div class="dcard drise">
+      <div class="label"><i></i>История платежей</div>
+      <div id="dhist" style="margin-top:6px"></div>
+    </div>
+    <div class="dcard drise">
+      <div class="setrow"><div>Напоминать о списании<small>за день, в Telegram</small></div><div class="sw on" id="sw1"></div></div>
+    </div>
+    <div class="dact drise">
+      <button class="ebtn">Редактировать</button>
+      <button class="rbtn2">Удалить</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay"></div>
+  <div class="sheet" id="sheet">
+    <div class="grab"></div>
+    <div class="step" id="st1">
+      <div class="shhead">
+        <div class="shtitle"><i></i>Новая подписка</div>
+        <div class="xbtn" id="shx1"><svg class="ic" width="14" height="14" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
+      </div>
+      <div class="presets">
+        <div class="preset" data-k="netflix"><div class="logo" style="background:#e50914"><svg class="bi" viewBox="0 0 24 24"><path d="M5.398 0v.006c3.028 8.556 5.37 15.175 8.348 23.596 2.344.058 4.85.398 4.854.398-2.8-7.924-5.923-16.747-8.487-24zm8.489 0v9.63L18.6 22.951c-.043-7.86-.004-15.913.002-22.95zM5.398 1.05V24c1.873-.225 2.81-.312 4.715-.398v-9.22z"/></svg></div><span>Netflix</span></div>
+        <div class="preset" data-k="spotify"><div class="logo" style="background:#1db954"><svg class="bi" viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg></div><span>Spotify</span></div>
+        <div class="preset" data-k="yandex"><div class="logo" style="background:#ffd34d;color:#1a1a1a">Я</div><span>Яндекс Плюс</span></div>
+        <div class="preset" data-k="kino"><div class="logo" style="background:#ff7a00">К</div><span>Кинопоиск</span></div>
+        <div class="preset" data-k="icloud"><div class="logo" style="background:#3a9bf0"><svg class="bi" viewBox="0 0 24 24"><path d="M13.762 4.29a6.51 6.51 0 0 0-5.669 3.332 3.571 3.571 0 0 0-1.558-.36 3.571 3.571 0 0 0-3.516 3A4.918 4.918 0 0 0 0 14.796a4.918 4.918 0 0 0 4.92 4.914 4.93 4.93 0 0 0 .617-.045h14.42c2.305-.272 4.041-2.258 4.043-4.589v-.009a4.594 4.594 0 0 0-3.727-4.508 6.51 6.51 0 0 0-6.511-6.27z"/></svg></div><span>iCloud+</span></div>
+        <div class="preset" data-k="youtube"><div class="logo" style="background:#ff0033"><svg class="bi" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></div><span>YouTube</span></div>
+        <div class="preset" data-k="gpt"><div class="logo" style="background:#10a37f"><svg class="bi" viewBox="0 0 24 24"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z"/></svg></div><span>ChatGPT</span></div>
+        <div class="preset" data-k="kion"><div class="logo" style="background:#ff5a3c">K</div><span>Kion</span></div>
+      </div>
+      <div class="shdiv">или</div>
+      <button class="custombtn" id="custombtn">
+        <svg class="ic" width="14" height="14" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        Своя подписка
+      </button>
+    </div>
+    <div class="step hide" id="st2">
+      <div class="shhead">
+        <div class="xbtn" id="shback"><svg class="ic" width="14" height="14" viewBox="0 0 24 24"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></div>
+        <div class="shtitle"><i></i>Добавить</div>
+        <div class="xbtn" id="shx2"><svg class="ic" width="14" height="14" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
+      </div>
+      <div class="selhead">
+        <div class="logo" id="shlogo" style="background:#e50914"><svg class="bi" viewBox="0 0 24 24"><path d="M5.398 0v.006c3.028 8.556 5.37 15.175 8.348 23.596 2.344.058 4.85.398 4.854.398-2.8-7.924-5.923-16.747-8.487-24zm8.489 0v9.63L18.6 22.951c-.043-7.86-.004-15.913.002-22.95zM5.398 1.05V24c1.873-.225 2.81-.312 4.715-.398v-9.22z"/></svg></div>
+        <div style="flex:1;min-width:0"><b id="shname">Netflix</b><span id="shsub">799 ₽/мес · видео</span></div>
+      </div>
+      <div class="frow"><span class="flabel">Название</span><input class="finput" id="fname" value="Netflix"></div>
+      <div class="frow"><span class="flabel">Сумма · ₽/мес</span><input class="finput" id="fprice" type="number" value="799"></div>
+      <div class="frow"><span class="flabel">Следующее списание</span><input class="finput" id="fdate" type="date" value="2026-07-28"></div>
+      <div class="frow"><span class="flabel">Цикл</span><div class="chips" id="fcycle"><button class="fchip on">Месяц</button><button class="fchip">Год</button></div></div>
+      <div class="frow"><span class="flabel">Категория</span><div class="chips" id="fcat"><button class="fchip on">Видео</button><button class="fchip">Музыка</button><button class="fchip">Облако</button><button class="fchip">Нейросети</button><button class="fchip">Другое</button></div></div>
+      <div class="frow"><span class="flabel">Цвет карточки</span><div class="colors" id="fcol">
+        <div class="cdot" data-c="#e50914" style="background:#e50914"></div>
+        <div class="cdot" data-c="#ff7a00" style="background:#ff7a00"></div>
+        <div class="cdot" data-c="#ffd34d" style="background:#ffd34d"></div>
+        <div class="cdot" data-c="#1db954" style="background:#1db954"></div>
+        <div class="cdot" data-c="#3a9bf0" style="background:#3a9bf0"></div>
+        <div class="cdot" data-c="#a78bfa" style="background:#a78bfa"></div>
+      </div></div>
+      <button class="addbtn" id="fadd">Добавить подписку</button>
+    </div>
+    <div class="step hide" id="st3">
+      <div class="succ">
+        <div class="okc"><svg class="ic" width="28" height="28" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
+        <b id="sucname">Netflix добавлен</b>
+        <span id="sucsub">799 ₽/мес · появится на дашборде</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const numEl=document.getElementById('num'),deltaEl=document.getElementById('delta'),servEl=document.getElementById('servs');
+const DATA={
+ m:{v:4104,d:'+12% к июню',s:'7 активных сервисов',l1:'Списано в июле',p1:'2 906 ₽',l2:'Осталось',p2:'1 198 ₽',w:71},
+ y:{v:49248,d:'+9% к 2025',s:'в среднем 4 104 ₽ / мес',l1:'Списано в 2026',p1:'18 732 ₽',l2:'До конца года',p2:'30 516 ₽',w:38}};
+let mode='m';
+const MD=[2114,2114,2313,2313,2114,3660,4104],ML=['Я','Ф','М','А','М','И','И'],MN=['Янв','Фев','Мар','Апр','Май','Июн','Июл'];
+const YD=[2114,2114,2313,2313,2114,3660,4104,4104,4104,4104,4104,4104],YL=['Я','Ф','М','А','М','И','И','А','С','О','Н','Д'],YN=['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+let CD=MD,CN=MN,CL=ML,FC=-1,PTS=[];
+const harea=document.getElementById('harea'),hline=document.getElementById('hline'),hfc=document.getElementById('hfc'),hx=document.getElementById('hx'),hdot=document.getElementById('hdot'),hend=document.getElementById('hend'),hendO=document.getElementById('hendO'),xtip=document.getElementById('xtip'),hchart=document.getElementById('hchart');
+function smooth(p){let d='M'+p[0][0]+' '+p[0][1];
+ for(let i=0;i<p.length-1;i++){const p0=p[Math.max(0,i-1)],p1=p[i],p2=p[i+1],p3=p[Math.min(p.length-1,i+2)];
+ const c1x=p1[0]+(p2[0]-p0[0])/6,c1y=p1[1]+(p2[1]-p0[1])/6;
+ const c2x=p2[0]-(p3[0]-p1[0])/6,c2y=p2[1]-(p3[1]-p1[1])/6;
+ d+='C'+c1x.toFixed(1)+' '+c1y.toFixed(1)+' '+c2x.toFixed(1)+' '+c2y.toFixed(1)+' '+p2[0]+' '+p2[1]}
+ return d}
+function buildChart(m){
+ CD=m==='m'?MD:YD;CN=m==='m'?MN:YN;CL=m==='m'?ML:YL;FC=m==='m'?-1:6;
+ const n=CD.length,min=Math.min(...CD),max=Math.max(...CD);
+ PTS=CD.map((v,i)=>[+(i*(350/(n-1))).toFixed(1),+(8+(1-(v-min)/(max-min||1))*48).toFixed(1)]);
+ const solid=FC<0?PTS:PTS.slice(0,FC+1);
+ hline.setAttribute('d',smooth(solid));
+ harea.setAttribute('d',smooth(solid)+'L'+solid[solid.length-1][0]+' 64L0 64Z');
+ if(FC>=0){hfc.setAttribute('d',smooth(PTS.slice(FC)));hfc.style.display=''}else hfc.style.display='none';
+ const last=solid[solid.length-1];
+ hend.setAttribute('cx',last[0]);hend.setAttribute('cy',last[1]);
+ hendO.setAttribute('cx',last[0]);hendO.setAttribute('cy',last[1]);
+ document.getElementById('rl0').textContent=CN[0];
+ document.getElementById('rl1').textContent=CN[n-1]+(FC>=0?' · прогноз':'')}
+function showP(i){const p=PTS[i];if(!p)return;
+ hx.setAttribute('x1',p[0]);hx.setAttribute('x2',p[0]);hx.style.display='';
+ hdot.setAttribute('cx',p[0]);hdot.setAttribute('cy',p[1]);hdot.style.display='';
+ let t=CN[i]+' · '+CD[i].toLocaleString('ru-RU')+' ₽';
+ if(FC>=0&&i>FC)t+=' · прогноз';
+ xtip.textContent=t;xtip.classList.add('on');
+ const w=hchart.clientWidth,px=p[0]/350*w;
+ xtip.style.left=Math.max(52,Math.min(w-52,px))+'px'}
+function hideP(){hx.style.display='none';hdot.style.display='none';xtip.classList.remove('on')}
+function pIdx(e){const r=hchart.getBoundingClientRect();
+ return Math.max(0,Math.min(CD.length-1,Math.round((e.clientX-r.left)/r.width*(CD.length-1))))}
+hchart.addEventListener('pointerdown',e=>{hchart.setPointerCapture(e.pointerId);showP(pIdx(e))});
+hchart.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'||e.buttons)showP(pIdx(e))});
+hchart.addEventListener('pointerup',hideP);
+hchart.addEventListener('pointercancel',hideP);
+hchart.addEventListener('pointerleave',hideP);
+buildChart('m');
+function tween(to){const from=+numEl.dataset.v||0,t0=performance.now(),dur=650;
+ const step=t=>{const k=Math.min((t-t0)/dur,1),e=1-Math.pow(1-k,3);
+ numEl.textContent=Math.round(from+(to-from)*e).toLocaleString('ru-RU');
+ if(k<1)requestAnimationFrame(step);else numEl.dataset.v=to};
+ requestAnimationFrame(step)}
+const ctl=document.getElementById('segctl'),hlabel=document.getElementById('hlabel');
+const mpl1=document.getElementById('mpl1'),mpv1=document.getElementById('mpv1'),mpl2=document.getElementById('mpl2'),mpv2=document.getElementById('mpv2'),mpfill=document.getElementById('mpfill');
+ctl.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+ if(b.dataset.k===mode)return;mode=b.dataset.k;
+ ctl.classList.toggle('y',mode==='y');
+ ctl.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+ const d=DATA[mode];tween(d.v);deltaEl.textContent=d.d;servEl.textContent=d.s;
+ hlabel.textContent=mode==='m'?'Расходы · Июль':'Расходы · 2026';
+ mpl1.textContent=d.l1;mpv1.textContent=d.p1;mpl2.textContent=d.l2;mpv2.textContent=d.p2;
+ mpfill.style.width=d.w+'%';hideP();buildChart(mode)}));
+const CATS=[{n:'Нейросети',a:1990,p:'48%'},{n:'Видео',a:1297,p:'32%'},{n:'Другое',a:399,p:'10%'},{n:'Музыка',a:269,p:'7%'},{n:'Облако',a:149,p:'4%'}];
+const segs=document.querySelectorAll('.seg'),rows=document.querySelectorAll('.lrow');
+const cc=document.getElementById('cc'),cv=document.getElementById('cv'),cl=document.getElementById('cl'),cp=document.getElementById('cp');
+let act=-1,cval=4104;
+const FR=[.485,.316,.097,.066,.036],GC=['#a78bfa','#7c5cf0','#5a4ea6','#3f3870','#28254a'];
+const mark=document.getElementById('mark');
+function ctween(to){const from=cval,t0=performance.now(),dur=500;
+ const step=t=>{const k=Math.min((t-t0)/dur,1),e=1-Math.pow(1-k,3);
+ cv.textContent=Math.round(from+(to-from)*e).toLocaleString('ru-RU')+' ₽';
+ if(k<1)requestAnimationFrame(step);else cval=to};requestAnimationFrame(step)}
+function midAngle(i){let s=0;for(let k=0;k<i;k++)s+=FR[k]*2*Math.PI;return s+FR[i]*Math.PI}
+function pick(i){act=(act===i)?-1:i;
+ segs.forEach((s,j)=>{s.classList.toggle('dim',act>-1&&j!==act);s.classList.toggle('big',j===act)});
+ rows.forEach((r,j)=>r.classList.toggle('on',j===act));
+ if(act<0){ctween(4104);cl.textContent='в месяц';cp.textContent='';mark.classList.remove('on')}
+ else{const c=CATS[act];ctween(c.a);cl.textContent=c.n;cp.textContent=c.p+' расходов';
+  const a=midAngle(act);
+  mark.style.left=(98+71.5*Math.sin(a))+'px';
+  mark.style.top=(98-71.5*Math.cos(a))+'px';
+  mark.style.background=GC[act];
+  mark.style.boxShadow='0 0 0 4px '+GC[act]+'33,0 0 12px '+GC[act];
+  mark.classList.add('on')}
+ cc.classList.remove('swap');void cc.offsetWidth;cc.classList.add('swap')}
+rows.forEach((r,i)=>r.addEventListener('click',()=>pick(i)));
+segs.forEach((s,i)=>s.addEventListener('click',()=>pick(i)));
+window.addEventListener('load',()=>{
+ setTimeout(()=>tween(4104),250);
+ setTimeout(()=>{mpfill.style.width='71%'},450);
+ segs.forEach((s,i)=>{const d=s.getAttribute('stroke-dasharray');
+  s.style.strokeDasharray='0 400';
+  setTimeout(()=>{s.style.strokeDasharray=d},200+i*130)})});
+const overlay=document.getElementById('overlay'),sheet=document.getElementById('sheet');
+const st1=document.getElementById('st1'),st2=document.getElementById('st2'),st3=document.getElementById('st3');
+const shlogo=document.getElementById('shlogo'),shname=document.getElementById('shname'),shsub=document.getElementById('shsub');
+const fname=document.getElementById('fname'),fprice=document.getElementById('fprice');
+let curColor='#e50914';
+function openSheet(){overlay.classList.add('on');sheet.classList.add('on')}
+function closeSheet(){overlay.classList.remove('on');sheet.classList.remove('on');
+ setTimeout(()=>{st2.classList.add('hide');st3.classList.add('hide');st1.classList.remove('hide')},420)}
+document.getElementById('fabMain').addEventListener('click',openSheet);
+overlay.addEventListener('click',closeSheet);
+document.getElementById('shx1').addEventListener('click',closeSheet);
+document.getElementById('shx2').addEventListener('click',closeSheet);
+document.getElementById('shback').addEventListener('click',()=>{st2.classList.add('hide');st1.classList.remove('hide')});
+const ICONS={netflix:'<svg class="bi" viewBox="0 0 24 24"><path d="M5.398 0v.006c3.028 8.556 5.37 15.175 8.348 23.596 2.344.058 4.85.398 4.854.398-2.8-7.924-5.923-16.747-8.487-24zm8.489 0v9.63L18.6 22.951c-.043-7.86-.004-15.913.002-22.95zM5.398 1.05V24c1.873-.225 2.81-.312 4.715-.398v-9.22z"/></svg>',spotify:'<svg class="bi" viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>',icloud:'<svg class="bi" viewBox="0 0 24 24"><path d="M13.762 4.29a6.51 6.51 0 0 0-5.669 3.332 3.571 3.571 0 0 0-1.558-.36 3.571 3.571 0 0 0-3.516 3A4.918 4.918 0 0 0 0 14.796a4.918 4.918 0 0 0 4.92 4.914 4.93 4.93 0 0 0 .617-.045h14.42c2.305-.272 4.041-2.258 4.043-4.589v-.009a4.594 4.594 0 0 0-3.727-4.508 6.51 6.51 0 0 0-6.511-6.27z"/></svg>',youtube:'<svg class="bi" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>',openai:'<svg class="bi" viewBox="0 0 24 24"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z"/></svg>'};
+const PRESETS={netflix:{n:'Netflix',p:799,c:'#e50914',icon:'netflix',cat:'Видео'},spotify:{n:'Spotify',p:269,c:'#1db954',icon:'spotify',cat:'Музыка'},yandex:{n:'Яндекс Плюс',p:399,c:'#ffd34d',cat:'Другое',dark:1},kino:{n:'Кинопоиск',p:299,c:'#ff7a00',cat:'Видео'},icloud:{n:'iCloud+',p:149,c:'#3a9bf0',icon:'icloud',cat:'Облако'},youtube:{n:'YouTube Premium',p:299,c:'#ff0033',icon:'youtube',cat:'Видео'},gpt:{n:'ChatGPT Plus',p:1990,c:'#10a37f',icon:'openai',cat:'Нейросети'},kion:{n:'Kion',p:199,c:'#ff5a3c',cat:'Видео'}};
+function syncSub(){const cat=document.querySelector('#fcat .fchip.on');
+ shsub.textContent=(fprice.value?fprice.value+' ₽/мес':'—')+(cat?' · '+cat.textContent.toLowerCase():'')}
+function fillForm(d){
+ fname.value=d?d.n:'';fprice.value=d?d.p:'';
+ curColor=d?d.c:'#a78bfa';
+ shlogo.innerHTML=(d&&d.icon&&ICONS[d.icon])?ICONS[d.icon]:'<span>'+(d?d.n[0]:'+')+'</span>';
+ shlogo.style.background=curColor;
+ shlogo.style.color=(d&&d.dark)?'#1a1a1a':'#fff';
+ shname.textContent=d?d.n:'Своя подписка';
+ document.querySelectorAll('#fcat .fchip').forEach(c=>c.classList.toggle('on',c.textContent===(d?d.cat:'Другое')));
+ document.querySelectorAll('#fcol .cdot').forEach(c=>c.classList.toggle('on',c.dataset.c===curColor));
+ syncSub()}
+document.querySelectorAll('.preset').forEach(p=>p.addEventListener('click',()=>{
+ fillForm(PRESETS[p.dataset.k]);st1.classList.add('hide');st2.classList.remove('hide')}));
+document.getElementById('custombtn').addEventListener('click',()=>{
+ fillForm(null);st1.classList.add('hide');st2.classList.remove('hide')});
+fname.addEventListener('input',()=>{shname.textContent=fname.value||'Своя подписка';
+ const sp=shlogo.querySelector('span');if(sp)sp.textContent=(fname.value||'+')[0].toUpperCase()});
+fprice.addEventListener('input',syncSub);
+document.getElementById('fcycle').addEventListener('click',e=>{const b=e.target.closest('.fchip');if(!b)return;
+ document.querySelectorAll('#fcycle .fchip').forEach(x=>x.classList.toggle('on',x===b))});
+document.getElementById('fcat').addEventListener('click',e=>{const b=e.target.closest('.fchip');if(!b)return;
+ document.querySelectorAll('#fcat .fchip').forEach(x=>x.classList.toggle('on',x===b));syncSub()});
+document.getElementById('fcol').addEventListener('click',e=>{const d=e.target.closest('.cdot');if(!d)return;
+ document.querySelectorAll('#fcol .cdot').forEach(x=>x.classList.toggle('on',x===d));
+ curColor=d.dataset.c;shlogo.style.background=curColor;
+ shlogo.style.color=curColor==='#ffd34d'?'#1a1a1a':'#fff'});
+document.getElementById('fadd').addEventListener('click',()=>{
+ document.getElementById('sucname').textContent=(fname.value||'Подписка')+' добавлен';
+ document.getElementById('sucsub').textContent=(fprice.value||'0')+' ₽/мес · появится на дашборде';
+ st2.classList.add('hide');st3.classList.remove('hide');
+ setTimeout(closeSheet,1600)});
+if(location.search.indexOf('add=1')>-1)setTimeout(openSheet,800);
+const detail=document.getElementById('detail'),dglow=document.getElementById('dglow');
+const checkSvg='<svg class="ic" width="11" height="11" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>';
+const usersSvg='<svg class="ic" width="22" height="22" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+const lockSvg='<svg class="ic" width="11" height="11" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+const SUBS={
+ netflix:{n:'Netflix',p:799,c:'#e50914',l:'N',icon:'netflix',cat:'Видео',next:'28 июля',left:'через 4 дня',hist:['28 июня','28 мая','28 апреля'],split:[{n:'Костя',u:'@kostya',s:266,p:0},{n:'Егор',u:'@egor',s:266,p:1}]},
+ spotify:{n:'Spotify Family',p:269,c:'#1db954',l:'S',icon:'spotify',cat:'Музыка',next:'3 авг',left:'через 10 дн',hist:['3 июля','3 июня','3 мая'],split:[{n:'Даня',u:'@danya',s:90,p:0},{n:'Миша',u:'@misha',s:90,p:1},{n:'Лера',u:'@lera',s:89,p:1}]},
+ yandex:{n:'Яндекс Плюс',p:399,c:'#ffd34d',l:'Я',cat:'Другое',next:'25 июля',left:'завтра',hist:['25 июня','25 мая','25 апреля'],dark:1},
+ gpt:{n:'ChatGPT Plus',p:1990,c:'#10a37f',l:'C',icon:'openai',cat:'Нейросети',next:'1 авг',left:'через 8 дн',hist:['1 июля','1 июня','1 мая']},
+ icloud:{n:'iCloud+',p:149,c:'#3a9bf0',l:'i',icon:'icloud',cat:'Облако',next:'10 авг',left:'через 17 дн',hist:['10 июля','10 июня','10 мая']},
+ youtube:{n:'YouTube Premium',p:299,c:'#ff0033',l:'Y',icon:'youtube',cat:'Видео',next:'15 авг',left:'через 22 дн',hist:['15 июля','15 июня','15 мая']},
+ kion:{n:'Kion',p:199,c:'#ff5a3c',l:'K',cat:'Видео',next:'20 авг',left:'через 27 дн',hist:['20 июля','20 июня','20 мая']}};
+const AVG=['linear-gradient(135deg,#8c6df6,#6947e6)','linear-gradient(135deg,#6d5cc2,#493e8c)','linear-gradient(135deg,#b49ffb,#8f76f2)'];
+function renderSplit(s){const box=document.getElementById('dsplit');
+ if(!s.split){box.innerHTML='<div class="ctaico">'+usersSvg+'</div><div class="dcta-t">Разделить оплату</div><div class="dcta-s">Добавь друзей по @username — каждый платит свою долю, бот сам напомнит о переводе за день до списания.</div><button class="dcta-b">Настроить split</button><div class="dlock">'+lockSvg+'нужна привязка Telegram</div>';return}
+ const share=s.p-s.split.reduce((a,x)=>a+x.s,0);
+ box.innerHTML='<div class="dsplit-head"><div class="label"><i></i>Split</div><span class="dcnt">'+s.split.length+' чел</span></div>'
+ +s.split.map((x,i)=>'<div class="drow"><div class="dav" style="background:'+AVG[i%AVG.length]+'">'+x.n[0]+'</div><div class="dnm">'+x.n+'<small>'+x.u+'</small></div><div class="dam">'+x.s+' ₽<br><span class="st '+(x.p?'o':'p')+'">'+(x.p?'оплатил':'ждём')+'</span></div></div>').join('')
+ +'<div class="dfoot"><span class="t">Твоя доля</span><b>'+share+' ₽/мес</b></div>'}
+function openDetail(k){const s=SUBS[k];if(!s)return;
+ const dlogo=document.getElementById('dlogo');
+ dlogo.innerHTML=(s.icon&&ICONS[s.icon])?ICONS[s.icon]:'<span>'+s.l+'</span>';dlogo.style.background=s.c;dlogo.style.color=s.dark?'#1a1a1a':'#fff';
+ dglow.style.setProperty('--bc',s.c);
+ document.getElementById('dname').textContent=s.n;
+ document.getElementById('dprice').textContent=s.p.toLocaleString('ru-RU')+' ₽ / мес';
+ document.getElementById('dnext').innerHTML='<i></i>'+s.next+' · '+s.left;
+ document.getElementById('dyear').textContent=(s.p*12).toLocaleString('ru-RU');
+ document.getElementById('dcat').textContent=s.cat;
+ renderSplit(s);
+ document.getElementById('dhist').innerHTML=s.hist.map(h=>'<div class="hrow"><span class="hd">'+h+'</span><b>'+checkSvg+s.p.toLocaleString('ru-RU')+' ₽</b></div>').join('');
+ detail.classList.add('on');
+ detail.scrollTop=0;
+ detail.querySelectorAll('.drise').forEach((el,i)=>{el.style.animation='none';void el.offsetWidth;el.style.animation='rise .5s cubic-bezier(.2,.7,.3,1) '+(i*0.045)+'s both'})}
+document.querySelectorAll('.sub[data-k]').forEach(c=>c.addEventListener('click',()=>openDetail(c.dataset.k)));
+document.querySelector('.sub.add').addEventListener('click',openSheet);
+document.getElementById('dback').addEventListener('click',()=>detail.classList.remove('on'));
+document.getElementById('sw1').addEventListener('click',function(){this.classList.toggle('on')});
+</script>
+</body>
+</html>

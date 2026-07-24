@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b0b10">
+<title>SubManager — Аналитика · Концепт</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0b10;
+  --surface:#14141d;
+  --surface2:#1c1c28;
+  --border:rgba(255,255,255,.07);
+  --accent:#a78bfa;
+  --accent-deep:#7c5cf0;
+  --text:#f4f4f7;
+  --dim:#8f8fa0;
+  --up:#ef8f8f;
+  --dn:#8fe3b0;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(167,139,250,.3)}
+body{background:#060608;font-family:'Manrope',sans-serif;color:var(--text);-webkit-font-smoothing:antialiased}
+.app{max-width:390px;margin:0 auto;background:var(--bg);position:relative;overflow:hidden;border-left:1px solid rgba(255,255,255,.04);border-right:1px solid rgba(255,255,255,.04);padding-bottom:112px}
+.glow{position:absolute;top:-150px;left:50%;transform:translateX(-50%);width:480px;height:340px;background:radial-gradient(closest-side,rgba(124,92,240,.26),transparent 72%);pointer-events:none}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.rise{opacity:0;animation:rise .6s cubic-bezier(.2,.7,.3,1) forwards}
+header{position:relative;display:flex;align-items:center;justify-content:space-between;padding:22px 20px 6px}
+.brand{display:flex;align-items:center;gap:11px}
+.avatar{width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,var(--accent),var(--accent-deep));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:19px;color:#0b0b10}
+.hi small{display:block;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);font-weight:700}
+.hi b{font-size:14px;font-weight:800}
+.iconbtn{width:38px;height:38px;border-radius:13px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;color:var(--dim);position:relative}
+.iconbtn .dot{position:absolute;top:8px;right:9px;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.label{display:flex;align-items:center;gap:8px;font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+.label i{width:3px;height:12px;background:var(--accent);border-radius:2px}
+.card{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:18px;margin:16px 20px 0}
+.title{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:.05em;text-transform:uppercase;padding:16px 20px 0;line-height:1}
+.monthnav{display:flex;align-items:center;justify-content:center;gap:10px;padding:16px 20px 0}
+.mbtn{width:32px;height:32px;border-radius:11px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;color:var(--dim);cursor:pointer;transition:opacity .2s,transform .12s}
+.mbtn:active{transform:scale(.9)}
+.mbtn.dis{opacity:.25;pointer-events:none}
+.mtitle{font-size:14px;font-weight:800;min-width:120px;text-align:center}
+.charthead{display:flex;align-items:flex-end;justify-content:space-between;margin-top:12px}
+.bignum{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.02em;line-height:1}
+.dchip{font-size:10px;font-weight:800;padding:4px 8px;border-radius:99px}
+.dchip.up{color:var(--up);border:1px solid rgba(239,143,143,.28);background:rgba(239,143,143,.08)}
+.dchip.dn{color:var(--dn);border:1px solid rgba(143,227,176,.25);background:rgba(143,227,176,.08)}
+.bars{display:flex;align-items:flex-end;gap:8px;height:132px;margin-top:10px}
+.bcol{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;gap:5px;min-width:0}
+.bval{font-size:9px;font-weight:800;opacity:0;transition:opacity .25s;height:12px;white-space:nowrap}
+.bcol.on .bval{opacity:1}
+.bwrap{flex:1;width:100%;display:flex;align-items:flex-end}
+.bar{width:100%;border-radius:6px 6px 3px 3px;background:rgba(167,139,250,.16);cursor:pointer;transition:background .25s;transform-origin:bottom;animation:grow .7s cubic-bezier(.2,.7,.3,1) both;animation-delay:calc(var(--i)*55ms)}
+@keyframes grow{from{transform:scaleY(0)}}
+.bar:hover{background:rgba(167,139,250,.3)}
+.bcol.on .bar{background:linear-gradient(180deg,var(--accent),var(--accent-deep));box-shadow:0 4px 16px rgba(124,92,240,.45)}
+.bl{font-size:9px;font-weight:700;color:var(--dim)}
+.bcol.on .bl{color:var(--accent)}
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:2px 20px 0}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:15px}
+.stat .sl{font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.stat .sv{font-family:'Bebas Neue',sans-serif;font-size:27px;margin-top:6px;letter-spacing:.02em}
+.stat .sv span{font-size:13px;color:var(--dim);font-family:'Manrope',sans-serif;font-weight:600}
+.stat.wide{grid-column:span 2;background:linear-gradient(135deg,rgba(167,139,250,.14),var(--surface) 60%);border-color:rgba(167,139,250,.3);display:flex;align-items:center;justify-content:space-between}
+.stat.wide .sv{margin-top:4px}
+.sicon{width:40px;height:40px;border-radius:13px;background:rgba(167,139,250,.14);border:1px solid rgba(167,139,250,.3);display:flex;align-items:center;justify-content:center;color:var(--accent);flex:0 0 auto}
+.catrow{margin-top:14px}
+.catrow:first-of-type{margin-top:4px}
+.catrow .cr{display:flex;justify-content:space-between;font-size:12px;font-weight:600}
+.catrow .cr b{font-weight:800}
+.catrow .cr span{color:var(--dim);font-size:11px;font-weight:600}
+.cbar{height:6px;border-radius:99px;background:rgba(255,255,255,.05);margin-top:7px;overflow:hidden}
+.cbar i{display:block;height:100%;border-radius:99px;width:0;transition:width 1s cubic-bezier(.2,.7,.3,1)}
+.toprow{display:flex;align-items:center;gap:11px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.toprow:last-child{border-bottom:0;padding-bottom:2px}
+.rk{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--dim);width:18px}
+.logo{width:32px;height:32px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#fff;flex:0 0 auto}
+.tn{flex:1;font-size:13px;font-weight:700;min-width:0}
+.tn small{display:block;font-size:10px;color:var(--dim);font-weight:600;margin-top:1px}
+.ta{font-size:13px;font-weight:800;text-align:right}
+.ta small{display:block;font-size:10px;color:var(--dim);font-weight:600;margin-top:1px}
+.insight{background:linear-gradient(135deg,rgba(167,139,250,.12),var(--surface) 55%);border:1px solid rgba(167,139,250,.32);border-radius:20px;padding:18px;margin:16px 20px 0;position:relative;overflow:hidden}
+.insight .it{font-size:14px;font-weight:800;margin-top:12px;line-height:1.45}
+.insight .is{font-size:11px;color:var(--dim);margin-top:6px;line-height:1.6}
+.tabbar{position:absolute;left:14px;right:14px;bottom:16px;background:rgba(20,20,29,.92);backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:24px;display:flex;align-items:flex-end;justify-content:space-around;padding:10px 10px 12px}
+.tab{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--dim);font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;width:56px;cursor:pointer}
+.tab.on{color:var(--accent)}
+.tab .pip{width:4px;height:4px;border-radius:50%;background:currentColor}
+a.tab{text-decoration:none}
+.fab{width:52px;height:52px;border-radius:18px;background:linear-gradient(135deg,var(--accent),var(--accent-deep));display:flex;align-items:center;justify-content:center;color:#0b0b10;box-shadow:0 10px 26px rgba(124,92,240,.5);margin-top:-30px;border:4px solid var(--bg);flex:0 0 auto;cursor:pointer;transition:transform .15s}
+.fab:active{transform:scale(.92)}
+svg.ic{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="glow"></div>
+
+  <header class="rise">
+    <div class="brand">
+      <div class="avatar">В</div>
+      <div class="hi">
+        <small>SubManager</small>
+        <b>Влад</b>
+      </div>
+    </div>
+    <div class="iconbtn">
+      <svg class="ic" width="19" height="19" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      <span class="dot"></span>
+    </div>
+  </header>
+
+  <div class="title rise" style="animation-delay:.05s">Аналитика</div>
+
+  <div class="monthnav rise" style="animation-delay:.1s">
+    <div class="mbtn" id="prev">
+      <svg class="ic" width="15" height="15" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+    </div>
+    <div class="mtitle" id="mtitle">Июль 2026</div>
+    <div class="mbtn dis" id="next">
+      <svg class="ic" width="15" height="15" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+    </div>
+  </div>
+
+  <div class="card rise" style="animation-delay:.14s">
+    <div class="label"><i></i>Динамика расходов</div>
+    <div class="charthead">
+      <div class="bignum" id="anum" data-v="4104">4 104 ₽</div>
+      <span class="dchip up" id="adelta">+12% vs июн</span>
+    </div>
+    <div class="bars" id="bars">
+      <div class="bcol"><span class="bval">2 114</span><div class="bwrap"><div class="bar" style="height:52%;--i:0"></div></div><span class="bl">ЯНВ</span></div>
+      <div class="bcol"><span class="bval">2 114</span><div class="bwrap"><div class="bar" style="height:52%;--i:1"></div></div><span class="bl">ФЕВ</span></div>
+      <div class="bcol"><span class="bval">2 313</span><div class="bwrap"><div class="bar" style="height:56%;--i:2"></div></div><span class="bl">МАР</span></div>
+      <div class="bcol"><span class="bval">2 313</span><div class="bwrap"><div class="bar" style="height:56%;--i:3"></div></div><span class="bl">АПР</span></div>
+      <div class="bcol"><span class="bval">2 114</span><div class="bwrap"><div class="bar" style="height:52%;--i:4"></div></div><span class="bl">МАЙ</span></div>
+      <div class="bcol"><span class="bval">3 660</span><div class="bwrap"><div class="bar" style="height:89%;--i:5"></div></div><span class="bl">ИЮН</span></div>
+      <div class="bcol on"><span class="bval">4 104</span><div class="bwrap"><div class="bar" style="height:100%;--i:6"></div></div><span class="bl">ИЮЛ</span></div>
+    </div>
+  </div>
+
+  <div class="statgrid rise" style="animation-delay:.18s;margin-top:16px">
+    <div class="stat">
+      <div class="sl">Проекция на год</div>
+      <div class="sv">49 248 <span>₽</span></div>
+    </div>
+    <div class="stat">
+      <div class="sl">В среднем в день</div>
+      <div class="sv">137 <span>₽</span></div>
+    </div>
+    <div class="stat wide">
+      <div>
+        <div class="sl">Возврат по split</div>
+        <div class="sv">802 <span>₽ / мес · от 5 друзей</span></div>
+      </div>
+      <div class="sicon">
+        <svg class="ic" width="19" height="19" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="card rise" style="animation-delay:.22s">
+    <div class="label"><i></i>Категории</div>
+    <div class="catrow">
+      <div class="cr"><span>Нейросети</span><span>48%&nbsp;&nbsp;<b>1 990 ₽</b></span></div>
+      <div class="cbar"><i data-w="100" style="background:linear-gradient(90deg,#b49ffb,#8f76f2)"></i></div>
+    </div>
+    <div class="catrow">
+      <div class="cr"><span>Видео</span><span>32%&nbsp;&nbsp;<b>1 297 ₽</b></span></div>
+      <div class="cbar"><i data-w="65" style="background:linear-gradient(90deg,#8c6df6,#6947e6)"></i></div>
+    </div>
+    <div class="catrow">
+      <div class="cr"><span>Другое</span><span>10%&nbsp;&nbsp;<b>399 ₽</b></span></div>
+      <div class="cbar"><i data-w="20" style="background:linear-gradient(90deg,#6d5cc2,#493e8c)"></i></div>
+    </div>
+    <div class="catrow">
+      <div class="cr"><span>Музыка</span><span>7%&nbsp;&nbsp;<b>269 ₽</b></span></div>
+      <div class="cbar"><i data-w="13" style="background:linear-gradient(90deg,#4c448a,#332d5e)"></i></div>
+    </div>
+    <div class="catrow">
+      <div class="cr"><span>Облако</span><span>4%&nbsp;&nbsp;<b>149 ₽</b></span></div>
+      <div class="cbar"><i data-w="7" style="background:linear-gradient(90deg,#352e5c,#221e3f)"></i></div>
+    </div>
+  </div>
+
+  <div class="card rise" style="animation-delay:.26s">
+    <div class="label"><i></i>Топ по цене</div>
+    <div class="toprow">
+      <span class="rk">01</span>
+      <div class="logo" style="background:#10a37f">C</div>
+      <div class="tn">ChatGPT Plus<small>Нейросети</small></div>
+      <div class="ta">1 990 ₽<small>48%</small></div>
+    </div>
+    <div class="toprow">
+      <span class="rk">02</span>
+      <div class="logo" style="background:#e50914">N</div>
+      <div class="tn">Netflix<small>Видео · split 2</small></div>
+      <div class="ta">799 ₽<small>19%</small></div>
+    </div>
+    <div class="toprow">
+      <span class="rk">03</span>
+      <div class="logo" style="background:#ffd34d;color:#1a1a1a">Я</div>
+      <div class="tn">Яндекс Плюс<small>Другое</small></div>
+      <div class="ta">399 ₽<small>10%</small></div>
+    </div>
+    <div class="toprow">
+      <span class="rk">04</span>
+      <div class="logo" style="background:#ff0033">Y</div>
+      <div class="tn">YouTube Premium<small>Видео</small></div>
+      <div class="ta">299 ₽<small>7%</small></div>
+    </div>
+  </div>
+
+  <div class="insight rise" style="animation-delay:.3s">
+    <div class="label"><i></i>Инсайт</div>
+    <div class="it">Нейросети съедают почти половину бюджета</div>
+    <div class="is">1 990 ₽ из 4 104 ₽ — это больше, чем видео, музыка и облако вместе взятые (1 715 ₽). Оправдано, если реально пользуешься каждый день. Пользуешься?</div>
+  </div>
+
+  <div class="tabbar rise" style="animation-delay:.36s">
+    <a class="tab" href="index.html">
+      <svg class="ic" width="20" height="20" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
+      Главная
+    </a>
+    <div class="tab on">
+      <svg class="ic" width="20" height="20" viewBox="0 0 24 24"><line x1="6" y1="20" x2="6" y2="14"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="18" y1="20" x2="18" y2="4"/></svg>
+      Аналитика
+      <span class="pip"></span>
+    </div>
+    <a class="fab" href="index.html?add=1">
+      <svg class="ic" width="24" height="24" viewBox="0 0 24 24" style="stroke-width:2.2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+    </a>
+    <a class="tab" href="friends.html">
+      <svg class="ic" width="20" height="20" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Друзья
+    </a>
+    <a class="tab" href="profile.html">
+      <svg class="ic" width="20" height="20" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Профиль
+    </a>
+  </div>
+</div>
+
+<script>
+const M=['Январь 2026','Февраль 2026','Март 2026','Апрель 2026','Май 2026','Июнь 2026','Июль 2026'];
+const MS=['янв','фев','мар','апр','май','июн','июл'];
+const T=[2114,2114,2313,2313,2114,3660,4104];
+let sel=6;
+const anum=document.getElementById('anum'),adelta=document.getElementById('adelta'),mtitle=document.getElementById('mtitle');
+const cols=document.querySelectorAll('.bcol'),prevB=document.getElementById('prev'),nextB=document.getElementById('next');
+function atween(to){const from=+anum.dataset.v||0,t0=performance.now(),dur=600;
+ const step=t=>{const k=Math.min((t-t0)/dur,1),e=1-Math.pow(1-k,3);
+ anum.textContent=Math.round(from+(to-from)*e).toLocaleString('ru-RU')+' ₽';
+ if(k<1)requestAnimationFrame(step);else anum.dataset.v=to};
+ requestAnimationFrame(step)}
+function render(){
+ cols.forEach((c,i)=>c.classList.toggle('on',i===sel));
+ mtitle.textContent=M[sel];
+ atween(T[sel]);
+ if(sel>0){const d=Math.round((T[sel]-T[sel-1])/T[sel-1]*100);
+  adelta.style.display='';
+  adelta.textContent=(d>=0?'+':'')+d+'% vs '+MS[sel-1];
+  adelta.className='dchip '+(d>=0?'up':'dn')}
+ else adelta.style.display='none';
+ prevB.classList.toggle('dis',sel===0);
+ nextB.classList.toggle('dis',sel===T.length-1)}
+cols.forEach((c,i)=>c.querySelector('.bar').addEventListener('click',()=>{if(sel!==i){sel=i;render()}}));
+prevB.addEventListener('click',()=>{if(sel>0){sel--;render()}});
+nextB.addEventListener('click',()=>{if(sel<T.length-1){sel++;render()}});
+window.addEventListener('load',()=>{
+ document.querySelectorAll('.cbar i').forEach((b,i)=>{
+  setTimeout(()=>{b.style.width=b.dataset.w+'%'},250+i*120)})});
+</script>
+</body>
+</html>

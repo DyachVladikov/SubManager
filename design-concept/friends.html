@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b0b10">
+<title>SubManager — Друзья · Концепт</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0b10;
+  --surface:#14141d;
+  --surface2:#1c1c28;
+  --border:rgba(255,255,255,.07);
+  --accent:#a78bfa;
+  --accent-deep:#7c5cf0;
+  --text:#f4f4f7;
+  --dim:#8f8fa0;
+  --up:#ef8f8f;
+  --dn:#8fe3b0;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(167,139,250,.3)}
+body{background:#060608;font-family:'Manrope',sans-serif;color:var(--text);-webkit-font-smoothing:antialiased}
+.app{max-width:390px;margin:0 auto;background:var(--bg);position:relative;overflow:hidden;border-left:1px solid rgba(255,255,255,.04);border-right:1px solid rgba(255,255,255,.04);padding-bottom:112px}
+.glow{position:absolute;top:-150px;left:50%;transform:translateX(-50%);width:480px;height:340px;background:radial-gradient(closest-side,rgba(124,92,240,.26),transparent 72%);pointer-events:none}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.rise{opacity:0;animation:rise .6s cubic-bezier(.2,.7,.3,1) forwards}
+header{position:relative;display:flex;align-items:center;justify-content:space-between;padding:22px 20px 6px}
+.brand{display:flex;align-items:center;gap:11px}
+.avatar{width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,var(--accent),var(--accent-deep));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:19px;color:#0b0b10}
+.hi small{display:block;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);font-weight:700}
+.hi b{font-size:14px;font-weight:800}
+.iconbtn{width:38px;height:38px;border-radius:13px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;color:var(--dim);position:relative}
+.iconbtn .dot{position:absolute;top:8px;right:9px;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.label{display:flex;align-items:center;gap:8px;font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+.label i{width:3px;height:12px;background:var(--accent);border-radius:2px}
+.card{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:18px;margin:16px 20px 0}
+.title{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:.05em;text-transform:uppercase;padding:16px 20px 0;line-height:1}
+.fhero{background:linear-gradient(135deg,rgba(167,139,250,.14),var(--surface) 55%);border-color:rgba(167,139,250,.3)}
+.sum{display:flex;align-items:flex-end;gap:8px;margin-top:8px}
+.num{font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:.88;background:linear-gradient(180deg,#ffffff 25%,#7d7d94);-webkit-background-clip:text;background-clip:text;color:transparent}
+.per{font-size:13px;font-weight:600;color:var(--dim);padding-bottom:6px}
+.fsub2{font-size:11px;color:var(--dim);font-weight:600;margin-top:6px}
+.fdiv{height:1px;background:rgba(255,255,255,.05);margin:14px 0}
+.frow2{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.pend{display:flex;align-items:center;font-size:11px;font-weight:700;color:var(--up)}
+.pend i{width:7px;height:7px;border-radius:3px;background:var(--up);margin-right:6px}
+.btn{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,var(--accent),var(--accent-deep));color:#0b0b10;font-family:inherit;font-weight:800;font-size:11px;padding:9px 14px;border-radius:12px;border:0;cursor:pointer;transition:transform .12s,background .25s,color .25s,border-color .25s}
+.btn:active{transform:scale(.95)}
+.btn.done{background:var(--surface2);color:var(--dn);border:1px solid rgba(143,227,176,.35)}
+.sec{display:flex;align-items:center;justify-content:space-between;padding:24px 20px 12px}
+.sec h2{display:flex;align-items:center;gap:9px;font-family:'Bebas Neue',sans-serif;font-size:21px;font-weight:400;letter-spacing:.06em;text-transform:uppercase}
+.sec h2 i{width:3px;height:14px;background:var(--accent);border-radius:2px}
+.sum2{font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--dim);letter-spacing:.04em}
+.flist{display:flex;flex-direction:column;gap:10px;padding:2px 20px 0}
+.fcard{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:14px;transition:border-color .3s}
+.fcard.sent{border-color:rgba(143,227,176,.3)}
+.fav{width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:20px;color:#0b0b10;flex:0 0 auto}
+.finfo{flex:1;min-width:0}
+.finfo b{font-size:14px;font-weight:800}
+.finfo .un{font-size:10px;color:var(--dim);font-weight:600;margin-left:5px}
+.fsub{font-size:10px;color:var(--dim);font-weight:600;margin-top:3px;transition:color .3s}
+.fsub.okt{color:var(--accent)}
+.fright{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.fright b{font-size:14px;font-weight:800}
+.rbtn{width:34px;height:34px;border-radius:12px;border:1px solid rgba(167,139,250,.35);background:rgba(167,139,250,.1);color:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .12s,background .25s,border-color .25s,color .25s}
+.rbtn:active{transform:scale(.88)}
+.rbtn.ok{background:rgba(143,227,176,.12);border-color:rgba(143,227,176,.35);color:var(--dn)}
+.plist{padding:6px 18px 14px}
+.prow{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.prow:last-child{border-bottom:0;padding-bottom:4px}
+.prow .fav{width:36px;height:36px;border-radius:12px;font-size:17px}
+.paid{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:800;color:var(--dn)}
+.insight{background:linear-gradient(135deg,rgba(167,139,250,.12),var(--surface) 55%);border:1px solid rgba(167,139,250,.32);border-radius:20px;padding:18px;margin:16px 20px 0}
+.insight .it{font-size:13px;font-weight:800;margin-top:12px;line-height:1.45}
+.insight .is{font-size:11px;color:var(--dim);margin-top:6px;line-height:1.6}
+.tabbar{position:absolute;left:14px;right:14px;bottom:16px;background:rgba(20,20,29,.92);backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:24px;display:flex;align-items:flex-end;justify-content:space-around;padding:10px 10px 12px}
+.tab{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--dim);font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;width:56px;cursor:pointer}
+.tab.on{color:var(--accent)}
+.tab .pip{width:4px;height:4px;border-radius:50%;background:currentColor}
+a.tab{text-decoration:none}
+.fab{width:52px;height:52px;border-radius:18px;background:linear-gradient(135deg,var(--accent),var(--accent-deep));display:flex;align-items:center;justify-content:center;color:#0b0b10;box-shadow:0 10px 26px rgba(124,92,240,.5);margin-top:-30px;border:4px solid var(--bg);flex:0 0 auto;cursor:pointer;transition:transform .15s}
+.fab:active{transform:scale(.92)}
+svg.ic{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="glow"></div>
+
+  <header class="rise">
+    <div class="brand">
+      <div class="avatar">В</div>
+      <div class="hi">
+        <small>SubManager</small>
+        <b>Влад</b>
+      </div>
+    </div>
+    <div class="iconbtn">
+      <svg class="ic" width="19" height="19" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      <span class="dot"></span>
+    </div>
+  </header>
+
+  <div class="title rise" style="animation-delay:.05s">Друзья</div>
+
+  <div class="card fhero rise" style="animation-delay:.1s">
+    <div class="label"><i></i>Возврат по split</div>
+    <div class="sum">
+      <div class="num">802</div>
+      <div class="per">₽ / мес</div>
+    </div>
+    <div class="fsub2">5 друзей · 2 подписки</div>
+    <div class="fdiv"></div>
+    <div class="frow2">
+      <span class="pend"><i></i>Ещё не пришло · 356 ₽</span>
+      <button class="btn" id="remAll">
+        <svg class="ic" width="13" height="13" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        Напомнить
+      </button>
+    </div>
+  </div>
+
+  <div class="sec rise" style="animation-delay:.14s">
+    <h2><i></i>Ждут перевода</h2>
+    <span class="sum2">356 ₽</span>
+  </div>
+  <div class="flist rise" style="animation-delay:.18s">
+    <div class="fcard">
+      <div class="fav" style="background:linear-gradient(135deg,#8c6df6,#6947e6)">Д</div>
+      <div class="finfo">
+        <b>Даня</b><span class="un">@danya</span>
+        <div class="fsub">Spotify Family · доля до 3 авг</div>
+      </div>
+      <div class="fright">
+        <b>90 ₽</b>
+        <button class="rbtn"><svg class="ic" width="15" height="15" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button>
+      </div>
+    </div>
+    <div class="fcard">
+      <div class="fav" style="background:linear-gradient(135deg,#6d5cc2,#493e8c)">К</div>
+      <div class="finfo">
+        <b>Костя</b><span class="un">@kostya</span>
+        <div class="fsub">Netflix · доля до 28 июл</div>
+      </div>
+      <div class="fright">
+        <b>266 ₽</b>
+        <button class="rbtn"><svg class="ic" width="15" height="15" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec rise" style="animation-delay:.22s">
+    <h2><i></i>Оплатили</h2>
+    <span class="sum2">445 ₽</span>
+  </div>
+  <div class="card rise" style="animation-delay:.26s;margin-top:2px">
+    <div class="plist">
+      <div class="prow">
+        <div class="fav" style="background:linear-gradient(135deg,#b49ffb,#8f76f2)">М</div>
+        <div class="finfo">
+          <b>Миша</b><span class="un">@misha</span>
+          <div class="fsub">Spotify Family</div>
+        </div>
+        <div class="fright">
+          <b>90 ₽</b>
+          <span class="paid"><svg class="ic" width="10" height="10" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>21 июля</span>
+        </div>
+      </div>
+      <div class="prow">
+        <div class="fav" style="background:linear-gradient(135deg,#4c448a,#332d5e);color:#c9c9d6">Л</div>
+        <div class="finfo">
+          <b>Лера</b><span class="un">@lera</span>
+          <div class="fsub">Spotify Family</div>
+        </div>
+        <div class="fright">
+          <b>89 ₽</b>
+          <span class="paid"><svg class="ic" width="10" height="10" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>19 июля</span>
+        </div>
+      </div>
+      <div class="prow">
+        <div class="fav" style="background:linear-gradient(135deg,#7c5cf0,#5a3fd6)">Е</div>
+        <div class="finfo">
+          <b>Егор</b><span class="un">@egor</span>
+          <div class="fsub">Netflix</div>
+        </div>
+        <div class="fright">
+          <b>266 ₽</b>
+          <span class="paid"><svg class="ic" width="10" height="10" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>22 июля</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight rise" style="animation-delay:.3s">
+    <div class="label"><i></i>Как это работает</div>
+    <div class="it">Бот сам напомнит за день до списания</div>
+    <div class="is">Должник получает сообщение с кнопкой «Я перевёл». Жмёт — статус обновляется у вас обоих, а тебе прилетает уведомление. Кнопка «Напомнить» — для особо забывчивых вне расписания.</div>
+  </div>
+
+  <div class="tabbar rise" style="animation-delay:.36s">
+    <a class="tab" href="index.html">
+      <svg class="ic" width="20" height="20" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
+      Главная
+    </a>
+    <a class="tab" href="analytics.html">
+      <svg class="ic" width="20" height="20" viewBox="0 0 24 24"><line x1="6" y1="20" x2="6" y2="14"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="18" y1="20" x2="18" y2="4"/></svg>
+      Аналитика
+    </a>
+    <a class="fab" href="index.html?add=1">
+      <svg class="ic" width="24" height="24" viewBox="0 0 24 24" style="stroke-width:2.2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+    </a>
+    <div class="tab on">
+      <svg class="ic" width="20" height="20" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Друзья
+      <span class="pip"></span>
+    </div>
+    <a class="tab" href="profile.html">
+      <svg class="ic" width="20" height="20" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Профиль
+    </a>
+  </div>
+</div>
+
+<script>
+const okSvg='<svg class="ic" width="15" height="15" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>';
+function sendRemind(btn){
+ const card=btn.closest('.fcard');
+ if(!card||card.classList.contains('sent'))return;
+ card.classList.add('sent');
+ btn.classList.add('ok');
+ btn.innerHTML=okSvg;
+ const s=card.querySelector('.fsub');
+ s.textContent='Бот отправил напоминание · только что';
+ s.classList.add('okt')}
+document.querySelectorAll('.rbtn').forEach(b=>b.addEventListener('click',()=>sendRemind(b)));
+const remAll=document.getElementById('remAll');
+remAll.addEventListener('click',()=>{
+ if(remAll.classList.contains('done'))return;
+ remAll.classList.add('done');
+ remAll.innerHTML=okSvg+' Отправлено';
+ document.querySelectorAll('.fcard:not(.sent) .rbtn').forEach((b,i)=>{
+  setTimeout(()=>sendRemind(b),350+i*400)})});
+</script>
+</body>
+</html>

@@ -10,6 +10,19 @@
   border-right: 1px solid rgba(255, 255, 255, 0.04);
   min-height: 100vh;
   padding-bottom: 34px;
+
+  @include tablet-above {
+    max-width: 1200px;
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    gap: 60px;
+    padding: 40px 60px;
+  }
+
+  @include desktop-above {
+    max-width: 1400px;
+    padding: 60px 80px;
+  }
 }
 
 .auth-page .glow {
@@ -62,6 +75,23 @@
 
 .swap {
   animation: swap 0.35s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.auth-left {
+  @include tablet-above {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 24px;
+  }
+}
+
+.auth-right {
+  @include tablet-above {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 .brandwrap {

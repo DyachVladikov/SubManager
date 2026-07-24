@@ -1,9 +1,10 @@
 import { useAuth } from '@/features/auth'
 import { AuthPage } from '@/features/auth'
+import { DashboardPage } from '@/pages/DashboardPage'
 import './App.scss'
 
 function App() {
-  const { session, loading, signOut } = useAuth()
+  const { session, loading } = useAuth()
 
   if (loading) {
     return (
@@ -19,17 +20,7 @@ function App() {
     return <AuthPage />
   }
 
-  return (
-    <div className="app-page">
-      <div className="app-card">
-        <h1 className="app-title">SubManager</h1>
-        <p className="app-text">Добро пожаловать, {session.user.email}</p>
-        <button className="app-button" onClick={signOut}>
-          Выйти
-        </button>
-      </div>
-    </div>
-  )
+  return <DashboardPage />
 }
 
 export default App

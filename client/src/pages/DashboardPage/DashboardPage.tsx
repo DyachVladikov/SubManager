@@ -1,5 +1,8 @@
 import { useState } from 'react'
-import { subscriptions, categories, monthNames, yearNames, heroData } from '@/mocks/subscriptions'
+import { categories, monthNames, yearNames, heroData } from '@/mocks/subscriptions'
+import { useGetSubscriptionsQuery, useDeleteSubscriptionMutation } from '@/entities/subscription/api/subscriptionApi'
+import { mapSubscription } from '@/entities/subscription/lib/mapSubscription'
+import { AddSubscriptionForm } from '@/features/subscription/add/ui/AddSubscriptionForm'
 import './DashboardPage.scss'
 
 export function DashboardPage() {
@@ -7,6 +10,30 @@ export function DashboardPage() {
   const [detailOpen, setDetailOpen] = useState(false)
   const [selectedSub, setSelectedSub] = useState<string | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
+
+  const { data: dbSubscriptions = [], isLoading } = useGetSubscriptionsQuery()
+  const [deleteSubscription] = useDeleteSubscriptionMutation()
+  const subscriptions = dbSubscriptions.map(mapSubscription)
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteSubscription(id).unwrap()
+      closeDetail()
+    } catch (error) {
+      console.error('Failed to delete subscription:', error)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="dashboard-page">
+        <div className="glow"></div>
+        <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+          <p>Загрузка...</p>
+        </div>
+      </div>
+    )
+  }
 
   const data = heroData[mode]
   const chartNames = mode === 'month' ? monthNames : yearNames
@@ -429,7 +456,9 @@ export function DashboardPage() {
           </div>
           <div className="dact drise">
             <button className="ebtn">Редактировать</button>
-            <button className="rbtn2">Удалить</button>
+            <button className="rbtn2" onClick={() => selected && handleDelete(selected.id)}>
+              Удалить
+            </button>
           </div>
         </div>
       )}
@@ -450,24 +479,7 @@ export function DashboardPage() {
                 </svg>
               </div>
             </div>
-            <div className="presets">
-              {subscriptions.slice(0, 8).map((sub) => (
-                <div className="preset" key={sub.id} onClick={() => setSheetOpen(false)}>
-                  <div className="logo" style={{ background: sub.color, color: sub.dark ? '#1a1a1a' : '#fff' }}>
-                    {sub.letter}
-                  </div>
-                  <span>{sub.name}</span>
-                </div>
-              ))}
-            </div>
-            <div className="shdiv">или</div>
-            <button className="custombtn" onClick={() => setSheetOpen(false)}>
-              <svg className="ic" width="14" height="14" viewBox="0 0 24 24">
-                <path d="M5 12h14" />
-                <path d="M12 5v14" />
-              </svg>
-              Своя подписка
-            </button>
+            <AddSubscriptionForm onClose={() => setSheetOpen(false)} />
           </div>
         </>
       )}

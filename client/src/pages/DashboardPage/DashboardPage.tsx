@@ -3,6 +3,7 @@ import { categories, monthNames, yearNames, heroData } from '@/mocks/subscriptio
 import { useGetSubscriptionsQuery, useDeleteSubscriptionMutation } from '@/entities/subscription/api/subscriptionApi'
 import { mapSubscription } from '@/entities/subscription/lib/mapSubscription'
 import { AddSubscriptionForm } from '@/features/subscription/add/ui/AddSubscriptionForm'
+import { LuHouse, LuChartColumn, LuPlus, LuUsers, LuUser } from 'react-icons/lu'
 import './DashboardPage.scss'
 
 export function DashboardPage() {
@@ -10,18 +11,24 @@ export function DashboardPage() {
   const [detailOpen, setDetailOpen] = useState(false)
   const [selectedSub, setSelectedSub] = useState<string | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [removingIds, setRemovingIds] = useState<string[]>([])
 
   const { data: dbSubscriptions = [], isLoading } = useGetSubscriptionsQuery()
   const [deleteSubscription] = useDeleteSubscriptionMutation()
   const subscriptions = dbSubscriptions.map(mapSubscription)
 
-  const handleDelete = async (id: string) => {
-    try {
-      await deleteSubscription(id).unwrap()
-      closeDetail()
-    } catch (error) {
-      console.error('Failed to delete subscription:', error)
-    }
+  const handleDelete = (id: string) => {
+    setRemovingIds((prev) => [...prev, id])
+    setTimeout(async () => {
+      try {
+        await deleteSubscription(id).unwrap()
+        closeDetail()
+      } catch (error) {
+        console.error('Failed to delete subscription:', error)
+      } finally {
+        setRemovingIds((prev) => prev.filter((x) => x !== id))
+      }
+    }, 300)
   }
 
   if (isLoading) {
@@ -247,7 +254,11 @@ export function DashboardPage() {
       </div>
       <div className="grid rise" style={{ animationDelay: '0.3s' }}>
         {subscriptions.map((sub) => (
-          <div className="sub" key={sub.id} onClick={() => openDetail(sub.id)}>
+          <div
+            className={`sub ${removingIds.includes(sub.id) ? 'removing' : ''}`}
+            key={sub.id}
+            onClick={() => openDetail(sub.id)}
+          >
             <div className="top">
               <div className="logo" style={{ background: sub.color, color: sub.dark ? '#1a1a1a' : '#fff' }}>
                 {sub.letter}
@@ -290,41 +301,23 @@ export function DashboardPage() {
 
       <div className="tabbar rise" style={{ animationDelay: '0.36s' }}>
         <div className="tab on">
-          <svg className="ic" width="20" height="20" viewBox="0 0 24 24">
-            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-            <path d="M9 22V12h6v10" />
-          </svg>
+          <LuHouse size={20} />
           Главная
           <span className="pip"></span>
         </div>
         <div className="tab">
-          <svg className="ic" width="20" height="20" viewBox="0 0 24 24">
-            <line x1="6" y1="20" x2="6" y2="14" />
-            <line x1="12" y1="20" x2="12" y2="8" />
-            <line x1="18" y1="20" x2="18" y2="4" />
-          </svg>
+          <LuChartColumn size={20} />
           Аналитика
         </div>
         <div className="fab" onClick={() => setSheetOpen(true)}>
-          <svg className="ic" width="24" height="24" viewBox="0 0 24 24" style={{ strokeWidth: 2.2 }}>
-            <path d="M5 12h14" />
-            <path d="M12 5v14" />
-          </svg>
+          <LuPlus size={24} />
         </div>
         <div className="tab">
-          <svg className="ic" width="20" height="20" viewBox="0 0 24 24">
-            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-            <circle cx="9" cy="7" r="4" />
-            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-          </svg>
+          <LuUsers size={20} />
           Друзья
         </div>
         <div className="tab">
-          <svg className="ic" width="20" height="20" viewBox="0 0 24 24">
-            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
-          </svg>
+          <LuUser size={20} />
           Профиль
         </div>
       </div>

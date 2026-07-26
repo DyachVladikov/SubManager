@@ -79,3 +79,50 @@
   opacity: 0.8;
   cursor: default;
 }
+
+.add-subscription-form .setrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.add-subscription-form .setrow small {
+  display: block;
+  font-size: 10px;
+  color: var(--dim);
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.add-subscription-form .sw {
+  width: 42px;
+  height: 24px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.12);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex: 0 0 auto;
+}
+
+.add-subscription-form .sw::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s;
+}
+
+.add-subscription-form .sw.on {
+  background: var(--accent);
+}
+
+.add-subscription-form .sw.on::after {
+  transform: translateX(18px);
+}

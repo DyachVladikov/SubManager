@@ -3,13 +3,15 @@ import './FormField.scss'
 
 interface FormFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string
+  error?: string
 }
 
-export function FormField({ label, ...props }: FormFieldProps) {
+export function FormField({ label, error, ...props }: FormFieldProps) {
   return (
-    <div className="frow">
+    <div className={`frow ${error ? 'has-error' : ''}`}>
       <span className="flabel">{label}</span>
       <input className="finput" {...props} />
+      {error && <span className="ferror">{error}</span>}
     </div>
   )
 }

@@ -29,3 +29,19 @@
 .finput:focus {
   border-color: rgba(167, 139, 250, 0.55);
 }
+
+.frow.has-error .finput {
+  border-color: rgba(239, 143, 143, 0.7);
+}
+
+.frow.has-error .finput:focus {
+  border-color: rgba(239, 143, 143, 0.9);
+  box-shadow: 0 0 0 3px rgba(239, 143, 143, 0.12);
+}
+
+.ferror {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--up);
+  margin-top: -2px;
+}

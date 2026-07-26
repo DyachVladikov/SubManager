@@ -1,0 +1,62 @@
+import { baseApi } from '@/shared/api/baseApi'
+import { supabase } from '@/shared/config/supabase'
+
+export interface Split {
+  id: string
+  subscription_id: string
+  debtor_username: string
+  amount: number
+  status: 'pending' | 'paid'
+  created_at: string
+  updated_at: string
+}
+
+export interface CreateSplitInput {
+  subscription_id: string
+  debtor_username: string
+  amount: number
+}
+
+export const splitApi = baseApi.injectEndpoints({
+  endpoints: (builder) => ({
+    getSplitsBySubscription: builder.query<Split[], string>({
+      queryFn: async (subscriptionId) => {
+        const { data, error } = await supabase
+          .from('splits')
+          .select('*')
+          .eq('subscription_id', subscriptionId)
+        if (error) return { error }
+        return { data: data as Split[] }
+      },
+      providesTags: ['Subscription'],
+    }),
+
+    createSplit: builder.mutation<Split, CreateSplitInput>({
+      queryFn: async (input) => {
+        const { data, error } = await supabase
+          .from('splits')
+          .insert([input])
+          .select()
+          .single()
+        if (error) return { error }
+        return { data: data as Split }
+      },
+      invalidatesTags: ['Subscription'],
+    }),
+
+    deleteSplit: builder.mutation<void, string>({
+      queryFn: async (id) => {
+        const { error } = await supabase.from('splits').delete().eq('id', id)
+        if (error) return { error }
+        return { data: undefined }
+      },
+      invalidatesTags: ['Subscription'],
+    }),
+  }),
+})
+
+export const {
+  useGetSplitsBySubscriptionQuery,
+  useCreateSplitMutation,
+  useDeleteSplitMutation,
+} = splitApi

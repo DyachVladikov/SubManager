@@ -18,17 +18,19 @@ export function DashboardPage() {
   const subscriptions = dbSubscriptions.map(mapSubscription)
 
   const handleDelete = (id: string) => {
-    setRemovingIds((prev) => [...prev, id])
-    setTimeout(async () => {
-      try {
-        await deleteSubscription(id).unwrap()
-        closeDetail()
-      } catch (error) {
-        console.error('Failed to delete subscription:', error)
-      } finally {
-        setRemovingIds((prev) => prev.filter((x) => x !== id))
-      }
-    }, 300)
+    closeDetail()
+    setTimeout(() => {
+      setRemovingIds((prev) => [...prev, id])
+      setTimeout(async () => {
+        try {
+          await deleteSubscription(id).unwrap()
+        } catch (error) {
+          console.error('Failed to delete subscription:', error)
+        } finally {
+          setRemovingIds((prev) => prev.filter((x) => x !== id))
+        }
+      }, 350)
+    }, 200)
   }
 
   if (isLoading) {

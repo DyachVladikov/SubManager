@@ -13,6 +13,7 @@ export interface Subscription {
 }
 
 export interface CreateSubscriptionInput {
+  user_id: string
   title: string
   amount: number
   currency?: string

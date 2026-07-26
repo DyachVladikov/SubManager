@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useCreateSubscriptionMutation } from '@/entities/subscription/api/subscriptionApi'
+import { FormField } from '@/shared/ui/FormField'
+import { supabase } from '@/shared/config/supabase'
 import './AddSubscriptionForm.scss'
 
 const presetColors = ['#e50914', '#ff7a00', '#ffd34d', '#1db954', '#3a9bf0', '#a78bfa']
@@ -16,11 +18,18 @@ export function AddSubscriptionForm({ onClose, initialName = '', initialPrice = 
   const [price, setPrice] = useState(initialPrice)
   const [date, setDate] = useState('')
   const [color, setColor] = useState(initialColor)
+  const [userId, setUserId] = useState<string | null>(null)
   const [createSubscription, { isLoading }] = useCreateSubscriptionMutation()
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUserId(data.user?.id || null)
+    })
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name || !price || !date) return
+    if (!name || !price || !date || !userId) return
 
     try {
       await createSubscription({
@@ -29,6 +38,7 @@ export function AddSubscriptionForm({ onClose, initialName = '', initialPrice = 
         currency: 'RUB',
         next_payment_date: date,
         color_hex: color,
+        user_id: userId,
       }).unwrap()
       onClose()
     } catch (error) {
@@ -38,38 +48,29 @@ export function AddSubscriptionForm({ onClose, initialName = '', initialPrice = 
 
   return (
     <form className="add-subscription-form" onSubmit={handleSubmit}>
-      <div className="frow">
-        <span className="flabel">Название</span>
-        <input
-          className="finput"
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Netflix"
-          required
-        />
-      </div>
-      <div className="frow">
-        <span className="flabel">Сумма · ₽/мес</span>
-        <input
-          className="finput"
-          type="number"
-          value={price}
-          onChange={(e) => setPrice(Number(e.target.value))}
-          placeholder="799"
-          required
-        />
-      </div>
-      <div className="frow">
-        <span className="flabel">Следующее списание</span>
-        <input
-          className="finput"
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          required
-        />
-      </div>
+      <FormField
+        label="Название"
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Netflix"
+        required
+      />
+      <FormField
+        label="Сумма · ₽/мес"
+        type="number"
+        value={price}
+        onChange={(e) => setPrice(Number(e.target.value))}
+        placeholder="799"
+        required
+      />
+      <FormField
+        label="Следующее списание"
+        type="date"
+        value={date}
+        onChange={(e) => setDate(e.target.value)}
+        required
+      />
       <div className="frow">
         <span className="flabel">Цвет карточки</span>
         <div className="colors">
@@ -83,7 +84,7 @@ export function AddSubscriptionForm({ onClose, initialName = '', initialPrice = 
           ))}
         </div>
       </div>
-      <button className="addbtn" type="submit" disabled={isLoading}>
+      <button className="addbtn" type="submit" disabled={isLoading || !userId}>
         {isLoading ? 'Сохранение...' : 'Добавить подписку'}
       </button>
     </form>

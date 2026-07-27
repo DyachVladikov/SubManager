@@ -19,6 +19,7 @@ export function DashboardPage() {
   const [detailOpen, setDetailOpen] = useState(false)
   const [selectedSub, setSelectedSub] = useState<string | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const { toast, showToast } = useToast()
   const { removingIds, removeSubscription } = useRemoveSubscription({
     onDeleted: () => showToast('delete'),
@@ -42,7 +43,28 @@ export function DashboardPage() {
     removeSubscription(id)
   }
 
+  const handleEdit = (id: string) => {
+    closeDetail()
+    setEditingId(id)
+    setSheetOpen(true)
+  }
+
+  const closeSheet = () => {
+    setSheetOpen(false)
+    setEditingId(null)
+  }
+
   const selected = subscriptions.find((s) => s.id === selectedSub)
+  const editingRaw = dbSubscriptions.find((s) => s.id === editingId)
+  const editing = editingRaw
+    ? {
+        id: editingRaw.id,
+        name: editingRaw.title,
+        price: String(editingRaw.amount),
+        date: editingRaw.next_payment_date,
+        color: editingRaw.color_hex || '#a78bfa',
+      }
+    : null
 
   if (isLoading) {
     return (
@@ -77,11 +99,12 @@ export function DashboardPage() {
           open={detailOpen}
           onClose={closeDetail}
           onDelete={handleDelete}
+          onEdit={handleEdit}
         />
       )}
 
       {sheetOpen && (
-        <AddSubscriptionSheet onClose={() => setSheetOpen(false)} onSuccess={() => showToast('success')} />
+        <AddSubscriptionSheet onClose={closeSheet} onSuccess={() => showToast('success')} editing={editing} />
       )}
 
       {toast && <Toast type={toast} />}

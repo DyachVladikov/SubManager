@@ -1,12 +1,21 @@
 import { AddSubscriptionForm } from '@/features/subscription/add/ui/AddSubscriptionForm'
 import './AddSubscriptionSheet.scss'
 
+export interface EditingSubscription {
+  id: string
+  name: string
+  price: string
+  date: string
+  color: string
+}
+
 interface AddSubscriptionSheetProps {
   onClose: () => void
   onSuccess: () => void
+  editing?: EditingSubscription | null
 }
 
-export function AddSubscriptionSheet({ onClose, onSuccess }: AddSubscriptionSheetProps) {
+export function AddSubscriptionSheet({ onClose, onSuccess, editing }: AddSubscriptionSheetProps) {
   return (
     <>
       <div className="add-subscription-sheet__overlay" onClick={onClose}></div>
@@ -14,7 +23,7 @@ export function AddSubscriptionSheet({ onClose, onSuccess }: AddSubscriptionShee
         <div className="add-subscription-sheet__grab"></div>
         <div className="add-subscription-sheet__head">
           <div className="add-subscription-sheet__title">
-            <i></i>Новая подписка
+            <i></i>{editing ? 'Редактирование' : 'Новая подписка'}
           </div>
           <div className="add-subscription-sheet__close-btn" onClick={onClose}>
             <svg width="14" height="14" viewBox="0 0 24 24">
@@ -23,7 +32,15 @@ export function AddSubscriptionSheet({ onClose, onSuccess }: AddSubscriptionShee
             </svg>
           </div>
         </div>
-        <AddSubscriptionForm onClose={onClose} onSuccess={onSuccess} />
+        <AddSubscriptionForm
+          onClose={onClose}
+          onSuccess={onSuccess}
+          editingId={editing?.id}
+          initialName={editing?.name}
+          initialPrice={editing?.price}
+          initialDate={editing?.date}
+          initialColor={editing?.color}
+        />
       </div>
     </>
   )

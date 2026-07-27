@@ -7,9 +7,10 @@ interface SubscriptionDetailProps {
   open: boolean
   onClose: () => void
   onDelete: (id: string) => void
+  onEdit: (id: string) => void
 }
 
-export function SubscriptionDetail({ subscription, open, onClose, onDelete }: SubscriptionDetailProps) {
+export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEdit }: SubscriptionDetailProps) {
   return (
     <div className={`subscription-detail ${open ? 'subscription-detail--open' : ''}`}>
       <div className="subscription-detail__glow" style={{ '--bc': subscription.color } as CSSProperties}></div>
@@ -141,7 +142,9 @@ export function SubscriptionDetail({ subscription, open, onClose, onDelete }: Su
         </div>
       </div>
       <div className="subscription-detail__actions">
-        <button className="subscription-detail__edit-btn">Редактировать</button>
+        <button className="subscription-detail__edit-btn" onClick={() => onEdit(subscription.id)}>
+          Редактировать
+        </button>
         <button className="subscription-detail__remove-btn" onClick={() => onDelete(subscription.id)}>
           Удалить
         </button>

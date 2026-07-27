@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useCreateSubscriptionMutation } from '@/entities/subscription/api/subscriptionApi'
+import { useCreateSubscriptionMutation, useUpdateSubscriptionMutation } from '@/entities/subscription/api/subscriptionApi'
 import { useCreateSplitMutation } from '@/entities/split/api/splitApi'
 import { FormField } from '@/shared/ui/FormField'
 import { supabase } from '@/shared/config/supabase'
@@ -10,23 +10,27 @@ const presetColors = ['#e50914', '#ff7a00', '#ffd34d', '#1db954', '#3a9bf0', '#a
 interface AddSubscriptionFormProps {
   onClose: () => void
   onSuccess?: () => void
+  editingId?: string
   initialName?: string
   initialPrice?: string
+  initialDate?: string
   initialColor?: string
 }
 
-export function AddSubscriptionForm({ onClose, onSuccess, initialName = '', initialPrice = '', initialColor = '#a78bfa' }: AddSubscriptionFormProps) {
+export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName = '', initialPrice = '', initialDate = '', initialColor = '#a78bfa' }: AddSubscriptionFormProps) {
   const [name, setName] = useState(initialName)
   const [price, setPrice] = useState(initialPrice)
-  const [date, setDate] = useState('')
+  const [date, setDate] = useState(initialDate)
   const [color, setColor] = useState(initialColor)
   const [isSplit, setIsSplit] = useState(false)
   const [splitUsername, setSplitUsername] = useState('')
   const [splitAmount, setSplitAmount] = useState('')
   const [userId, setUserId] = useState<string | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const [createSubscription, { isLoading }] = useCreateSubscriptionMutation()
+  const [createSubscription, { isLoading: isCreating }] = useCreateSubscriptionMutation()
+  const [updateSubscription, { isLoading: isUpdating }] = useUpdateSubscriptionMutation()
   const [createSplit] = useCreateSplitMutation()
+  const isLoading = isCreating || isUpdating
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -55,27 +59,37 @@ export function AddSubscriptionForm({ onClose, onSuccess, initialName = '', init
     if (!validate() || !userId) return
 
     try {
-      const subscription = await createSubscription({
-        title: name,
-        amount: Number(price),
-        currency: 'RUB',
-        next_payment_date: date,
-        color_hex: color,
-        user_id: userId,
-      }).unwrap()
-
-      if (isSplit && subscription) {
-        await createSplit({
-          subscription_id: subscription.id,
-          debtor_username: splitUsername,
-          amount: Number(splitAmount),
+      if (editingId) {
+        await updateSubscription({
+          id: editingId,
+          title: name,
+          amount: Number(price),
+          next_payment_date: date,
+          color_hex: color,
         }).unwrap()
+      } else {
+        const subscription = await createSubscription({
+          title: name,
+          amount: Number(price),
+          currency: 'RUB',
+          next_payment_date: date,
+          color_hex: color,
+          user_id: userId,
+        }).unwrap()
+
+        if (isSplit && subscription) {
+          await createSplit({
+            subscription_id: subscription.id,
+            debtor_username: splitUsername,
+            amount: Number(splitAmount),
+          }).unwrap()
+        }
       }
 
       onSuccess?.()
       onClose()
     } catch (error) {
-      console.error('Failed to create subscription:', error)
+      console.error('Failed to save subscription:', error)
     }
   }
 
@@ -141,45 +155,49 @@ export function AddSubscriptionForm({ onClose, onSuccess, initialName = '', init
         </div>
       </div>
 
-      <div className="add-form__row">
-        <div className="add-form__setrow">
-          <div>
-            Разделить оплату
-            <small>Добавить друга по @username</small>
-          </div>
-          <div className={`add-form__switch ${isSplit ? 'add-form__switch--on' : ''}`} onClick={() => setIsSplit(!isSplit)}></div>
-        </div>
-      </div>
-
-      {isSplit && (
+      {!editingId && (
         <>
-          <FormField
-            label="Telegram username друга"
-            type="text"
-            value={splitUsername}
-            onChange={(e) => {
-              setSplitUsername(e.target.value)
-              clearError('splitUsername')
-            }}
-            placeholder="@kostya"
-            error={errors.splitUsername}
-          />
-          <FormField
-            label="Сумма доли · ₽"
-            type="number"
-            value={splitAmount}
-            onChange={(e) => {
-              setSplitAmount(e.target.value)
-              clearError('splitAmount')
-            }}
-            placeholder="266"
-            error={errors.splitAmount}
-          />
+          <div className="add-form__row">
+            <div className="add-form__setrow">
+              <div>
+                Разделить оплату
+                <small>Добавить друга по @username</small>
+              </div>
+              <div className={`add-form__switch ${isSplit ? 'add-form__switch--on' : ''}`} onClick={() => setIsSplit(!isSplit)}></div>
+            </div>
+          </div>
+
+          {isSplit && (
+            <>
+              <FormField
+                label="Telegram username друга"
+                type="text"
+                value={splitUsername}
+                onChange={(e) => {
+                  setSplitUsername(e.target.value)
+                  clearError('splitUsername')
+                }}
+                placeholder="@kostya"
+                error={errors.splitUsername}
+              />
+              <FormField
+                label="Сумма доли · ₽"
+                type="number"
+                value={splitAmount}
+                onChange={(e) => {
+                  setSplitAmount(e.target.value)
+                  clearError('splitAmount')
+                }}
+                placeholder="266"
+                error={errors.splitAmount}
+              />
+            </>
+          )}
         </>
       )}
 
       <button className="add-form__submit" type="submit" disabled={isLoading || !userId}>
-        {isLoading ? 'Сохранение...' : 'Добавить подписку'}
+        {isLoading ? 'Сохранение...' : editingId ? 'Сохранить' : 'Добавить подписку'}
       </button>
     </form>
   )

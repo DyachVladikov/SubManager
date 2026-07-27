@@ -3,6 +3,7 @@
 @use '@a1rth/css-normalize' as *;
 @use './resources.scss' as *;
 @use './utils.scss' as *;
+@use './animations.scss' as *;
 
 @forward './fonts.scss';
 @forward './variables.scss';

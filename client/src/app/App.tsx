@@ -9,8 +9,8 @@ function App() {
   if (loading) {
     return (
       <div className="app-page">
-        <div className="app-card">
-          <p className="app-text">Загрузка...</p>
+        <div className="app-page__card">
+          <p className="app-page__text">Загрузка...</p>
         </div>
       </div>
     )

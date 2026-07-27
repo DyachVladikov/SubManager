@@ -9,12 +9,13 @@ const presetColors = ['#e50914', '#ff7a00', '#ffd34d', '#1db954', '#3a9bf0', '#a
 
 interface AddSubscriptionFormProps {
   onClose: () => void
+  onSuccess?: () => void
   initialName?: string
   initialPrice?: string
   initialColor?: string
 }
 
-export function AddSubscriptionForm({ onClose, initialName = '', initialPrice = '', initialColor = '#a78bfa' }: AddSubscriptionFormProps) {
+export function AddSubscriptionForm({ onClose, onSuccess, initialName = '', initialPrice = '', initialColor = '#a78bfa' }: AddSubscriptionFormProps) {
   const [name, setName] = useState(initialName)
   const [price, setPrice] = useState(initialPrice)
   const [date, setDate] = useState('')
@@ -37,7 +38,12 @@ export function AddSubscriptionForm({ onClose, initialName = '', initialPrice = 
     const newErrors: Record<string, string> = {}
     if (!name.trim()) newErrors.name = 'Обязательное поле'
     if (!price || Number(price) <= 0) newErrors.price = 'Обязательное поле'
-    if (!date) newErrors.date = 'Обязательное поле'
+    if (!date) {
+      newErrors.date = 'Обязательное поле'
+    } else {
+      const year = Number(date.split('-')[0])
+      if (year < 2020 || year > 2100) newErrors.date = 'Некорректный год'
+    }
     if (isSplit && !splitUsername.trim()) newErrors.splitUsername = 'Обязательное поле'
     if (isSplit && (!splitAmount || Number(splitAmount) <= 0)) newErrors.splitAmount = 'Обязательное поле'
     setErrors(newErrors)
@@ -66,6 +72,7 @@ export function AddSubscriptionForm({ onClose, initialName = '', initialPrice = 
         }).unwrap()
       }
 
+      onSuccess?.()
       onClose()
     } catch (error) {
       console.error('Failed to create subscription:', error)
@@ -83,7 +90,7 @@ export function AddSubscriptionForm({ onClose, initialName = '', initialPrice = 
   }
 
   return (
-    <form className="add-subscription-form" onSubmit={handleSubmit} noValidate>
+    <form className="add-form" onSubmit={handleSubmit} noValidate>
       <FormField
         label="Название"
         type="text"
@@ -110,19 +117,23 @@ export function AddSubscriptionForm({ onClose, initialName = '', initialPrice = 
         label="Следующее списание"
         type="date"
         value={date}
+        min={new Date().toISOString().split('T')[0]}
+        max="2100-12-31"
         onChange={(e) => {
-          setDate(e.target.value)
+          const value = e.target.value
+          if (value && value.split('-')[0].length > 4) return
+          setDate(value)
           clearError('date')
         }}
         error={errors.date}
       />
-      <div className="frow">
-        <span className="flabel">Цвет карточки</span>
-        <div className="colors">
+      <div className="add-form__row">
+        <span className="add-form__label">Цвет карточки</span>
+        <div className="add-form__colors">
           {presetColors.map((c) => (
             <div
               key={c}
-              className={`cdot ${color === c ? 'on' : ''}`}
+              className={`add-form__color ${color === c ? 'add-form__color--active' : ''}`}
               style={{ background: c }}
               onClick={() => setColor(c)}
             ></div>
@@ -130,13 +141,13 @@ export function AddSubscriptionForm({ onClose, initialName = '', initialPrice = 
         </div>
       </div>
 
-      <div className="frow">
-        <div className="setrow">
+      <div className="add-form__row">
+        <div className="add-form__setrow">
           <div>
             Разделить оплату
             <small>Добавить друга по @username</small>
           </div>
-          <div className={`sw ${isSplit ? 'on' : ''}`} onClick={() => setIsSplit(!isSplit)}></div>
+          <div className={`add-form__switch ${isSplit ? 'add-form__switch--on' : ''}`} onClick={() => setIsSplit(!isSplit)}></div>
         </div>
       </div>
 
@@ -167,7 +178,7 @@ export function AddSubscriptionForm({ onClose, initialName = '', initialPrice = 
         </>
       )}
 
-      <button className="addbtn" type="submit" disabled={isLoading || !userId}>
+      <button className="add-form__submit" type="submit" disabled={isLoading || !userId}>
         {isLoading ? 'Сохранение...' : 'Добавить подписку'}
       </button>
     </form>

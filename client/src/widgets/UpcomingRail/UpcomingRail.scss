@@ -1,0 +1,149 @@
+.upcoming-rail {
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 20px 12px;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--font-family-accent);
+    font-size: 21px;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+
+    i {
+      width: 3px;
+      height: 14px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+  }
+
+  &__more {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--dim);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    svg {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  }
+
+  &__list {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 2px 20px 4px;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+.upcoming-card {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 10px 14px 10px 10px;
+  cursor: pointer;
+  transition: transform 0.12s, border-color 0.2s;
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &--hot {
+    border-color: rgba(167, 139, 250, 0.5);
+    background: linear-gradient(180deg, rgba(167, 139, 250, 0.12), var(--surface) 70%);
+  }
+
+  &__date {
+    text-align: center;
+    min-width: 32px;
+
+    b {
+      display: block;
+      font-family: var(--font-family-accent);
+      font-size: 22px;
+      line-height: 1;
+      font-weight: 400;
+    }
+
+    span {
+      font-size: 8px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--dim);
+    }
+  }
+
+  &__badge {
+    display: block;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 2px;
+  }
+
+  &__sep {
+    width: 1px;
+    height: 30px;
+    background: var(--border);
+  }
+
+  &__logo {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-family-accent);
+    font-size: 15px;
+    color: #fff;
+    flex: 0 0 auto;
+    position: relative;
+    overflow: hidden;
+  }
+
+  &__logo-icon {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 58%;
+    height: 58%;
+    fill: currentColor;
+  }
+
+  &__name {
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  &__amount {
+    font-size: 12px;
+    font-weight: 800;
+    margin-top: 1px;
+  }
+}

@@ -47,19 +47,19 @@ export function AuthPage() {
 
   return (
     <div className="auth-page">
-      <div className="glow"></div>
-      <div className="glow2"></div>
+      <div className="auth-page__glow"></div>
+      <div className="auth-page__glow auth-page__glow--bottom"></div>
 
-      <div className="auth-left">
-        <div className="brandwrap rise" style={{ animationDelay: '0.02s' }}>
-          <div className="logotile">S</div>
-          <div className="wordmark">
+      <div className="auth-page__left">
+        <div className="auth-page__brand rise" style={{ animationDelay: '0.02s' }}>
+          <div className="auth-page__logo-tile">S</div>
+          <div className="auth-page__wordmark">
             Sub<b>Manager</b>
             <small>subscription tracker</small>
           </div>
         </div>
 
-        <div className="head rise" style={{ animationDelay: '0.08s' }}>
+        <div className="auth-page__head rise" style={{ animationDelay: '0.08s' }}>
           <h1>
             Все подписки.
             <br />
@@ -71,8 +71,8 @@ export function AuthPage() {
           </p>
         </div>
 
-        <div className="tmanote rise" style={{ animationDelay: '0.2s' }}>
-          <div className="tmico">
+        <div className="auth-page__note rise" style={{ animationDelay: '0.2s' }}>
+          <div className="auth-page__note-icon">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor">
               <path d="M9.04 15.51l-.38 5.34c.54 0 .78-.23 1.06-.51l2.55-2.44 5.28 3.87c.97.53 1.66.25 1.92-.9L21.9 4.6c.31-1.42-.51-1.97-1.46-1.63L2.7 9.92c-1.39.54-1.37 1.31-.24 1.66l4.55 1.42 10.57-6.66c.5-.31.95-.14.58.19L9.04 15.51z" />
             </svg>
@@ -83,28 +83,29 @@ export function AuthPage() {
           </div>
         </div>
 
-        <div className="terms rise" style={{ animationDelay: '0.26s' }}>
+        <div className="auth-page__terms rise" style={{ animationDelay: '0.26s' }}>
           Продолжая, ты принимаешь <a>условия использования</a>
           <br />и <a>политику конфиденциальности</a>
         </div>
       </div>
 
-      <div className="auth-right">
-        <div className="card rise" style={{ animationDelay: '0.14s' }}>
-          <button className="gbtn" onClick={handleGoogle} disabled={loading}>
+      <div className="auth-page__right">
+        <div className="auth-page__card rise" style={{ animationDelay: '0.14s' }}>
+          <button className="auth-page__google-btn" onClick={handleGoogle} disabled={loading}>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="#4285F4">
               <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z" />
             </svg>
             <span>{loading ? 'Подключаем Google…' : 'Продолжить с Google'}</span>
           </button>
 
-          <div className="divider">или</div>
+          <div className="auth-page__divider">или</div>
 
           <form onSubmit={handleAuth}>
-            <div className="frow">
+            <div className="auth-page__field">
               <label>Email</label>
-              <div className="inp">
+              <div className="auth-page__input-wrap">
                 <input
+                  className="auth-page__input"
                   type="email"
                   placeholder="vlad@gmail.com"
                   autoComplete="email"
@@ -115,10 +116,11 @@ export function AuthPage() {
               </div>
             </div>
 
-            <div className="frow">
+            <div className="auth-page__field">
               <label>Пароль</label>
-              <div className="inp">
+              <div className="auth-page__input-wrap">
                 <input
+                  className="auth-page__input"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
                   autoComplete={isLogin ? 'current-password' : 'new-password'}
@@ -127,7 +129,7 @@ export function AuthPage() {
                   required
                 />
                 <button
-                  className="eye"
+                  className="auth-page__eye"
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                 >
@@ -148,24 +150,24 @@ export function AuthPage() {
             </div>
 
             {isLogin && (
-              <a className="forgot" onClick={() => setMessage('Восстановление пока не реализовано')}>
+              <a className="auth-page__forgot" onClick={() => setMessage('Восстановление пока не реализовано')}>
                 Забыл пароль?
               </a>
             )}
 
-            <button className="sbtn" type="submit" disabled={loading}>
-              {loading ? <span className="spin"></span> : isLogin ? 'Войти' : 'Создать аккаунт'}
+            <button className="auth-page__submit" type="submit" disabled={loading}>
+              {loading ? <span className="auth-page__spinner"></span> : isLogin ? 'Войти' : 'Создать аккаунт'}
             </button>
           </form>
 
-          <div className="swline">
+          <div className="auth-page__switch-line">
             {isLogin ? 'Нет аккаунта? ' : 'Уже есть аккаунт? '}
             <a onClick={() => setIsLogin(!isLogin)}>
               {isLogin ? 'Регистрация' : 'Войти'}
             </a>
           </div>
 
-          {message && <p className="auth-message">{message}</p>}
+          {message && <p className="auth-page__message">{message}</p>}
         </div>
       </div>
     </div>

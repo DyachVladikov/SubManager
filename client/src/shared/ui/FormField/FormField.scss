@@ -1,47 +1,49 @@
-.frow {
+.form-field {
   display: flex;
   flex-direction: column;
   gap: 7px;
-}
 
-.flabel {
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--dim);
-}
+  &__label {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
 
-.finput {
-  width: 100%;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 13px;
-  padding: 12px 13px;
-  color: var(--text);
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  outline: none;
-  transition: border-color 0.2s;
-}
+  &__input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    padding: 12px 13px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    outline: none;
+    transition: border-color 0.2s;
 
-.finput:focus {
-  border-color: rgba(167, 139, 250, 0.55);
-}
+    &:focus {
+      border-color: rgba(167, 139, 250, 0.55);
+    }
+  }
 
-.frow.has-error .finput {
-  border-color: rgba(239, 143, 143, 0.7);
-}
+  &--error {
+    .form-field__input {
+      border-color: rgba(239, 143, 143, 0.7);
 
-.frow.has-error .finput:focus {
-  border-color: rgba(239, 143, 143, 0.9);
-  box-shadow: 0 0 0 3px rgba(239, 143, 143, 0.12);
-}
+      &:focus {
+        border-color: rgba(239, 143, 143, 0.9);
+        box-shadow: 0 0 0 3px rgba(239, 143, 143, 0.12);
+      }
+    }
+  }
 
-.ferror {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--up);
-  margin-top: -2px;
+  &__error {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--up);
+    margin-top: -2px;
+  }
 }

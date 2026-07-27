@@ -1,128 +1,110 @@
-.add-subscription-form {
+.add-form {
   display: flex;
   flex-direction: column;
   gap: 13px;
-}
 
-.add-subscription-form .frow {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
+  &__row {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
 
-.add-subscription-form .flabel {
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--dim);
-}
+  &__label {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
 
-.add-subscription-form .finput {
-  width: 100%;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 13px;
-  padding: 12px 13px;
-  color: var(--text);
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  outline: none;
-  transition: border-color 0.2s;
-}
+  &__colors {
+    display: flex;
+    gap: 9px;
+  }
 
-.add-subscription-form .finput:focus {
-  border-color: rgba(167, 139, 250, 0.55);
-}
+  &__color {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.12s, border-color 0.2s;
 
-.add-subscription-form .colors {
-  display: flex;
-  gap: 9px;
-}
+    &--active {
+      border-color: #fff;
+      transform: scale(1.12);
+    }
+  }
 
-.add-subscription-form .cdot {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: transform 0.12s, border-color 0.2s;
-}
+  &__submit {
+    width: 100%;
+    margin-top: 18px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+    color: #0b0b10;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 14px;
+    padding: 15px;
+    border-radius: 16px;
+    border: 0;
+    cursor: pointer;
+    transition: transform 0.12s;
+    box-shadow: 0 8px 24px rgba(124, 92, 240, 0.4);
 
-.add-subscription-form .cdot.on {
-  border-color: #fff;
-  transform: scale(1.12);
-}
+    &:active {
+      transform: scale(0.97);
+    }
 
-.add-subscription-form .addbtn {
-  width: 100%;
-  margin-top: 18px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-deep));
-  color: #0b0b10;
-  font-family: inherit;
-  font-weight: 800;
-  font-size: 14px;
-  padding: 15px;
-  border-radius: 16px;
-  border: 0;
-  cursor: pointer;
-  transition: transform 0.12s;
-  box-shadow: 0 8px 24px rgba(124, 92, 240, 0.4);
-}
+    &:disabled {
+      opacity: 0.8;
+      cursor: default;
+    }
+  }
 
-.add-subscription-form .addbtn:active {
-  transform: scale(0.97);
-}
+  &__setrow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 700;
 
-.add-subscription-form .addbtn:disabled {
-  opacity: 0.8;
-  cursor: default;
-}
+    small {
+      display: block;
+      font-size: 10px;
+      color: var(--dim);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+  }
 
-.add-subscription-form .setrow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 12px;
-  font-weight: 700;
-}
+  &__switch {
+    width: 42px;
+    height: 24px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.12);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex: 0 0 auto;
 
-.add-subscription-form .setrow small {
-  display: block;
-  font-size: 10px;
-  color: var(--dim);
-  font-weight: 600;
-  margin-top: 2px;
-}
+    &::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.2s;
+    }
 
-.add-subscription-form .sw {
-  width: 42px;
-  height: 24px;
-  border-radius: 99px;
-  background: rgba(255, 255, 255, 0.12);
-  position: relative;
-  cursor: pointer;
-  transition: background 0.2s;
-  flex: 0 0 auto;
-}
+    &--on {
+      background: var(--accent);
 
-.add-subscription-form .sw::after {
-  content: '';
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #fff;
-  transition: transform 0.2s;
-}
-
-.add-subscription-form .sw.on {
-  background: var(--accent);
-}
-
-.add-subscription-form .sw.on::after {
-  transform: translateX(18px);
+      &::after {
+        transform: translateX(18px);
+      }
+    }
+  }
 }

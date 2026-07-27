@@ -1,0 +1,73 @@
+.dashboard-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 20px 6px;
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+  }
+
+  &__avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 13px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-family-accent);
+    font-size: 19px;
+    color: #0b0b10;
+  }
+
+  &__greeting {
+    small {
+      display: block;
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--dim);
+      font-weight: 700;
+    }
+
+    b {
+      font-size: 14px;
+      font-weight: 800;
+    }
+  }
+
+  &__icon-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 13px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--dim);
+    position: relative;
+
+    svg {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  }
+
+  &__dot {
+    position: absolute;
+    top: 8px;
+    right: 9px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+}

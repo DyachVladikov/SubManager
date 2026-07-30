@@ -1,21 +1,42 @@
-import { heroData, monthNames, yearNames } from '@/mocks/subscriptions'
+import { useMemo } from 'react'
+import type { Subscription } from '@/entities/subscription/model/types'
+import { computeHeroStats } from '@/entities/subscription/lib/subscriptionStats'
 import './HeroCard.scss'
 
 interface HeroCardProps {
   mode: 'month' | 'year'
   onModeChange: (mode: 'month' | 'year') => void
+  subscriptions: Subscription[]
 }
 
-export function HeroCard({ mode, onModeChange }: HeroCardProps) {
-  const data = heroData[mode]
-  const chartNames = mode === 'month' ? monthNames : yearNames
+export function HeroCard({ mode, onModeChange, subscriptions }: HeroCardProps) {
+  const stats = useMemo(() => computeHeroStats(subscriptions), [subscriptions])
+
+  const isMonth = mode === 'month'
+  const points = isMonth ? stats.monthlyTotals : stats.yearlyTotals
+  const labels = isMonth ? stats.monthLabels : stats.yearLabels
+  const value = isMonth ? stats.monthTotal : stats.yearTotal
+  const paid = isMonth ? stats.paidMonth : stats.paidYear
+  const remaining = isMonth ? stats.remainingMonth : stats.remainingYear
+  const progress = paid + remaining > 0 ? Math.round((paid / (paid + remaining)) * 100) : 0
+
+  const chartWidth = 350
+  const chartHeight = 64
+  const max = Math.max(...points, 1)
+  const coords = points.map((point, i) => ({
+    x: 8 + (i * (chartWidth - 16)) / Math.max(points.length - 1, 1),
+    y: 54 - (point / max) * 42,
+  }))
+  const linePath = coords.map((c, i) => `${i === 0 ? 'M' : 'L'}${c.x.toFixed(1)} ${c.y.toFixed(1)}`).join(' ')
+  const areaPath = `${linePath} L${coords[coords.length - 1].x.toFixed(1)} ${chartHeight} L${coords[0].x.toFixed(1)} ${chartHeight} Z`
+  const last = coords[coords.length - 1]
 
   return (
     <div className="hero-card rise" style={{ animationDelay: '0.06s' }}>
       <div className="hero-card__topline">
         <div className="hero-card__label">
           <i></i>
-          <span>{data.label}</span>
+          <span>{isMonth ? `Расходы · ${stats.currentMonthLabel}` : `Расходы · ${stats.currentYear}`}</span>
         </div>
         <div className={`hero-card__segctl ${mode === 'year' ? 'hero-card__segctl--year' : ''}`}>
           <span className="hero-card__segctl-pill"></span>
@@ -33,19 +54,14 @@ export function HeroCard({ mode, onModeChange }: HeroCardProps) {
           </button>
         </div>
       </div>
-      <div className="hero-card__sum">
-        <div className="hero-card__num">{data.value.toLocaleString('ru-RU')}</div>
+      <div className="hero-card__sum swap" key={`sum-${mode}`}>
+        <div className="hero-card__num">{value.toLocaleString('ru-RU')}</div>
         <div className="hero-card__per">₽</div>
       </div>
-      <div className="hero-card__row">
-        <span className="hero-card__chip">
-          <svg width="11" height="11" viewBox="0 0 24 24">
-            <path d="M7 17 17 7" />
-            <path d="M8 7h9v9" />
-          </svg>
-          <span>{data.delta}</span>
+      <div className="hero-card__row swap" key={`row-${mode}`}>
+        <span className="hero-card__servs">
+          {isMonth ? `${stats.servicesCount} активных сервисов` : `в среднем ${stats.monthTotal.toLocaleString('ru-RU')} ₽ / мес`}
         </span>
-        <span className="hero-card__servs">{data.services}</span>
       </div>
       <div className="hero-card__chart">
         <svg width="100%" height="64" viewBox="0 0 350 64" preserveAspectRatio="none">
@@ -57,33 +73,29 @@ export function HeroCard({ mode, onModeChange }: HeroCardProps) {
           </defs>
           <line x1="0" y1="20" x2="350" y2="20" stroke="rgba(255,255,255,.05)" strokeDasharray="3 5" />
           <line x1="0" y1="44" x2="350" y2="44" stroke="rgba(255,255,255,.05)" strokeDasharray="3 5" />
-          <path id="harea" fill="url(#sg)" />
-          <path id="hfc" fill="none" stroke="#7c5cf0" strokeWidth="2" strokeDasharray="4 5" strokeLinecap="round" opacity=".55" />
-          <path id="hline" fill="none" stroke="#a78bfa" strokeWidth="2" strokeLinecap="round" />
-          <line id="hx" y1="4" y2="64" stroke="rgba(255,255,255,.25)" strokeDasharray="2 4" />
-          <circle id="hendO" r="7" fill="#a78bfa" opacity=".18" />
-          <circle id="hend" r="3" fill="#a78bfa" />
-          <circle id="hdot" r="4" fill="#a78bfa" />
+          <path d={areaPath} fill="url(#sg)" />
+          <path d={linePath} fill="none" stroke="#a78bfa" strokeWidth="2" strokeLinecap="round" />
+          <circle cx={last.x} cy={last.y} r="7" fill="#a78bfa" opacity=".18" />
+          <circle cx={last.x} cy={last.y} r="3" fill="#a78bfa" />
         </svg>
-        <div className="hero-card__tip"></div>
         <div className="hero-card__range">
-          <span>{chartNames[0]}</span>
-          <span>{chartNames[chartNames.length - 1]}</span>
+          <span>{labels[0]}</span>
+          <span>{labels[labels.length - 1]}</span>
         </div>
       </div>
-      <div className="hero-card__progress">
+      <div className="hero-card__progress swap" key={`progress-${mode}`}>
         <div className="hero-card__progress-row">
           <span>
             <i className="hero-card__dot hero-card__dot--paid"></i>
-            <span>{data.paid}</span> · <b>{data.paidValue}</b>
+            <span>{isMonth ? 'Списано' : `Списано в ${stats.currentYear}`}</span> · <b>{paid.toLocaleString('ru-RU')} ₽</b>
           </span>
           <span>
             <i className="hero-card__dot hero-card__dot--remaining"></i>
-            <span>{data.remaining}</span> · <b>{data.remainingValue}</b>
+            <span>{isMonth ? 'Осталось' : 'До конца года'}</span> · <b>{remaining.toLocaleString('ru-RU')} ₽</b>
           </span>
         </div>
         <div className="hero-card__progress-bar">
-          <i style={{ width: `${data.progress}%` }}></i>
+          <i style={{ width: `${progress}%` }}></i>
         </div>
       </div>
     </div>

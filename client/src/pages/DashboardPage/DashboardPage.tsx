@@ -90,7 +90,7 @@ export function DashboardPage() {
       <div className="dashboard-page__glow"></div>
 
       <DashboardHeader />
-      <HeroCard mode={mode} onModeChange={setMode} />
+      <HeroCard mode={mode} onModeChange={setMode} subscriptions={dbSubscriptions} />
       <CategoriesCard />
       <UpcomingRail subscriptions={subscriptions} />
       <SubscriptionsGrid

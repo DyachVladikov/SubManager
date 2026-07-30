@@ -1,13 +1,18 @@
 .subscription-detail {
   position: fixed;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  max-width: 430px;
   background: var(--bg);
-  z-index: 15;
+  z-index: 16;
   transform: translateX(102%);
   transition: transform 0.4s cubic-bezier(0.3, 0.8, 0.3, 1);
   overflow-y: auto;
   padding-bottom: 44px;
   scrollbar-width: none;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
 
   &::-webkit-scrollbar {
     display: none;
@@ -15,6 +20,22 @@
 
   &--open {
     transform: translateX(0);
+  }
+
+  &__backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 15;
+    background: rgba(5, 5, 8, 0.55);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+
+    &--open {
+      opacity: 1;
+      pointer-events: auto;
+    }
   }
 
   &__glow {
@@ -57,6 +78,14 @@
       justify-content: center;
       cursor: pointer;
       transition: transform 0.12s;
+
+      svg {
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
 
       &:active {
         transform: scale(0.9);
@@ -393,6 +422,11 @@
 
       svg {
         color: var(--dn);
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
       }
     }
   }

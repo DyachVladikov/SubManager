@@ -19,6 +19,15 @@ export interface CreateSplitInput {
 
 export const splitApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    getSplits: builder.query<Split[], void>({
+      queryFn: async () => {
+        const { data, error } = await supabase.from('splits').select('*')
+        if (error) return { error }
+        return { data: data as Split[] }
+      },
+      providesTags: ['Subscription'],
+    }),
+
     getSplitsBySubscription: builder.query<Split[], string>({
       queryFn: async (subscriptionId) => {
         const { data, error } = await supabase
@@ -56,6 +65,7 @@ export const splitApi = baseApi.injectEndpoints({
 })
 
 export const {
+  useGetSplitsQuery,
   useGetSplitsBySubscriptionQuery,
   useCreateSplitMutation,
   useDeleteSplitMutation,

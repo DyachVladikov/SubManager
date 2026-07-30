@@ -6,11 +6,12 @@ import './SubscriptionsGrid.scss'
 interface SubscriptionsGridProps {
   subscriptions: Subscription[]
   removingIds: string[]
+  splitCounts: Record<string, number>
   onOpen: (id: string) => void
   onAdd: () => void
 }
 
-export function SubscriptionsGrid({ subscriptions, removingIds, onOpen, onAdd }: SubscriptionsGridProps) {
+export function SubscriptionsGrid({ subscriptions, removingIds, splitCounts, onOpen, onAdd }: SubscriptionsGridProps) {
   const gridRef = useRef<HTMLDivElement>(null)
   useFlipGrid(gridRef)
 
@@ -40,7 +41,7 @@ export function SubscriptionsGrid({ subscriptions, removingIds, onOpen, onAdd }:
               <div className="sub-card__logo" style={{ background: sub.color, color: sub.dark ? '#1a1a1a' : '#fff' }}>
                 {sub.letter}
               </div>
-              {sub.split && (
+              {(splitCounts[sub.id] ?? 0) > 0 && (
                 <span className="sub-card__split">
                   <svg width="9" height="9" viewBox="0 0 24 24">
                     <path d="M8 3 4 7l4 4" />
@@ -48,7 +49,7 @@ export function SubscriptionsGrid({ subscriptions, removingIds, onOpen, onAdd }:
                     <path d="m16 21 4-4-4-4" />
                     <path d="M20 17H4" />
                   </svg>
-                  {sub.split.length}
+                  {splitCounts[sub.id]}
                 </span>
               )}
             </div>

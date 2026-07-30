@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useGetSubscriptionsQuery } from '@/entities/subscription/api/subscriptionApi'
+import { useGetSplitsQuery } from '@/entities/split/api/splitApi'
 import { mapSubscription } from '@/entities/subscription/lib/mapSubscription'
 import { useRemoveSubscription } from '@/features/subscription/delete'
 import { useToast } from '@/shared/lib/useToast'
+import { useBodyScrollLock } from '@/shared/lib/useBodyScrollLock'
 import { Toast } from '@/shared/ui/Toast'
 import { DashboardHeader } from '@/widgets/DashboardHeader'
 import { HeroCard } from '@/widgets/HeroCard'
@@ -26,7 +28,12 @@ export function DashboardPage() {
   })
 
   const { data: dbSubscriptions = [], isLoading } = useGetSubscriptionsQuery()
+  const { data: splits = [] } = useGetSplitsQuery()
   const subscriptions = dbSubscriptions.map(mapSubscription)
+  const splitCounts = splits.reduce<Record<string, number>>((acc, split) => {
+    acc[split.subscription_id] = (acc[split.subscription_id] || 0) + 1
+    return acc
+  }, {})
 
   const openDetail = (id: string) => {
     setSelectedSub(id)
@@ -55,6 +62,7 @@ export function DashboardPage() {
   }
 
   const selected = subscriptions.find((s) => s.id === selectedSub)
+  useBodyScrollLock(sheetOpen || selectedSub !== null)
   const editingRaw = dbSubscriptions.find((s) => s.id === editingId)
   const editing = editingRaw
     ? {
@@ -88,6 +96,7 @@ export function DashboardPage() {
       <SubscriptionsGrid
         subscriptions={subscriptions}
         removingIds={removingIds}
+        splitCounts={splitCounts}
         onOpen={openDetail}
         onAdd={() => setSheetOpen(true)}
       />

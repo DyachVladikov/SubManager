@@ -7,6 +7,17 @@ import './AddSubscriptionForm.scss'
 
 const presetColors = ['#e50914', '#ff7a00', '#ffd34d', '#1db954', '#3a9bf0', '#a78bfa']
 
+const popularServices = [
+  { name: 'Netflix', color: '#e50914' },
+  { name: 'Яндекс Плюс', color: '#fc3f1d' },
+  { name: 'YouTube Premium', color: '#ff0000' },
+  { name: 'Spotify', color: '#1db954' },
+  { name: 'Кинопоиск', color: '#ff7a00' },
+  { name: 'VK Музыка', color: '#0077ff' },
+  { name: 'Okko', color: '#a78bfa' },
+  { name: 'Apple Music', color: '#fa2d48' },
+]
+
 interface AddSubscriptionFormProps {
   onClose: () => void
   onSuccess?: () => void
@@ -25,6 +36,7 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
   const [isSplit, setIsSplit] = useState(false)
   const [splitUsername, setSplitUsername] = useState('')
   const [splitAmount, setSplitAmount] = useState('')
+  const [splitMode, setSplitMode] = useState<'rub' | 'pct'>('rub')
   const [userId, setUserId] = useState<string | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [createSubscription, { isLoading: isCreating }] = useCreateSubscriptionMutation()
@@ -49,7 +61,14 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
       if (year < 2020 || year > 2100) newErrors.date = 'Некорректный год'
     }
     if (isSplit && !splitUsername.trim()) newErrors.splitUsername = 'Обязательное поле'
-    if (isSplit && (!splitAmount || Number(splitAmount) <= 0)) newErrors.splitAmount = 'Обязательное поле'
+    if (isSplit) {
+      const value = Number(splitAmount)
+      if (!splitAmount || value <= 0) {
+        newErrors.splitAmount = 'Обязательное поле'
+      } else if (splitMode === 'pct' && value >= 100) {
+        newErrors.splitAmount = 'От 1 до 99'
+      }
+    }
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -59,6 +78,8 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
     if (!validate() || !userId) return
 
     try {
+      const splitAmountValue = splitMode === 'pct' ? Math.round((Number(price) * Number(splitAmount)) / 100) : Number(splitAmount)
+
       if (editingId) {
         await updateSubscription({
           id: editingId,
@@ -67,6 +88,14 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
           next_payment_date: date,
           color_hex: color,
         }).unwrap()
+
+        if (isSplit && splitUsername.trim()) {
+          await createSplit({
+            subscription_id: editingId,
+            debtor_username: splitUsername,
+            amount: splitAmountValue,
+          }).unwrap()
+        }
       } else {
         const subscription = await createSubscription({
           title: name,
@@ -81,7 +110,7 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
           await createSplit({
             subscription_id: subscription.id,
             debtor_username: splitUsername,
-            amount: Number(splitAmount),
+            amount: splitAmountValue,
           }).unwrap()
         }
       }
@@ -105,6 +134,27 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
 
   return (
     <form className="add-form" onSubmit={handleSubmit} noValidate>
+      {!editingId && (
+        <div className="add-form__row">
+          <span className="add-form__label">Популярные</span>
+          <div className="add-form__presets">
+            {popularServices.map((service) => (
+              <div
+                key={service.name}
+                className="add-form__preset"
+                onClick={() => {
+                  setName(service.name)
+                  setColor(service.color)
+                  clearError('name')
+                }}
+              >
+                <i style={{ background: service.color }}></i>
+                {service.name}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       <FormField
         label="Название"
         type="text"
@@ -155,44 +205,59 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
         </div>
       </div>
 
-      {!editingId && (
-        <>
-          <div className="add-form__row">
-            <div className="add-form__setrow">
-              <div>
-                Разделить оплату
-                <small>Добавить друга по @username</small>
-              </div>
-              <div className={`add-form__switch ${isSplit ? 'add-form__switch--on' : ''}`} onClick={() => setIsSplit(!isSplit)}></div>
-            </div>
+      <div className="add-form__row">
+        <div className="add-form__setrow">
+          <div>
+            Разделить оплату
+            <small>Добавить друга по @username</small>
           </div>
+          <div className={`add-form__switch ${isSplit ? 'add-form__switch--on' : ''}`} onClick={() => setIsSplit(!isSplit)}></div>
+        </div>
+      </div>
 
-          {isSplit && (
-            <>
-              <FormField
-                label="Telegram username друга"
-                type="text"
-                value={splitUsername}
-                onChange={(e) => {
-                  setSplitUsername(e.target.value)
-                  clearError('splitUsername')
-                }}
-                placeholder="@kostya"
-                error={errors.splitUsername}
-              />
-              <FormField
-                label="Сумма доли · ₽"
-                type="number"
-                value={splitAmount}
-                onChange={(e) => {
-                  setSplitAmount(e.target.value)
-                  clearError('splitAmount')
-                }}
-                placeholder="266"
-                error={errors.splitAmount}
-              />
-            </>
-          )}
+      {isSplit && (
+        <>
+          <FormField
+            label="Telegram username друга"
+            type="text"
+            value={splitUsername}
+            onChange={(e) => {
+              setSplitUsername(e.target.value)
+              clearError('splitUsername')
+            }}
+            placeholder="@kostya"
+            error={errors.splitUsername}
+          />
+          <div className="add-form__row">
+            <div className="add-form__label-row">
+              <span className="add-form__label">{splitMode === 'rub' ? 'Сумма доли' : 'Доля в процентах'}</span>
+              <div className="add-form__unit-toggle">
+                <span
+                  className={`add-form__unit ${splitMode === 'rub' ? 'add-form__unit--active' : ''}`}
+                  onClick={() => setSplitMode('rub')}
+                >
+                  ₽
+                </span>
+                <span
+                  className={`add-form__unit ${splitMode === 'pct' ? 'add-form__unit--active' : ''}`}
+                  onClick={() => setSplitMode('pct')}
+                >
+                  %
+                </span>
+              </div>
+            </div>
+            <FormField
+              label=""
+              type="number"
+              value={splitAmount}
+              onChange={(e) => {
+                setSplitAmount(e.target.value)
+                clearError('splitAmount')
+              }}
+              placeholder={splitMode === 'rub' ? '266' : '33'}
+              error={errors.splitAmount}
+            />
+          </div>
         </>
       )}
 

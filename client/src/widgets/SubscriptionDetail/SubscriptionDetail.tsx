@@ -1,5 +1,6 @@
-import type { CSSProperties } from 'react'
+import { useEffect, type CSSProperties } from 'react'
 import type { Subscription } from '@/mocks/subscriptions'
+import { useGetSplitsBySubscriptionQuery } from '@/entities/split/api/splitApi'
 import './SubscriptionDetail.scss'
 
 interface SubscriptionDetailProps {
@@ -11,8 +12,23 @@ interface SubscriptionDetailProps {
 }
 
 export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEdit }: SubscriptionDetailProps) {
+  const { data: splits = [] } = useGetSplitsBySubscriptionQuery(subscription.id)
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', handleEsc)
+    return () => window.removeEventListener('keydown', handleEsc)
+  }, [onClose])
+
   return (
-    <div className={`subscription-detail ${open ? 'subscription-detail--open' : ''}`}>
+    <>
+      <div
+        className={`subscription-detail__backdrop ${open ? 'subscription-detail__backdrop--open' : ''}`}
+        onClick={onClose}
+      ></div>
+      <div className={`subscription-detail ${open ? 'subscription-detail--open' : ''}`}>
       <div className="subscription-detail__glow" style={{ '--bc': subscription.color } as CSSProperties}></div>
       <div className="subscription-detail__head">
         <div className="subscription-detail__head-btn" onClick={onClose}>
@@ -22,7 +38,7 @@ export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEd
           </svg>
         </div>
         <span className="subscription-detail__head-label">Подписка</span>
-        <div className="subscription-detail__head-btn">
+        <div className="subscription-detail__head-btn" onClick={() => onEdit(subscription.id)}>
           <svg width="14" height="14" viewBox="0 0 24 24">
             <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
           </svg>
@@ -60,34 +76,34 @@ export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEd
         </div>
       </div>
       <div className="subscription-detail__card">
-        {subscription.split ? (
+        {splits.length > 0 ? (
           <>
             <div className="subscription-detail__split-head">
               <div className="subscription-detail__label">
                 <i></i>Split
               </div>
-              <span className="subscription-detail__split-count">{subscription.split.length} чел</span>
+              <span className="subscription-detail__split-count">{splits.length} чел</span>
             </div>
-            {subscription.split.map((p) => (
-              <div className="subscription-detail__row" key={p.username}>
+            {splits.map((p) => (
+              <div className="subscription-detail__row" key={p.id}>
                 <div className="subscription-detail__avatar" style={{ background: `linear-gradient(135deg,#8c6df6,#6947e6)` }}>
-                  {p.name[0]}
+                  {p.debtor_username.replace(/^@/, '')[0].toUpperCase()}
                 </div>
                 <div className="subscription-detail__person">
-                  {p.name}
-                  <small>{p.username}</small>
+                  {p.debtor_username.replace(/^@/, '')}
+                  <small>@{p.debtor_username.replace(/^@/, '')}</small>
                 </div>
                 <div className="subscription-detail__amount">
                   {p.amount} ₽<br />
-                  <span className={`subscription-detail__status ${p.paid ? 'subscription-detail__status--paid' : 'subscription-detail__status--pending'}`}>
-                    {p.paid ? 'оплатил' : 'ждём'}
+                  <span className={`subscription-detail__status ${p.status === 'paid' ? 'subscription-detail__status--paid' : 'subscription-detail__status--pending'}`}>
+                    {p.status === 'paid' ? 'оплатил' : 'ждём'}
                   </span>
                 </div>
               </div>
             ))}
             <div className="subscription-detail__split-footer">
               <span className="subscription-detail__split-label">Твоя доля</span>
-              <b>{subscription.price - subscription.split.reduce((a, p) => a + p.amount, 0)} ₽/мес</b>
+              <b>{subscription.price - splits.reduce((a, p) => a + p.amount, 0)} ₽/мес</b>
             </div>
           </>
         ) : (
@@ -104,7 +120,9 @@ export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEd
             <div className="subscription-detail__cta-text">
               Добавь друзей по @username — каждый платит свою долю, бот сам напомнит о переводе за день до списания.
             </div>
-            <button className="subscription-detail__cta-btn">Настроить split</button>
+            <button className="subscription-detail__cta-btn" onClick={() => onEdit(subscription.id)}>
+              Настроить split
+            </button>
             <div className="subscription-detail__cta-lock">
               <svg width="11" height="11" viewBox="0 0 24 24">
                 <rect width="18" height="11" x="3" y="11" rx="2" />
@@ -149,6 +167,7 @@ export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEd
           Удалить
         </button>
       </div>
-    </div>
+      </div>
+    </>
   )
 }

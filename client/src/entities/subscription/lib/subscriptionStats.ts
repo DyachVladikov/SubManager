@@ -16,6 +16,38 @@ export const monthNamesFull = [
   'Декабрь',
 ]
 
+export interface CategoryStat {
+  name: string
+  amount: number
+  percent: number
+}
+
+export function computeCategoryStats(subs: Subscription[], categoryNames: Record<string, string>): CategoryStat[] {
+  const totals = new Map<string, number>()
+  subs.forEach((sub) => {
+    const name = (sub.category_id && categoryNames[sub.category_id]) || 'Другое'
+    totals.set(name, (totals.get(name) || 0) + sub.amount)
+  })
+
+  const sorted = Array.from(totals.entries())
+    .map(([name, amount]) => ({ name, amount }))
+    .sort((a, b) => b.amount - a.amount)
+
+  const total = sorted.reduce((acc, cat) => acc + cat.amount, 0)
+  if (total === 0) return []
+
+  const top = sorted.slice(0, 4)
+  const rest = sorted.slice(4)
+  if (rest.length > 0) {
+    top.push({ name: 'Остальное', amount: rest.reduce((acc, cat) => acc + cat.amount, 0) })
+  }
+
+  return top.map((cat) => ({
+    ...cat,
+    percent: Math.round((cat.amount / total) * 100),
+  }))
+}
+
 export interface HeroStats {
   monthTotal: number
   yearTotal: number
@@ -24,10 +56,12 @@ export interface HeroStats {
   remainingMonth: number
   paidYear: number
   remainingYear: number
-  monthlyTotals: number[]
+  dailyCumulative: number[]
+  todayIndex: number
+  monthRangeLabels: string[]
   yearlyTotals: number[]
-  monthLabels: string[]
   yearLabels: string[]
+  currentMonthIndex: number
   currentMonthLabel: string
   currentYear: number
 }
@@ -46,25 +80,29 @@ export function computeHeroStats(subs: Subscription[]): HeroStats {
 
   const monthTotal = subs.reduce((acc, sub) => acc + sub.amount, 0)
 
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+  const todayDay = now.getDate()
+
   let paidMonth = 0
   let remainingMonth = 0
+  const dailyAmounts = new Array<number>(daysInMonth).fill(0)
   subs.forEach((sub) => {
-    const next = new Date(sub.next_payment_date)
-    const alreadyPaidThisMonth = next.getFullYear() > year || (next.getFullYear() === year && next.getMonth() > month)
-    if (alreadyPaidThisMonth) {
+    const billingDay = Math.min(new Date(sub.next_payment_date).getDate(), daysInMonth)
+    dailyAmounts[billingDay - 1] += sub.amount
+    if (billingDay <= todayDay) {
       paidMonth += sub.amount
     } else {
       remainingMonth += sub.amount
     }
   })
-
-  const monthlyTotals: number[] = []
-  const monthLabels: string[] = []
-  for (let i = 6; i >= 0; i--) {
-    const date = new Date(year, month - i + 1, 0, 23, 59, 59)
-    monthlyTotals.push(totalBefore(subs, date))
-    monthLabels.push(monthNamesShort[date.getMonth()])
-  }
+  const dailyCumulative: number[] = []
+  let running = 0
+  dailyAmounts.forEach((amount) => {
+    running += amount
+    dailyCumulative.push(running)
+  })
+  const todayIndex = Math.min(now.getDate() - 1, daysInMonth - 1)
+  const monthRangeLabels = [`1 ${monthNamesShort[month]}`, `${daysInMonth} ${monthNamesShort[month]}`]
 
   const yearlyTotals: number[] = []
   for (let m = 0; m < 12; m++) {
@@ -77,16 +115,18 @@ export function computeHeroStats(subs: Subscription[]): HeroStats {
 
   return {
     monthTotal,
-    yearTotal: monthlyTotals[monthlyTotals.length - 1] * 12,
+    yearTotal: monthTotal * 12,
     servicesCount: subs.length,
     paidMonth,
     remainingMonth,
     paidYear,
     remainingYear,
-    monthlyTotals,
+    dailyCumulative,
+    todayIndex,
+    monthRangeLabels,
     yearlyTotals,
-    monthLabels,
     yearLabels: monthNamesShort,
+    currentMonthIndex: month,
     currentMonthLabel: monthNamesFull[month],
     currentYear: year,
   }

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useGetSubscriptionsQuery } from '@/entities/subscription/api/subscriptionApi'
+import { useGetSubscriptionsQuery, useGetCategoriesQuery } from '@/entities/subscription/api/subscriptionApi'
 import { useGetSplitsQuery } from '@/entities/split/api/splitApi'
 import { mapSubscription } from '@/entities/subscription/lib/mapSubscription'
 import { useRemoveSubscription } from '@/features/subscription/delete'
@@ -29,7 +29,12 @@ export function DashboardPage() {
 
   const { data: dbSubscriptions = [], isLoading } = useGetSubscriptionsQuery()
   const { data: splits = [] } = useGetSplitsQuery()
-  const subscriptions = dbSubscriptions.map(mapSubscription)
+  const { data: categories = [] } = useGetCategoriesQuery()
+  const categoryNames = categories.reduce<Record<string, string>>((acc, cat) => {
+    acc[cat.id] = cat.name
+    return acc
+  }, {})
+  const subscriptions = dbSubscriptions.map((sub) => mapSubscription(sub, sub.category_id ? categoryNames[sub.category_id] : undefined))
   const splitCounts = splits.reduce<Record<string, number>>((acc, split) => {
     acc[split.subscription_id] = (acc[split.subscription_id] || 0) + 1
     return acc
@@ -71,6 +76,7 @@ export function DashboardPage() {
         price: String(editingRaw.amount),
         date: editingRaw.next_payment_date,
         color: editingRaw.color_hex || '#a78bfa',
+        categoryId: editingRaw.category_id,
       }
     : null
 
@@ -91,7 +97,7 @@ export function DashboardPage() {
 
       <DashboardHeader />
       <HeroCard mode={mode} onModeChange={setMode} subscriptions={dbSubscriptions} />
-      <CategoriesCard />
+      <CategoriesCard subscriptions={dbSubscriptions} categoryNames={categoryNames} />
       <UpcomingRail subscriptions={subscriptions} />
       <SubscriptionsGrid
         subscriptions={subscriptions}

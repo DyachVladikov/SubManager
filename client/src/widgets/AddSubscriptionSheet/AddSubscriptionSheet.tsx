@@ -7,6 +7,7 @@ export interface EditingSubscription {
   price: string
   date: string
   color: string
+  categoryId: string | null
 }
 
 interface AddSubscriptionSheetProps {
@@ -40,6 +41,7 @@ export function AddSubscriptionSheet({ onClose, onSuccess, editing }: AddSubscri
           initialPrice={editing?.price}
           initialDate={editing?.date}
           initialColor={editing?.color}
+          initialCategoryId={editing?.categoryId}
         />
       </div>
     </>

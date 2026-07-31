@@ -1,22 +1,20 @@
 import { useState, useEffect } from 'react'
-import { useCreateSubscriptionMutation, useUpdateSubscriptionMutation } from '@/entities/subscription/api/subscriptionApi'
+import { useCreateSubscriptionMutation, useUpdateSubscriptionMutation, useGetCategoriesQuery } from '@/entities/subscription/api/subscriptionApi'
 import { useCreateSplitMutation } from '@/entities/split/api/splitApi'
+import { presetCatalog } from '@/entities/subscription/model/presetCatalog'
 import { FormField } from '@/shared/ui/FormField'
+import { Select } from '@/shared/ui/Select'
 import { supabase } from '@/shared/config/supabase'
 import './AddSubscriptionForm.scss'
 
 const presetColors = ['#e50914', '#ff7a00', '#ffd34d', '#1db954', '#3a9bf0', '#a78bfa']
 
-const popularServices = [
-  { name: 'Netflix', color: '#e50914' },
-  { name: 'Яндекс Плюс', color: '#fc3f1d' },
-  { name: 'YouTube Premium', color: '#ff0000' },
-  { name: 'Spotify', color: '#1db954' },
-  { name: 'Кинопоиск', color: '#ff7a00' },
-  { name: 'VK Музыка', color: '#0077ff' },
-  { name: 'Okko', color: '#a78bfa' },
-  { name: 'Apple Music', color: '#fa2d48' },
-]
+const getDefaultDate = () => {
+  const date = new Date()
+  date.setMonth(date.getMonth() + 1)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+}
 
 interface AddSubscriptionFormProps {
   onClose: () => void
@@ -26,13 +24,17 @@ interface AddSubscriptionFormProps {
   initialPrice?: string
   initialDate?: string
   initialColor?: string
+  initialCategoryId?: string | null
 }
 
-export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName = '', initialPrice = '', initialDate = '', initialColor = '#a78bfa' }: AddSubscriptionFormProps) {
+export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName = '', initialPrice = '', initialDate = '', initialColor = '#a78bfa', initialCategoryId = null }: AddSubscriptionFormProps) {
   const [name, setName] = useState(initialName)
   const [price, setPrice] = useState(initialPrice)
-  const [date, setDate] = useState(initialDate)
+  const [date, setDate] = useState(initialDate || getDefaultDate())
   const [color, setColor] = useState(initialColor)
+  const [categoryId, setCategoryId] = useState<string | null>(initialCategoryId)
+  const [presetCategory, setPresetCategory] = useState('')
+  const [selectedService, setSelectedService] = useState('')
   const [isSplit, setIsSplit] = useState(false)
   const [splitUsername, setSplitUsername] = useState('')
   const [splitAmount, setSplitAmount] = useState('')
@@ -41,8 +43,49 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [createSubscription, { isLoading: isCreating }] = useCreateSubscriptionMutation()
   const [updateSubscription, { isLoading: isUpdating }] = useUpdateSubscriptionMutation()
+  const { data: categories = [] } = useGetCategoriesQuery()
   const [createSplit] = useCreateSplitMutation()
   const isLoading = isCreating || isUpdating
+
+  const nameToCategoryId = categories.reduce<Record<string, string>>((acc, cat) => {
+    acc[cat.name] = cat.id
+    return acc
+  }, {})
+  const activePresetCategory = presetCatalog.find((cat) => cat.name === presetCategory) || null
+  const serviceOptions = (activePresetCategory?.services || []).map((service) => ({
+    value: service.name,
+    label: service.name,
+    color: service.color,
+  }))
+
+  useEffect(() => {
+    if (presetCategory || !initialCategoryId) return
+    const dbCategory = categories.find((cat) => cat.id === initialCategoryId)
+    if (dbCategory && presetCatalog.some((cat) => cat.name === dbCategory.name)) {
+      setPresetCategory(dbCategory.name)
+    }
+  }, [categories, initialCategoryId, presetCategory])
+
+  const handlePresetCategoryClick = (catName: string) => {
+    if (presetCategory === catName) {
+      setPresetCategory('')
+      setCategoryId(null)
+    } else {
+      setPresetCategory(catName)
+      setCategoryId(nameToCategoryId[catName] || null)
+    }
+    setSelectedService('')
+  }
+
+  const handleServiceSelect = (serviceName: string) => {
+    setSelectedService(serviceName)
+    const service = activePresetCategory?.services.find((s) => s.name === serviceName)
+    if (!service) return
+    setName(service.name)
+    setColor(service.color)
+    if (service.price) setPrice(String(service.price))
+    clearError('name')
+  }
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -87,6 +130,7 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
           amount: Number(price),
           next_payment_date: date,
           color_hex: color,
+          category_id: categoryId,
         }).unwrap()
 
         if (isSplit && splitUsername.trim()) {
@@ -103,6 +147,7 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
           currency: 'RUB',
           next_payment_date: date,
           color_hex: color,
+          category_id: categoryId,
           user_id: userId,
         }).unwrap()
 
@@ -134,25 +179,24 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
 
   return (
     <form className="add-form" onSubmit={handleSubmit} noValidate>
-      {!editingId && (
+      <div className="add-form__row">
+        <span className="add-form__label">Категория</span>
+        <div className="add-form__presets">
+          {presetCatalog.map((cat) => (
+            <div
+              key={cat.name}
+              className={`add-form__preset ${presetCategory === cat.name ? 'add-form__preset--active' : ''}`}
+              onClick={() => handlePresetCategoryClick(cat.name)}
+            >
+              {cat.name}
+            </div>
+          ))}
+        </div>
+      </div>
+      {serviceOptions.length > 0 && (
         <div className="add-form__row">
-          <span className="add-form__label">Популярные</span>
-          <div className="add-form__presets">
-            {popularServices.map((service) => (
-              <div
-                key={service.name}
-                className="add-form__preset"
-                onClick={() => {
-                  setName(service.name)
-                  setColor(service.color)
-                  clearError('name')
-                }}
-              >
-                <i style={{ background: service.color }}></i>
-                {service.name}
-              </div>
-            ))}
-          </div>
+          <span className="add-form__label">Сервис</span>
+          <Select options={serviceOptions} value={selectedService} onChange={handleServiceSelect} placeholder="Выбери сервис" />
         </div>
       )}
       <FormField

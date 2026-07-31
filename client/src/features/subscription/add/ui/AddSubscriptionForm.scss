@@ -50,6 +50,11 @@
     &:active {
       transform: scale(0.95);
     }
+
+    &--active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
   }
 
   &__label-row {

@@ -24,14 +24,14 @@ export function calculateDaysLeft(dateString: string): string {
   return `через ${Math.floor(diffDays / 30)} мес`
 }
 
-export function mapSubscription(dbSub: DbSubscription): MockSubscription {
+export function mapSubscription(dbSub: DbSubscription, categoryName?: string): MockSubscription {
   return {
     id: dbSub.id,
     name: dbSub.title,
     price: dbSub.amount,
     color: dbSub.color_hex || '#a78bfa',
     letter: dbSub.title[0].toUpperCase(),
-    category: dbSub.category_id || 'Другое',
+    category: categoryName || 'Другое',
     nextDate: formatNextDate(dbSub.next_payment_date),
     daysLeft: calculateDaysLeft(dbSub.next_payment_date),
     history: [],

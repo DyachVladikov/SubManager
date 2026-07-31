@@ -13,8 +13,9 @@ export function HeroCard({ mode, onModeChange, subscriptions }: HeroCardProps) {
   const stats = useMemo(() => computeHeroStats(subscriptions), [subscriptions])
 
   const isMonth = mode === 'month'
-  const points = isMonth ? stats.monthlyTotals : stats.yearlyTotals
-  const labels = isMonth ? stats.monthLabels : stats.yearLabels
+  const points = isMonth ? stats.dailyCumulative : stats.yearlyTotals
+  const labels = isMonth ? stats.monthRangeLabels : stats.yearLabels
+  const dotIndex = isMonth ? stats.todayIndex : stats.currentMonthIndex
   const value = isMonth ? stats.monthTotal : stats.yearTotal
   const paid = isMonth ? stats.paidMonth : stats.paidYear
   const remaining = isMonth ? stats.remainingMonth : stats.remainingYear
@@ -27,9 +28,18 @@ export function HeroCard({ mode, onModeChange, subscriptions }: HeroCardProps) {
     x: 8 + (i * (chartWidth - 16)) / Math.max(points.length - 1, 1),
     y: 54 - (point / max) * 42,
   }))
-  const linePath = coords.map((c, i) => `${i === 0 ? 'M' : 'L'}${c.x.toFixed(1)} ${c.y.toFixed(1)}`).join(' ')
-  const areaPath = `${linePath} L${coords[coords.length - 1].x.toFixed(1)} ${chartHeight} L${coords[0].x.toFixed(1)} ${chartHeight} Z`
-  const last = coords[coords.length - 1]
+  const toPath = (list: { x: number; y: number }[]) =>
+    list.map((c, i) => `${i === 0 ? 'M' : 'L'}${c.x.toFixed(1)} ${c.y.toFixed(1)}`).join(' ')
+  const splitIndex = Math.min(dotIndex, coords.length - 1)
+  const paidCoords = coords.slice(0, splitIndex + 1)
+  const forecastCoords = coords.slice(splitIndex)
+  const paidPath = toPath(paidCoords)
+  const forecastPath = toPath(forecastCoords)
+  const areaPath =
+    paidCoords.length > 1
+      ? `${paidPath} L${paidCoords[paidCoords.length - 1].x.toFixed(1)} ${chartHeight} L${paidCoords[0].x.toFixed(1)} ${chartHeight} Z`
+      : ''
+  const dot = coords[splitIndex]
 
   return (
     <div className="hero-card rise" style={{ animationDelay: '0.06s' }}>
@@ -71,13 +81,23 @@ export function HeroCard({ mode, onModeChange, subscriptions }: HeroCardProps) {
               <stop offset="1" stopColor="#a78bfa" stopOpacity="0" />
             </linearGradient>
           </defs>
-          <line x1="0" y1="20" x2="350" y2="20" stroke="rgba(255,255,255,.05)" strokeDasharray="3 5" />
-          <line x1="0" y1="44" x2="350" y2="44" stroke="rgba(255,255,255,.05)" strokeDasharray="3 5" />
-          <path d={areaPath} fill="url(#sg)" />
-          <path d={linePath} fill="none" stroke="#a78bfa" strokeWidth="2" strokeLinecap="round" />
-          <circle cx={last.x} cy={last.y} r="7" fill="#a78bfa" opacity=".18" />
-          <circle cx={last.x} cy={last.y} r="3" fill="#a78bfa" />
+          <line x1="0" y1="20" x2="350" y2="20" style={{ stroke: 'rgba(255,255,255,.05)' }} strokeDasharray="3 5" />
+          <line x1="0" y1="44" x2="350" y2="44" style={{ stroke: 'rgba(255,255,255,.05)' }} strokeDasharray="3 5" />
+          {areaPath && <path d={areaPath} fill="url(#sg)" />}
+          <path d={paidPath} fill="none" style={{ stroke: '#a78bfa' }} strokeWidth="2" strokeLinecap="round" />
+          {forecastCoords.length > 1 && (
+            <path
+              d={forecastPath}
+              fill="none"
+              style={{ stroke: '#a78bfa' }}
+              strokeOpacity="0.4"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeDasharray="2 6"
+            />
+          )}
         </svg>
+        <div className="hero-card__chart-dot" style={{ left: `${(dot.x / chartWidth) * 100}%`, top: `${dot.y}px` }}></div>
         <div className="hero-card__range">
           <span>{labels[0]}</span>
           <span>{labels[labels.length - 1]}</span>

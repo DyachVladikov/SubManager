@@ -67,43 +67,16 @@
     max-width: 110px;
   }
 
-  &__donut-percent {
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.14em;
-    color: var(--accent);
-    text-transform: uppercase;
-    margin-bottom: 2px;
+  &__empty {
+    margin-top: 16px;
+    padding: 24px 0;
+    font-size: 12px;
+    color: var(--dim);
+    text-align: center;
   }
 
   &__seg {
     transition: stroke-dasharray 0.9s cubic-bezier(0.3, 0.7, 0.3, 1), stroke-width 0.3s, opacity 0.3s, filter 0.3s;
-    cursor: pointer;
-
-    &--dim {
-      opacity: 0.18;
-    }
-
-    &--big {
-      stroke-width: 25;
-      filter: drop-shadow(0 0 9px var(--gc));
-    }
-  }
-
-  &__mark {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.4);
-    transition: opacity 0.3s, transform 0.3s, left 0.4s cubic-bezier(0.3, 0.7, 0.3, 1), top 0.4s cubic-bezier(0.3, 0.7, 0.3, 1);
-    pointer-events: none;
-
-    &--visible {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
   }
 
   &__list {

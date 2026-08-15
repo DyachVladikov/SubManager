@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/shared/config/supabase'
+import { withTimeout } from '@/shared/lib/withTimeout'
+import { getAuthErrorMessage } from '../lib/authErrors'
 import './AuthPage.scss'
 
 export function AuthPage() {
@@ -10,6 +12,20 @@ export function AuthPage() {
   const [message, setMessage] = useState('')
   const [showPassword, setShowPassword] = useState(false)
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('error')) {
+      setMessage('Вход через Google не удался. Попробуй ещё раз или войди по почте')
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) setLoading(false)
+    }
+    window.addEventListener('pageshow', handlePageShow)
+    return () => window.removeEventListener('pageshow', handlePageShow)
+  }, [])
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -17,22 +33,28 @@ export function AuthPage() {
 
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        })
+        const { error } = await withTimeout(
+          supabase.auth.signInWithPassword({
+            email,
+            password,
+          }),
+          15000
+        )
         if (error) throw error
         setMessage('Вход выполнен')
       } else {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-        })
+        const { error } = await withTimeout(
+          supabase.auth.signUp({
+            email,
+            password,
+          }),
+          15000
+        )
         if (error) throw error
         setMessage('Проверь почту для подтверждения')
       }
-    } catch (error: any) {
-      setMessage(error.message || 'Ошибка авторизации')
+    } catch (error) {
+      setMessage(getAuthErrorMessage(error))
     } finally {
       setLoading(false)
     }
@@ -40,9 +62,14 @@ export function AuthPage() {
 
   const handleGoogle = async () => {
     setLoading(true)
-    await supabase.auth.signInWithOAuth({
+    setMessage('')
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
     })
+    if (error) {
+      setMessage(getAuthErrorMessage(error))
+    }
+    setLoading(false)
   }
 
   return (

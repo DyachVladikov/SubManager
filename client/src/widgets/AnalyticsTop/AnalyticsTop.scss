@@ -1,0 +1,94 @@
+@use '@/shared/styles/helpers/index.scss' as *;
+
+.analytics-top {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 18px;
+  margin: 16px 20px 0;
+
+  @include tablet-above {
+    margin: 16px 0 0;
+  }
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--dim);
+
+    i {
+      width: 3px;
+      height: 12px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+    &:last-child {
+      border-bottom: 0;
+      padding-bottom: 2px;
+    }
+  }
+
+  &__rank {
+    font-family: var(--font-family-accent);
+    font-size: 16px;
+    color: var(--dim);
+    width: 18px;
+  }
+
+  &__logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-family-accent);
+    font-size: 16px;
+    color: #fff;
+    flex: 0 0 auto;
+  }
+
+  &__name {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 700;
+    min-width: 0;
+
+    small {
+      display: block;
+      font-size: 10px;
+      color: var(--dim);
+      font-weight: 600;
+      margin-top: 1px;
+    }
+  }
+
+  &__amount {
+    font-size: 13px;
+    font-weight: 800;
+    text-align: right;
+
+    small {
+      display: block;
+      font-size: 10px;
+      color: var(--dim);
+      font-weight: 600;
+      margin-top: 1px;
+    }
+  }
+}

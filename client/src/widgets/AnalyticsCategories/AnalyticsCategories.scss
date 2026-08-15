@@ -1,0 +1,82 @@
+@use '@/shared/styles/helpers/index.scss' as *;
+
+.analytics-categories {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 18px;
+  margin: 16px 20px 0;
+
+  @include tablet-above {
+    margin: 16px 0 0;
+  }
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--dim);
+
+    i {
+      width: 3px;
+      height: 12px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+  }
+
+  &__empty {
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--dim);
+  }
+
+  &__row {
+    margin-top: 14px;
+
+    &:first-of-type {
+      margin-top: 4px;
+    }
+  }
+
+  &__row-head {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 600;
+
+    b {
+      font-weight: 800;
+    }
+
+    span:last-child {
+      color: var(--dim);
+      font-size: 11px;
+
+      b {
+        color: var(--text);
+      }
+    }
+  }
+
+  &__bar {
+    height: 6px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.05);
+    margin-top: 7px;
+    overflow: hidden;
+
+    i {
+      display: block;
+      height: 100%;
+      border-radius: 99px;
+      width: 0;
+      transition: width 1s cubic-bezier(0.2, 0.7, 0.3, 1);
+    }
+  }
+}

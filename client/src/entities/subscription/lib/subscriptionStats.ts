@@ -66,7 +66,7 @@ export interface HeroStats {
   currentYear: number
 }
 
-function totalBefore(subs: Subscription[], until: Date): number {
+export function totalBefore(subs: Subscription[], until: Date): number {
   return subs.reduce((acc, sub) => {
     if (sub.created_at && new Date(sub.created_at) > until) return acc
     return acc + sub.amount

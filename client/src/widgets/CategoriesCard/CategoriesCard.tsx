@@ -1,20 +1,9 @@
 import { useMemo } from 'react'
 import type { Subscription } from '@/entities/subscription/model/types'
 import { computeCategoryStats } from '@/entities/subscription/lib/subscriptionStats'
+import { getCategoryColor } from '@/entities/subscription/lib/categoryColors'
 import './CategoriesCard.scss'
 
-const categoryColors: Record<string, string> = {
-  Нейросети: '#a78bfa',
-  Развлечения: '#ff5c00',
-  Музыка: '#1db954',
-  Игры: '#3a9bf0',
-  Облако: '#ffd34d',
-  'Работа и учёба': '#fa2d48',
-  'Спорт и здоровье': '#00c4cc',
-  Другое: '#6b6b85',
-  Остальное: '#4a4763',
-}
-const fallbackColors = ['#a78bfa', '#3a9bf0', '#1db954', '#ff7a00', '#6b6b85']
 const circumference = 2 * Math.PI * 54
 
 interface CategoriesCardProps {
@@ -29,7 +18,7 @@ export function CategoriesCard({ subscriptions, categoryNames }: CategoriesCardP
   let offset = 0
   const segments = stats.map((cat, i) => {
     const length = Math.max((cat.amount / total) * circumference - 1.6, 0)
-    const segment = { ...cat, color: categoryColors[cat.name] || fallbackColors[i % fallbackColors.length], length, offset: -offset }
+    const segment = { ...cat, color: getCategoryColor(cat.name, i), length, offset: -offset }
     offset += length + 1.6
     return segment
   })

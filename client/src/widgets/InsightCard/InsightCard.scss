@@ -1,0 +1,47 @@
+@use '@/shared/styles/helpers/index.scss' as *;
+
+.insight-card {
+  background: linear-gradient(135deg, rgba(167, 139, 250, 0.12), var(--surface) 55%);
+  border: 1px solid rgba(167, 139, 250, 0.32);
+  border-radius: 20px;
+  padding: 18px;
+  margin: 16px 20px 0;
+  position: relative;
+  overflow: hidden;
+
+  @include tablet-above {
+    margin: 16px 0 0;
+  }
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--dim);
+
+    i {
+      width: 3px;
+      height: 12px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+  }
+
+  &__title {
+    font-size: 14px;
+    font-weight: 800;
+    margin-top: 12px;
+    line-height: 1.45;
+  }
+
+  &__text {
+    font-size: 11px;
+    color: var(--dim);
+    margin-top: 6px;
+    line-height: 1.6;
+  }
+}

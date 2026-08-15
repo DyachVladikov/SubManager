@@ -1,0 +1,32 @@
+.coming-soon {
+  max-width: 390px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+  border-left: 1px solid rgba(255, 255, 255, 0.04);
+  border-right: 1px solid rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &__glow {
+    position: absolute;
+    top: -150px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 480px;
+    height: 340px;
+    background: radial-gradient(closest-side, rgba(124, 92, 240, 0.26), transparent 72%);
+    pointer-events: none;
+  }
+
+  &__text {
+    font-family: var(--font-family-accent);
+    font-size: 34px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+}

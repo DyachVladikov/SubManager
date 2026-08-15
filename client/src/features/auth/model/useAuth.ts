@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/shared/config/supabase'
+import { withTimeout } from '@/shared/lib/withTimeout'
 import type { Session } from '@supabase/supabase-js'
 
 export function useAuth() {
@@ -7,10 +8,18 @@ export function useAuth() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session)
-      setLoading(false)
-    })
+    let mounted = true
+
+    withTimeout(supabase.auth.getSession(), 4000)
+      .then(({ data }) => {
+        if (!mounted) return
+        setSession(data.session)
+        setLoading(false)
+      })
+      .catch(() => {
+        if (!mounted) return
+        setLoading(false)
+      })
 
     const {
       data: { subscription },
@@ -18,7 +27,10 @@ export function useAuth() {
       setSession(session)
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+    }
   }, [])
 
   const signOut = () => supabase.auth.signOut()

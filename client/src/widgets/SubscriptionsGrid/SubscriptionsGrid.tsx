@@ -1,7 +1,9 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import type { Subscription } from '@/mocks/subscriptions'
 import { useFlipGrid } from '@/shared/lib/useFlipGrid'
 import './SubscriptionsGrid.scss'
+
+const collapsedCount = 6
 
 interface SubscriptionsGridProps {
   subscriptions: Subscription[]
@@ -12,8 +14,12 @@ interface SubscriptionsGridProps {
 }
 
 export function SubscriptionsGrid({ subscriptions, removingIds, splitCounts, onOpen, onAdd }: SubscriptionsGridProps) {
+  const [expanded, setExpanded] = useState(false)
   const gridRef = useRef<HTMLDivElement>(null)
   useFlipGrid(gridRef)
+
+  const hasMore = subscriptions.length > collapsedCount
+  const visibleSubscriptions = expanded ? subscriptions : subscriptions.slice(0, collapsedCount)
 
   return (
     <>
@@ -21,16 +27,18 @@ export function SubscriptionsGrid({ subscriptions, removingIds, splitCounts, onO
         <h2 className="subscriptions-grid__title">
           <i></i>Мои подписки
         </h2>
-        <span className="subscriptions-grid__more">
-          все
-          <svg width="11" height="11" viewBox="0 0 24 24">
-            <path d="M5 12h14" />
-            <path d="m13 6 6 6-6 6" />
-          </svg>
-        </span>
+        {hasMore && (
+          <span className="subscriptions-grid__more" onClick={() => setExpanded(!expanded)}>
+            {expanded ? 'свернуть' : 'все'}
+            <svg width="11" height="11" viewBox="0 0 24 24">
+              <path d="M5 12h14" />
+              <path d="m13 6 6 6-6 6" />
+            </svg>
+          </span>
+        )}
       </div>
       <div className="subscriptions-grid__list rise" style={{ animationDelay: '0.3s' }} ref={gridRef}>
-        {subscriptions.map((sub) => (
+        {visibleSubscriptions.map((sub) => (
           <div
             className={`sub-card ${removingIds.includes(sub.id) ? 'sub-card--removing' : ''}`}
             key={sub.id}

@@ -3,16 +3,17 @@ import './UpcomingRail.scss'
 
 interface UpcomingRailProps {
   subscriptions: Subscription[]
+  onShowAll: () => void
 }
 
-export function UpcomingRail({ subscriptions }: UpcomingRailProps) {
+export function UpcomingRail({ subscriptions, onShowAll }: UpcomingRailProps) {
   return (
     <>
       <div className="upcoming-rail__header rise" style={{ animationDelay: '0.18s' }}>
         <h2 className="upcoming-rail__title">
           <i></i>Ближайшие списания
         </h2>
-        <span className="upcoming-rail__more">
+        <span className="upcoming-rail__more" onClick={onShowAll}>
           все
           <svg width="11" height="11" viewBox="0 0 24 24">
             <path d="M5 12h14" />

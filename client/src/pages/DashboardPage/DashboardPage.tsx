@@ -11,16 +11,22 @@ import { HeroCard } from '@/widgets/HeroCard'
 import { CategoriesCard } from '@/widgets/CategoriesCard'
 import { UpcomingRail } from '@/widgets/UpcomingRail'
 import { SubscriptionsGrid } from '@/widgets/SubscriptionsGrid'
-import { DashboardTabBar } from '@/widgets/DashboardTabBar'
+import { TabBar, type TabKey } from '@/widgets/TabBar'
 import { SubscriptionDetail } from '@/widgets/SubscriptionDetail'
 import { AddSubscriptionSheet } from '@/widgets/AddSubscriptionSheet'
+import { AllPaymentsSheet } from '@/widgets/AllPaymentsSheet'
 import './DashboardPage.scss'
 
-export function DashboardPage() {
+interface DashboardPageProps {
+  onNavigate: (tab: TabKey) => void
+}
+
+export function DashboardPage({ onNavigate }: DashboardPageProps) {
   const [mode, setMode] = useState<'month' | 'year'>('month')
   const [detailOpen, setDetailOpen] = useState(false)
   const [selectedSub, setSelectedSub] = useState<string | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [allPaymentsOpen, setAllPaymentsOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const { toast, showToast } = useToast()
   const { removingIds, removeSubscription } = useRemoveSubscription({
@@ -67,7 +73,7 @@ export function DashboardPage() {
   }
 
   const selected = subscriptions.find((s) => s.id === selectedSub)
-  useBodyScrollLock(sheetOpen || selectedSub !== null)
+  useBodyScrollLock(sheetOpen || selectedSub !== null || allPaymentsOpen)
   const editingRaw = dbSubscriptions.find((s) => s.id === editingId)
   const editing = editingRaw
     ? {
@@ -98,7 +104,7 @@ export function DashboardPage() {
       <DashboardHeader />
       <HeroCard mode={mode} onModeChange={setMode} subscriptions={dbSubscriptions} />
       <CategoriesCard subscriptions={dbSubscriptions} categoryNames={categoryNames} />
-      <UpcomingRail subscriptions={subscriptions} />
+      <UpcomingRail subscriptions={subscriptions} onShowAll={() => setAllPaymentsOpen(true)} />
       <SubscriptionsGrid
         subscriptions={subscriptions}
         removingIds={removingIds}
@@ -106,7 +112,7 @@ export function DashboardPage() {
         onOpen={openDetail}
         onAdd={() => setSheetOpen(true)}
       />
-      <DashboardTabBar onAdd={() => setSheetOpen(true)} />
+      <TabBar active="home" onNavigate={onNavigate} onAdd={() => setSheetOpen(true)} />
 
       {selected && (
         <SubscriptionDetail
@@ -120,6 +126,17 @@ export function DashboardPage() {
 
       {sheetOpen && (
         <AddSubscriptionSheet onClose={closeSheet} onSuccess={() => showToast('success')} editing={editing} />
+      )}
+
+      {allPaymentsOpen && (
+        <AllPaymentsSheet
+          subscriptions={subscriptions}
+          onClose={() => setAllPaymentsOpen(false)}
+          onOpen={(id) => {
+            setAllPaymentsOpen(false)
+            openDetail(id)
+          }}
+        />
       )}
 
       {toast && <Toast type={toast} />}

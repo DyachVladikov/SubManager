@@ -1,0 +1,68 @@
+@use '@/shared/styles/helpers/index.scss' as *;
+
+.analytics-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 2px 20px 0;
+  margin-top: 16px;
+
+  @include tablet-above {
+    padding: 2px 0 0;
+  }
+
+  &__card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 15px;
+
+    &--wide {
+      grid-column: span 2;
+      background: linear-gradient(135deg, rgba(167, 139, 250, 0.14), var(--surface) 60%);
+      border-color: rgba(167, 139, 250, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .analytics-stats__value {
+        margin-top: 4px;
+      }
+    }
+  }
+
+  &__label {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  &__value {
+    font-family: var(--font-family-accent);
+    font-size: 27px;
+    margin-top: 6px;
+    letter-spacing: 0.02em;
+
+    span {
+      font-size: 13px;
+      color: var(--dim);
+      font-family: var(--font-family-main);
+      font-weight: 600;
+    }
+  }
+
+  &__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 13px;
+    background: rgba(167, 139, 250, 0.14);
+    border: 1px solid rgba(167, 139, 250, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    flex: 0 0 auto;
+  }
+}

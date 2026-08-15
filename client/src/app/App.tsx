@@ -1,10 +1,15 @@
+import { useState } from 'react'
 import { useAuth } from '@/features/auth'
 import { AuthPage } from '@/features/auth'
 import { DashboardPage } from '@/pages/DashboardPage'
+import { AnalyticsPage } from '@/pages/AnalyticsPage'
+import { ComingSoon } from './ComingSoon'
+import type { TabKey } from '@/widgets/TabBar'
 import './App.scss'
 
 function App() {
   const { session, loading } = useAuth()
+  const [tab, setTab] = useState<TabKey>('home')
 
   if (loading) {
     return (
@@ -20,7 +25,15 @@ function App() {
     return <AuthPage />
   }
 
-  return <DashboardPage />
+  if (tab === 'analytics') {
+    return <AnalyticsPage onNavigate={setTab} />
+  }
+
+  if (tab === 'friends' || tab === 'profile') {
+    return <ComingSoon active={tab} onNavigate={setTab} />
+  }
+
+  return <DashboardPage onNavigate={setTab} />
 }
 
 export default App

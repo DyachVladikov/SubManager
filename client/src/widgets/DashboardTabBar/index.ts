@@ -1,1 +1,0 @@
-export { DashboardTabBar } from './DashboardTabBar'

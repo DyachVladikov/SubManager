@@ -1,0 +1,180 @@
+@use '@/shared/styles/helpers/index.scss' as *;
+
+.analytics-chart {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 18px;
+  margin: 16px 20px 0;
+
+  @include tablet-above {
+    margin: 16px 0 0;
+  }
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--dim);
+
+    i {
+      width: 3px;
+      height: 12px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+  }
+
+  &__monthnav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding-top: 16px;
+  }
+
+  &__month-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 11px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--dim);
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.12s;
+
+    &:active {
+      transform: scale(0.9);
+    }
+
+    &--disabled {
+      opacity: 0.25;
+      pointer-events: none;
+    }
+  }
+
+  &__month-title {
+    font-size: 14px;
+    font-weight: 800;
+    min-width: 120px;
+    text-align: center;
+  }
+
+  &__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-top: 12px;
+  }
+
+  &__bignum {
+    font-family: var(--font-family-accent);
+    font-size: 32px;
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+
+  &__chip {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 4px 8px;
+    border-radius: 99px;
+
+    &--up {
+      color: var(--up);
+      border: 1px solid rgba(239, 143, 143, 0.28);
+      background: rgba(239, 143, 143, 0.08);
+    }
+
+    &--dn {
+      color: var(--dn);
+      border: 1px solid rgba(143, 227, 176, 0.25);
+      background: rgba(143, 227, 176, 0.08);
+    }
+  }
+
+  &__bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 132px;
+    margin-top: 10px;
+  }
+
+  &__col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    gap: 5px;
+    min-width: 0;
+    cursor: pointer;
+  }
+
+  &__value {
+    font-size: 9px;
+    font-weight: 800;
+    opacity: 0;
+    transition: opacity 0.25s;
+    height: 12px;
+    white-space: nowrap;
+  }
+
+  &__bar-wrap {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  &__bar {
+    width: 100%;
+    border-radius: 6px 6px 3px 3px;
+    background: rgba(167, 139, 250, 0.16);
+    transition: background 0.25s;
+    transform-origin: bottom;
+    animation: grow 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+    animation-delay: calc(var(--i) * 55ms);
+
+    &:hover {
+      background: rgba(167, 139, 250, 0.3);
+    }
+  }
+
+  &__bar-label {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--dim);
+    text-transform: uppercase;
+  }
+
+  &__col--active {
+    .analytics-chart__value {
+      opacity: 1;
+    }
+
+    .analytics-chart__bar {
+      background: linear-gradient(180deg, var(--accent), var(--accent-deep));
+      box-shadow: 0 4px 16px rgba(124, 92, 240, 0.45);
+    }
+
+    .analytics-chart__bar-label {
+      color: var(--accent);
+    }
+  }
+}
+
+@keyframes grow {
+  from {
+    transform: scaleY(0);
+  }
+}

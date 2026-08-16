@@ -65,12 +65,12 @@ export function HeroCard({ mode, onModeChange, subscriptions }: HeroCardProps) {
         </div>
       </div>
       <div className="hero-card__sum swap" key={`sum-${mode}`}>
-        <div className="hero-card__num">{value.toLocaleString('ru-RU')}</div>
+        <div className="hero-card__num">{value.toLocaleString('ru-RU', { useGrouping: false })}</div>
         <div className="hero-card__per">₽</div>
       </div>
       <div className="hero-card__row swap" key={`row-${mode}`}>
         <span className="hero-card__servs">
-          {isMonth ? `${stats.servicesCount} активных сервисов` : `в среднем ${stats.monthTotal.toLocaleString('ru-RU')} ₽ / мес`}
+          {isMonth ? `${stats.servicesCount} активных сервисов` : `в среднем ${stats.monthTotal.toLocaleString('ru-RU', { useGrouping: false })} ₽ / мес`}
         </span>
       </div>
       <div className="hero-card__chart">
@@ -107,11 +107,11 @@ export function HeroCard({ mode, onModeChange, subscriptions }: HeroCardProps) {
         <div className="hero-card__progress-row">
           <span>
             <i className="hero-card__dot hero-card__dot--paid"></i>
-            <span>{isMonth ? 'Списано' : `Списано в ${stats.currentYear}`}</span> · <b>{paid.toLocaleString('ru-RU')} ₽</b>
+            <span>{isMonth ? 'Списано' : `Списано в ${stats.currentYear}`}</span> · <b>{paid.toLocaleString('ru-RU', { useGrouping: false })} ₽</b>
           </span>
           <span>
             <i className="hero-card__dot hero-card__dot--remaining"></i>
-            <span>{isMonth ? 'Осталось' : 'До конца года'}</span> · <b>{remaining.toLocaleString('ru-RU')} ₽</b>
+            <span>{isMonth ? 'Осталось' : 'До конца года'}</span> · <b>{remaining.toLocaleString('ru-RU', { useGrouping: false })} ₽</b>
           </span>
         </div>
         <div className="hero-card__progress-bar">

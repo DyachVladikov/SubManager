@@ -1,0 +1,1 @@
+export { FriendsSummary } from './FriendsSummary'

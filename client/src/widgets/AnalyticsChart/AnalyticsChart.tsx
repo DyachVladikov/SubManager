@@ -36,7 +36,7 @@ export function AnalyticsChart({ months }: AnalyticsChartProps) {
       </div>
       <div className="analytics-chart__head">
         <div className="analytics-chart__bignum swap" key={selected}>
-          {current.total.toLocaleString('ru-RU')} ₽
+          {current.total.toLocaleString('ru-RU', { useGrouping: false })} ₽
         </div>
         {previous && previous.total > 0 && delta !== null && (
           <span className={`analytics-chart__chip analytics-chart__chip--${delta >= 0 ? 'up' : 'dn'}`}>
@@ -52,7 +52,7 @@ export function AnalyticsChart({ months }: AnalyticsChartProps) {
             className={`analytics-chart__col${i === selected ? ' analytics-chart__col--active' : ''}`}
             onClick={() => setSelected(i)}
           >
-            <span className="analytics-chart__value">{month.total.toLocaleString('ru-RU')}</span>
+            <span className="analytics-chart__value">{month.total.toLocaleString('ru-RU', { useGrouping: false })}</span>
             <div className="analytics-chart__bar-wrap">
               <div
                 className="analytics-chart__bar"

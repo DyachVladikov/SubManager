@@ -63,7 +63,7 @@ export function SubscriptionsGrid({ subscriptions, removingIds, splitCounts, onO
             </div>
             <h3 className="sub-card__name">{sub.name}</h3>
             <div className="sub-card__price">
-              <b>{sub.price.toLocaleString('ru-RU')} ₽</b> <span>/ мес</span>
+              <b>{sub.price.toLocaleString('ru-RU', { useGrouping: false })} ₽</b> <span>/ мес</span>
             </div>
             <div className="sub-card__dates">
               <span>{sub.nextDate}</span>

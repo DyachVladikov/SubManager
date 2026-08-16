@@ -24,7 +24,7 @@ export function InsightCard({ subscriptions, categoryNames, monthTotal }: Insigh
         {top.name} съедают {top.percent}% бюджета
       </div>
       <div className="insight-card__text">
-        {top.amount.toLocaleString('ru-RU')} ₽ из {monthTotal.toLocaleString('ru-RU')} ₽. Оправдано, если пользуешься
+        {top.amount.toLocaleString('ru-RU', { useGrouping: false })} ₽ из {monthTotal.toLocaleString('ru-RU', { useGrouping: false })} ₽. Оправдано, если пользуешься
         каждый день. Пользуешься?
       </div>
     </div>

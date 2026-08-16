@@ -12,20 +12,20 @@ export function AnalyticsStats({ stats }: AnalyticsStatsProps) {
       <div className="analytics-stats__card">
         <div className="analytics-stats__label">Проекция на год</div>
         <div className="analytics-stats__value">
-          {stats.yearProjection.toLocaleString('ru-RU')} <span>₽</span>
+          {stats.yearProjection.toLocaleString('ru-RU', { useGrouping: false })} <span>₽</span>
         </div>
       </div>
       <div className="analytics-stats__card">
         <div className="analytics-stats__label">В среднем в день</div>
         <div className="analytics-stats__value">
-          {stats.dailyAverage.toLocaleString('ru-RU')} <span>₽</span>
+          {stats.dailyAverage.toLocaleString('ru-RU', { useGrouping: false })} <span>₽</span>
         </div>
       </div>
       <div className="analytics-stats__card analytics-stats__card--wide">
         <div>
           <div className="analytics-stats__label">Возврат по split</div>
           <div className="analytics-stats__value">
-            {stats.splitReturn.toLocaleString('ru-RU')}{' '}
+            {stats.splitReturn.toLocaleString('ru-RU', { useGrouping: false })}{' '}
             <span>
               ₽ / мес · от {stats.splitFriends} {pluralFriends(stats.splitFriends)}
             </span>

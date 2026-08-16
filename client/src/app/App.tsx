@@ -3,6 +3,7 @@ import { useAuth } from '@/features/auth'
 import { AuthPage } from '@/features/auth'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { AnalyticsPage } from '@/pages/AnalyticsPage'
+import { FriendsPage } from '@/pages/FriendsPage'
 import { ComingSoon } from './ComingSoon'
 import type { TabKey } from '@/widgets/TabBar'
 import './App.scss'
@@ -29,7 +30,11 @@ function App() {
     return <AnalyticsPage onNavigate={setTab} />
   }
 
-  if (tab === 'friends' || tab === 'profile') {
+  if (tab === 'friends') {
+    return <FriendsPage onNavigate={setTab} />
+  }
+
+  if (tab === 'profile') {
     return <ComingSoon active={tab} onNavigate={setTab} />
   }
 

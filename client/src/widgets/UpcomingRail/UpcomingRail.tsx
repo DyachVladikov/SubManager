@@ -35,7 +35,7 @@ export function UpcomingRail({ subscriptions, onShowAll }: UpcomingRailProps) {
             </div>
             <div>
               <div className="upcoming-card__name">{sub.name}</div>
-              <div className="upcoming-card__amount">{sub.price.toLocaleString('ru-RU')} ₽</div>
+              <div className="upcoming-card__amount">{sub.price.toLocaleString('ru-RU', { useGrouping: false })} ₽</div>
             </div>
           </div>
         ))}

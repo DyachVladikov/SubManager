@@ -1,0 +1,1 @@
+export { FriendsPending } from './FriendsPending'

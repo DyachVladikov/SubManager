@@ -41,7 +41,7 @@ export function AllPaymentsSheet({ subscriptions, onClose, onOpen }: AllPayments
                 <div className="all-payments-sheet__name">{sub.name}</div>
                 <div className="all-payments-sheet__left">{sub.daysLeft}</div>
               </div>
-              <div className="all-payments-sheet__amount">{sub.price.toLocaleString('ru-RU')} ₽</div>
+              <div className="all-payments-sheet__amount">{sub.price.toLocaleString('ru-RU', { useGrouping: false })} ₽</div>
             </div>
           ))}
         </div>

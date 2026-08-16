@@ -29,7 +29,7 @@ export function AnalyticsTop({ subscriptions, categoryNames, monthTotal }: Analy
             <small>{(sub.category_id && categoryNames[sub.category_id]) || 'Другое'}</small>
           </div>
           <div className="analytics-top__amount">
-            {sub.amount.toLocaleString('ru-RU')} ₽
+            {sub.amount.toLocaleString('ru-RU', { useGrouping: false })} ₽
             <small>{monthTotal > 0 ? Math.round((sub.amount / monthTotal) * 100) : 0}%</small>
           </div>
         </div>

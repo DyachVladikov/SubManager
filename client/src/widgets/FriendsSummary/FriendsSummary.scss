@@ -1,0 +1,125 @@
+@use '@/shared/styles/helpers/index.scss' as *;
+
+.friends-summary {
+  position: relative;
+  background: linear-gradient(135deg, rgba(167, 139, 250, 0.14), var(--surface) 55%);
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  border-radius: 20px;
+  padding: 18px;
+  margin: 16px 20px 0;
+
+  @include tablet-above {
+    margin: 16px 0 0;
+  }
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--dim);
+
+    i {
+      width: 3px;
+      height: 12px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+  }
+
+  &__sum {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  &__num {
+    font-family: var(--font-family-accent);
+    font-size: 52px;
+    line-height: 0.88;
+    background: linear-gradient(180deg, #ffffff 25%, #7d7d94);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  &__per {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--dim);
+    padding-bottom: 6px;
+  }
+
+  &__sub {
+    font-size: 11px;
+    color: var(--dim);
+    font-weight: 600;
+    margin-top: 6px;
+  }
+
+  &__divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.05);
+    margin: 14px 0;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  &__pending {
+    display: flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--up);
+
+    i {
+      width: 7px;
+      height: 7px;
+      border-radius: 3px;
+      background: var(--up);
+      margin-right: 6px;
+    }
+  }
+
+  &__remind {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+    color: #0b0b10;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 11px;
+    padding: 9px 14px;
+    border-radius: 12px;
+    border: 0;
+    cursor: pointer;
+    transition: transform 0.12s, opacity 0.2s;
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    svg {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  }
+}

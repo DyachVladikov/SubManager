@@ -51,7 +51,7 @@ export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEd
         {subscription.letter}
       </div>
       <div className="subscription-detail__name">{subscription.name}</div>
-      <div className="subscription-detail__price">{subscription.price.toLocaleString('ru-RU')} ₽ / мес</div>
+      <div className="subscription-detail__price">{subscription.price.toLocaleString('ru-RU', { useGrouping: false })} ₽ / мес</div>
       <div className="subscription-detail__chips">
         <span className="subscription-detail__chip subscription-detail__chip--ok">
           <i></i>активна
@@ -65,7 +65,7 @@ export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEd
         <div className="subscription-detail__stat">
           <div className="subscription-detail__stat-label">В год</div>
           <div className="subscription-detail__stat-value">
-            <span>{(subscription.price * 12).toLocaleString('ru-RU')}</span> ₽
+            <span>{(subscription.price * 12).toLocaleString('ru-RU', { useGrouping: false })}</span> ₽
           </div>
         </div>
         <div className="subscription-detail__stat">
@@ -145,7 +145,7 @@ export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEd
                 <svg width="11" height="11" viewBox="0 0 24 24">
                   <path d="M20 6 9 17l-5-5" />
                 </svg>
-                {subscription.price.toLocaleString('ru-RU')} ₽
+                {subscription.price.toLocaleString('ru-RU', { useGrouping: false })} ₽
               </b>
             </div>
           ))}

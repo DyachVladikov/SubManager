@@ -32,8 +32,8 @@
 
   &__donut {
     position: relative;
-    width: 196px;
-    height: 196px;
+    width: 224px;
+    height: 224px;
   }
 
   &__donut-center {
@@ -48,8 +48,9 @@
 
     b {
       font-family: var(--font-family-accent);
-      font-size: 30px;
-      letter-spacing: 0.02em;
+      font-size: 24px;
+      font-weight: 400;
+      letter-spacing: 0.04em;
     }
 
     &--swap {
@@ -57,14 +58,23 @@
     }
   }
 
-  &__donut-label {
+  &__donut-percent {
     font-size: 9px;
     font-weight: 800;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+
+  &__donut-label {
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--dim);
-    margin-top: 3px;
-    max-width: 110px;
+    margin-top: 4px;
+    max-width: 96px;
+    line-height: 1.45;
   }
 
   &__empty {
@@ -77,6 +87,32 @@
 
   &__seg {
     transition: stroke-dasharray 0.9s cubic-bezier(0.3, 0.7, 0.3, 1), stroke-width 0.3s, opacity 0.3s, filter 0.3s;
+
+    &--dim {
+      opacity: 0.18;
+    }
+
+    &--big {
+      stroke-width: 25;
+    }
+  }
+
+  &__mark {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.4);
+    transition: opacity 0.3s, transform 0.3s, left 0.4s cubic-bezier(0.3, 0.7, 0.3, 1), top 0.4s cubic-bezier(0.3, 0.7, 0.3, 1);
+    pointer-events: none;
+
+    &--on {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
   }
 
   &__list {

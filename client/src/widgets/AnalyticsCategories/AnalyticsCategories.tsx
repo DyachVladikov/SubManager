@@ -31,7 +31,7 @@ export function AnalyticsCategories({ subscriptions, categoryNames }: AnalyticsC
             <div className="analytics-categories__row-head">
               <span>{cat.name}</span>
               <span>
-                {cat.percent}%&nbsp;&nbsp;<b>{cat.amount.toLocaleString('ru-RU')} ₽</b>
+                {cat.percent}%&nbsp;&nbsp;<b>{cat.amount.toLocaleString('ru-RU', { useGrouping: false })} ₽</b>
               </span>
             </div>
             <div className="analytics-categories__bar">

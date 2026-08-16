@@ -1,0 +1,126 @@
+@use '@/shared/styles/helpers/index.scss' as *;
+
+.friends-paid {
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 20px 12px;
+
+    @include tablet-above {
+      padding: 24px 0 12px;
+    }
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--font-family-accent);
+    font-size: 21px;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+
+    i {
+      width: 3px;
+      height: 14px;
+      background: var(--dn);
+      border-radius: 2px;
+    }
+  }
+
+  &__sum {
+    font-family: var(--font-family-accent);
+    font-size: 17px;
+    color: var(--dim);
+    letter-spacing: 0.04em;
+  }
+
+  &__card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    margin: 2px 20px 0;
+    padding: 6px 18px 14px;
+
+    @include tablet-above {
+      margin: 2px 0 0;
+    }
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+    &:last-child {
+      border-bottom: 0;
+      padding-bottom: 4px;
+    }
+  }
+
+  &__avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-family-accent);
+    font-size: 17px;
+    color: #0b0b10;
+    flex: 0 0 auto;
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+
+    b {
+      font-size: 14px;
+      font-weight: 800;
+    }
+  }
+
+  &__sub {
+    font-size: 10px;
+    color: var(--dim);
+    font-weight: 600;
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+
+    b {
+      font-size: 14px;
+      font-weight: 800;
+    }
+  }
+
+  &__check {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--dn);
+
+    svg {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  }
+}

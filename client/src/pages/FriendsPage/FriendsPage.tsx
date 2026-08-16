@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useGetSubscriptionsQuery } from '@/entities/subscription/api/subscriptionApi'
-import { useGetSplitsQuery } from '@/entities/split/api/splitApi'
+import { useGetSplitsQuery, useUpdateSplitStatusMutation, type Split } from '@/entities/split/api/splitApi'
 import { useToast } from '@/shared/lib/useToast'
 import { useBodyScrollLock } from '@/shared/lib/useBodyScrollLock'
 import { Toast } from '@/shared/ui/Toast'
@@ -8,6 +8,7 @@ import { DashboardHeader } from '@/widgets/DashboardHeader'
 import { TabBar, type TabKey } from '@/widgets/TabBar'
 import { FriendsSummary } from '@/widgets/FriendsSummary'
 import { FriendsPending } from '@/widgets/FriendsPending'
+import { FriendsPaid } from '@/widgets/FriendsPaid'
 import { AddSubscriptionSheet } from '@/widgets/AddSubscriptionSheet'
 import './FriendsPage.scss'
 
@@ -20,6 +21,7 @@ export function FriendsPage({ onNavigate }: FriendsPageProps) {
   const { toast, showToast } = useToast()
   const { data: splits = [], isLoading } = useGetSplitsQuery()
   const { data: subscriptions = [] } = useGetSubscriptionsQuery()
+  const [updateSplitStatus] = useUpdateSplitStatusMutation()
   useBodyScrollLock(sheetOpen)
 
   const subscriptionById = subscriptions.reduce<Record<string, (typeof subscriptions)[number]>>((acc, sub) => {
@@ -27,6 +29,12 @@ export function FriendsPage({ onNavigate }: FriendsPageProps) {
     return acc
   }, {})
   const pendingSplits = splits.filter((split) => split.status === 'pending')
+  const paidSplits = splits.filter((split) => split.status === 'paid')
+
+  const handlePaid = async (split: Split) => {
+    await updateSplitStatus({ id: split.id, status: 'paid' })
+    showToast('success')
+  }
 
   if (isLoading) {
     return (
@@ -50,7 +58,13 @@ export function FriendsPage({ onNavigate }: FriendsPageProps) {
 
       <div className="friends-page__content">
         <FriendsSummary splits={splits} onRemindAll={() => showToast('success')} />
-        <FriendsPending splits={pendingSplits} subscriptions={subscriptionById} onRemind={() => showToast('success')} />
+        <FriendsPending
+          splits={pendingSplits}
+          subscriptions={subscriptionById}
+          onRemind={() => showToast('success')}
+          onPaid={handlePaid}
+        />
+        <FriendsPaid splits={paidSplits} subscriptions={subscriptionById} />
       </div>
 
       <TabBar active="friends" onNavigate={onNavigate} onAdd={() => setSheetOpen(true)} />

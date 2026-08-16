@@ -53,6 +53,20 @@ export const splitApi = baseApi.injectEndpoints({
       invalidatesTags: ['Subscription'],
     }),
 
+    updateSplitStatus: builder.mutation<Split, { id: string; status: 'pending' | 'paid' }>({
+      queryFn: async ({ id, status }) => {
+        const { data, error } = await supabase
+          .from('splits')
+          .update({ status })
+          .eq('id', id)
+          .select()
+          .single()
+        if (error) return { error }
+        return { data: data as Split }
+      },
+      invalidatesTags: ['Subscription'],
+    }),
+
     deleteSplit: builder.mutation<void, string>({
       queryFn: async (id) => {
         const { error } = await supabase.from('splits').delete().eq('id', id)
@@ -68,5 +82,6 @@ export const {
   useGetSplitsQuery,
   useGetSplitsBySubscriptionQuery,
   useCreateSplitMutation,
+  useUpdateSplitStatusMutation,
   useDeleteSplitMutation,
 } = splitApi

@@ -1,0 +1,1 @@
+export { FriendsPaid } from './FriendsPaid'

@@ -1,23 +1,17 @@
 import type { Split } from '@/entities/split/api/splitApi'
 import type { Subscription } from '@/entities/subscription/model/types'
 import { formatNextDate } from '@/entities/subscription/lib/mapSubscription'
+import { gradientForName } from '@/entities/split/lib/avatarGradients'
 import './FriendsPending.scss'
-
-const avatarGradients: [string, string][] = [
-  ['#8c6df6', '#6947e6'],
-  ['#f6a76d', '#e65f47'],
-  ['#6dc8f6', '#478ce6'],
-  ['#f66da7', '#e6478c'],
-  ['#8fe3b0', '#47b06d'],
-]
 
 interface FriendsPendingProps {
   splits: Split[]
   subscriptions: Record<string, Subscription>
   onRemind: (split: Split) => void
+  onPaid: (split: Split) => void
 }
 
-export function FriendsPending({ splits, subscriptions, onRemind }: FriendsPendingProps) {
+export function FriendsPending({ splits, subscriptions, onRemind, onPaid }: FriendsPendingProps) {
   const total = splits.reduce((acc, split) => acc + split.amount, 0)
 
   if (splits.length === 0) {
@@ -48,7 +42,7 @@ export function FriendsPending({ splits, subscriptions, onRemind }: FriendsPendi
       <div className="friends-pending__list rise" style={{ animationDelay: '0.18s' }}>
         {splits.map((split) => {
           const username = split.debtor_username.replace(/^@/, '')
-          const gradient = avatarGradients[username.charCodeAt(0) % avatarGradients.length]
+          const gradient = gradientForName(username)
           const subscription = subscriptions[split.subscription_id]
           return (
             <div className="friends-pending__card" key={split.id}>
@@ -66,12 +60,23 @@ export function FriendsPending({ splits, subscriptions, onRemind }: FriendsPendi
               </div>
               <div className="friends-pending__right">
                 <b>{split.amount.toLocaleString('ru-RU', { useGrouping: false })} ₽</b>
-                <button className="friends-pending__remind" onClick={() => onRemind(split)} title="Напомнить">
-                  <svg width="15" height="15" viewBox="0 0 24 24">
-                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-                  </svg>
-                </button>
+                <div className="friends-pending__actions">
+                  <button
+                    className="friends-pending__remind friends-pending__remind--ok"
+                    onClick={() => onPaid(split)}
+                    title="Получено"
+                  >
+                    <svg width="15" height="15" viewBox="0 0 24 24">
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  </button>
+                  <button className="friends-pending__remind" onClick={() => onRemind(split)} title="Напомнить">
+                    <svg width="15" height="15" viewBox="0 0 24 24">
+                      <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
           )

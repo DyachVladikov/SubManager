@@ -104,6 +104,11 @@
     }
   }
 
+  &__actions {
+    display: flex;
+    gap: 8px;
+  }
+
   &__remind {
     width: 34px;
     height: 34px;
@@ -119,6 +124,12 @@
 
     &:active {
       transform: scale(0.88);
+    }
+
+    &--ok {
+      background: rgba(143, 227, 176, 0.12);
+      border-color: rgba(143, 227, 176, 0.35);
+      color: var(--dn);
     }
 
     svg {

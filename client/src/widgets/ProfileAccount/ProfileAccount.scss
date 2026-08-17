@@ -1,0 +1,65 @@
+@use '@/shared/styles/helpers/index.scss' as *;
+
+.profile-account {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 18px;
+  margin: 16px 20px 0;
+
+  @include tablet-above {
+    margin: 16px 0 0;
+  }
+
+  &__avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 17px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-family-accent);
+    font-size: 26px;
+    color: #0b0b10;
+    flex: 0 0 auto;
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__name {
+    display: block;
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  &__email {
+    display: block;
+    font-size: 11px;
+    color: var(--dim);
+    font-weight: 600;
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--dim);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 99px;
+    margin-top: 7px;
+  }
+}

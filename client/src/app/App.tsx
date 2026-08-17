@@ -4,7 +4,7 @@ import { AuthPage } from '@/features/auth'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { AnalyticsPage } from '@/pages/AnalyticsPage'
 import { FriendsPage } from '@/pages/FriendsPage'
-import { ComingSoon } from './ComingSoon'
+import { ProfilePage } from '@/pages/ProfilePage'
 import type { TabKey } from '@/widgets/TabBar'
 import './App.scss'
 
@@ -35,7 +35,7 @@ function App() {
   }
 
   if (tab === 'profile') {
-    return <ComingSoon active={tab} onNavigate={setTab} />
+    return <ProfilePage onNavigate={setTab} />
   }
 
   return <DashboardPage onNavigate={setTab} />

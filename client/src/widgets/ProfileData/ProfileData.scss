@@ -1,0 +1,101 @@
+@use '@/shared/styles/helpers/index.scss' as *;
+
+.profile-data {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 18px;
+  margin: 16px 20px 0;
+
+  @include tablet-above {
+    margin: 16px 0 0;
+  }
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--dim);
+
+    i {
+      width: 3px;
+      height: 12px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:first-of-type {
+      margin-top: 8px;
+    }
+
+    &:last-child {
+      border-bottom: 0;
+      padding-bottom: 2px;
+    }
+  }
+
+  &__name {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+  }
+
+  &__icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--dim);
+    flex: 0 0 auto;
+
+    svg {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  }
+
+  &__chev {
+    margin-left: auto;
+    color: var(--dim);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    small {
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    svg {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  }
+}

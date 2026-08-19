@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useAuth } from '@/features/auth'
+import { useAuth, useTmaAuth } from '@/features/auth'
 import { AuthPage } from '@/features/auth'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { AnalyticsPage } from '@/pages/AnalyticsPage'
@@ -10,9 +10,10 @@ import './App.scss'
 
 function App() {
   const { session, loading } = useAuth()
+  const tmaAuth = useTmaAuth()
   const [tab, setTab] = useState<TabKey>('home')
 
-  if (loading) {
+  if (loading || tmaAuth === 'signing') {
     return (
       <div className="app-page">
         <div className="app-page__card">

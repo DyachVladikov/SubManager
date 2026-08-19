@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import { telegramHttpsAgent, fetchRetry } from './net.js'
 import { Bot } from 'grammy'
 
 const token = process.env.BOT_TOKEN
@@ -10,10 +11,10 @@ if (!token || !supabaseUrl || !supabaseKey) {
   process.exit(1)
 }
 
-const bot = new Bot(token)
+const bot = new Bot(token, { client: { baseFetchConfig: { agent: telegramHttpsAgent } } })
 
 async function consumeLinkToken({ linkToken, telegramId, telegramUsername }) {
-  const res = await fetch(`${supabaseUrl}/rest/v1/rpc/consume_link_token`, {
+  const res = await fetchRetry(`${supabaseUrl}/rest/v1/rpc/consume_link_token`, {
     method: 'POST',
     headers: {
       apikey: supabaseKey,
@@ -29,6 +30,27 @@ async function consumeLinkToken({ linkToken, telegramId, telegramUsername }) {
   if (!res.ok) return false
   return res.json()
 }
+
+function trackBotUser(from) {
+  fetchRetry(`${supabaseUrl}/rest/v1/rpc/track_bot_user`, {
+    method: 'POST',
+    headers: {
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      p_telegram_id: from.id,
+      p_username: from.username ?? null,
+      p_first_name: from.first_name ?? null,
+    }),
+  }).catch((err) => console.error('track_bot_user:', err))
+}
+
+bot.use(async (ctx, next) => {
+  if (ctx.from) trackBotUser(ctx.from)
+  await next()
+})
 
 bot.command('start', async (ctx) => {
   const payload = ctx.match?.trim()
@@ -56,6 +78,51 @@ bot.command('start', async (ctx) => {
   } catch (err) {
     console.error(err)
     await ctx.reply('Что-то пошло не так. Попробуй ещё раз чуть позже.')
+  }
+})
+
+bot.callbackQuery(/^pay:(.+)$/, async (ctx) => {
+  const splitId = ctx.match[1]
+  try {
+    const res = await fetchRetry(`${supabaseUrl}/rest/v1/rpc/pay_split_by_debtor`, {
+      method: 'POST',
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ p_split_id: splitId, p_telegram_id: ctx.from.id }),
+    })
+    const rows = res.ok ? await res.json() : []
+    const row = rows[0]
+    if (!row || row.result === 'not_found') {
+      await ctx.answerCallbackQuery('Долг не найден')
+      return
+    }
+    if (row.result === 'not_yours') {
+      await ctx.answerCallbackQuery('Эта кнопка не для тебя')
+      return
+    }
+    if (row.result === 'already_paid') {
+      await ctx.answerCallbackQuery('Уже отмечено оплаченным')
+      return
+    }
+    await ctx.answerCallbackQuery('Принято! Владельцу улетело уведомление ✅')
+    const keyboard = ctx.callbackQuery.message?.reply_markup?.inline_keyboard ?? []
+    const remaining = keyboard.filter((btnRow) => !btnRow.some((b) => b.callback_data === `pay:${splitId}`))
+    await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: remaining } })
+    if (row.owner_telegram_id) {
+      const n = Number(row.amount)
+      const value = Number.isInteger(n) ? String(n) : n.toFixed(2)
+      const sum = `${value} ${row.currency === 'RUB' ? '₽' : row.currency}`
+      await ctx.api.sendMessage(
+        row.owner_telegram_id,
+        `💰 @${row.debtor_username} перевёл ${sum} за «${row.subscription_title}». Split закрыт.`,
+      )
+    }
+  } catch (err) {
+    console.error(err)
+    await ctx.answerCallbackQuery('Ошибка, попробуй позже')
   }
 })
 

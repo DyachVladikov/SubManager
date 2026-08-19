@@ -87,6 +87,8 @@ npm run remind         # разовая рассылка напоминаний
 npm run remind -- --dry  # прогон без отправки (печатает сообщения в консоль)
 ```
 
+Если `api.telegram.org` недоступен из сети (провайдер блокирует), впиши в `server/.env` локальный прокси VPN-клиента, например `HTTPS_PROXY=http://127.0.0.1:10809` — оба скрипта пойдут через него.
+
 Ежедневные напоминания крутятся через GitHub Actions (`.github/workflows/reminders.yml`, 10:00 МСК). Для работы workflow добавь в репозитории **Settings → Secrets and variables → Actions** три секрета: `BOT_TOKEN`, `SUPABASE_URL`, `SUPABASE_KEY`.
 
 ## Команды

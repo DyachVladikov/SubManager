@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import { fetchRetry } from './net.js'
 
 const token = process.env.BOT_TOKEN
 const supabaseUrl = process.env.SUPABASE_URL
@@ -11,7 +12,7 @@ if (!token || !supabaseUrl || !supabaseKey) {
 }
 
 async function rpc(name) {
-  const res = await fetch(`${supabaseUrl}/rest/v1/rpc/${name}`, {
+  const res = await fetchRetry(`${supabaseUrl}/rest/v1/rpc/${name}`, {
     method: 'POST',
     headers: {
       apikey: supabaseKey,
@@ -30,24 +31,31 @@ function formatAmount(amount, currency) {
   return `${value} ${currency === 'RUB' ? '₽' : currency}`
 }
 
-function groupByTelegram(rows) {
+function groupBy(rows, key) {
   const map = new Map()
   for (const row of rows) {
-    if (!map.has(row.telegram_id)) map.set(row.telegram_id, [])
-    map.get(row.telegram_id).push(row)
+    const id = row[key]
+    if (id === null || id === undefined) continue
+    if (!map.has(id)) map.set(id, [])
+    map.get(id).push(row)
   }
   return map
 }
 
-async function send(chatId, text) {
+async function send(chatId, text, buttons) {
   if (dry) {
-    console.log(`--- → чат ${chatId}\n${text}\n`)
+    const labels = buttons?.length ? `\nкнопки: ${buttons.map((b) => `[${b.text}]`).join(' ')}` : ''
+    console.log(`--- → чат ${chatId}\n${text}${labels}\n`)
     return
+  }
+  const body = { chat_id: chatId, text }
+  if (buttons?.length) {
+    body.reply_markup = { inline_keyboard: buttons.map((b) => [{ text: b.text, callback_data: b.callback_data }]) }
   }
   const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: chatId, text }),
+    body: JSON.stringify(body),
   })
   if (!res.ok) console.error(`sendMessage в чат ${chatId}: ${res.status} ${await res.text()}`)
 }
@@ -55,7 +63,7 @@ async function send(chatId, text) {
 const today = new Date().toLocaleDateString('sv-SE')
 
 const payments = await rpc('get_payment_reminders')
-const paymentsByUser = groupByTelegram(payments)
+const paymentsByUser = groupBy(payments, 'telegram_id')
 for (const [chatId, rows] of paymentsByUser) {
   const lines = rows.map((r) => {
     const when = r.next_payment_date === today ? 'сегодня' : 'завтра'
@@ -64,20 +72,38 @@ for (const [chatId, rows] of paymentsByUser) {
   await send(chatId, `⏰ Ближайшие списания:\n\n${lines.join('\n')}`)
 }
 
-let splitsChats = 0
-if (new Date().getDay() === 1) {
-  const splits = await rpc('get_pending_splits')
-  const splitsByUser = groupByTelegram(splits)
-  for (const [chatId, rows] of splitsByUser) {
-    const lines = rows.map(
-      (r) => `• @${r.debtor_username.replace(/^@/, '')} — ${formatAmount(r.amount, r.currency)} (${r.subscription_title})`,
-    )
-    await send(
-      chatId,
-      `💸 Сводка по split за неделю.\n\nТебе ещё не вернули:\n\n${lines.join('\n')}\n\nЖми «Напомнить» в приложении на вкладке «Друзья».`,
-    )
-  }
-  splitsChats = splitsByUser.size
+const splits = await rpc('get_pending_splits')
+
+const debtorDms = groupBy(splits, 'debtor_telegram_id')
+for (const [chatId, rows] of debtorDms) {
+  const lines = rows.map((r) => {
+    const owner = r.owner_telegram_username ? `@${r.owner_telegram_username}` : 'владельцу SubManager'
+    return `• ${r.subscription_title} — ${formatAmount(r.amount, r.currency)} (${owner})`
+  })
+  const buttons = rows.map((r) => ({
+    text: `Я перевел · ${r.subscription_title}`,
+    callback_data: `pay:${r.split_id}`,
+  }))
+  await send(
+    chatId,
+    `💸 Напоминание по split\n\nТвои долги за подписки:\n\n${lines.join('\n')}\n\nКак переведёшь — жми кнопку под списком, владельцу прилетит уведомление.`,
+    buttons,
+  )
 }
 
-console.log(`Готово: списания → ${paymentsByUser.size} чатов, split → ${splitsChats} чатов${dry ? ' (dry-run, ничего не отправлено)' : ''}`)
+let digestChats = 0
+if (new Date().getDay() === 1) {
+  const ownerDigests = groupBy(splits, 'owner_telegram_id')
+  for (const [chatId, rows] of ownerDigests) {
+    const lines = rows.map((r) => `• @${r.debtor_username} — ${formatAmount(r.amount, r.currency)} (${r.subscription_title})`)
+    await send(
+      chatId,
+      `💸 Сводка по split за неделю.\n\nТебе ещё не вернули:\n\n${lines.join('\n')}\n\nДолжникам уже улетают напоминания с кнопкой «Я перевел».`,
+    )
+  }
+  digestChats = ownerDigests.size
+}
+
+console.log(
+  `Готово: списания → ${paymentsByUser.size} чатов, должникам → ${debtorDms.size} чатов, сводки владельцам → ${digestChats}${dry ? ' (dry-run, ничего не отправлено)' : ''}`,
+)

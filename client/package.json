@@ -13,6 +13,7 @@
     "@a1rth/css-normalize": "^1.2.4",
     "@reduxjs/toolkit": "^2.12.0",
     "@supabase/supabase-js": "^2.112.3",
+    "@telegram-apps/sdk": "^3.11.8",
     "dexie": "^4.4.4",
     "grammy": "^1.45.1",
     "react": "^19.2.7",

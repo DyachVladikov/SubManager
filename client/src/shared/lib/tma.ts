@@ -1,22 +1,25 @@
-interface TmaWebApp {
-  initData: string
-  ready: () => void
-  expand: () => void
-  setHeaderColor: (color: string) => void
-  setBackgroundColor: (color: string) => void
+import { expandViewport, init, miniApp, retrieveRawInitData } from '@telegram-apps/sdk'
+
+export function getTmaInitData(): string | null {
+  try {
+    return retrieveRawInitData() || null
+  } catch {
+    return null
+  }
 }
 
-export function getTmaWebApp(): TmaWebApp | null {
-  const webApp = (window as unknown as { Telegram?: { WebApp?: TmaWebApp } }).Telegram?.WebApp
-  return webApp?.initData ? webApp : null
-}
-
-export function initTma(): TmaWebApp | null {
-  const webApp = getTmaWebApp()
-  if (!webApp) return null
-  webApp.ready()
-  webApp.expand()
-  webApp.setHeaderColor('#0b0b10')
-  webApp.setBackgroundColor('#0b0b10')
-  return webApp
+export function initTma(): string | null {
+  const initDataRaw = getTmaInitData()
+  if (!initDataRaw) return null
+  try {
+    init()
+    if (miniApp.mount.isAvailable()) {
+      miniApp.mount()
+      if (miniApp.setHeaderColor.isAvailable()) miniApp.setHeaderColor('#0b0b10')
+      if (miniApp.setBackgroundColor.isAvailable()) miniApp.setBackgroundColor('#0b0b10')
+      miniApp.ready()
+    }
+    if (expandViewport.isAvailable()) expandViewport()
+  } catch {}
+  return initDataRaw
 }

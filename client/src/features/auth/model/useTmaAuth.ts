@@ -8,13 +8,13 @@ export function useTmaAuth() {
   const [state, setState] = useState<TmaAuthState>('none')
 
   useEffect(() => {
-    const webApp = initTma()
-    if (!webApp) return
+    const initData = initTma()
+    if (!initData) return
     setState('signing')
     fetch('/api/tma-auth', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ initData: webApp.initData }),
+      body: JSON.stringify({ initData }),
     })
       .then(async (res) => {
         if (!res.ok) throw new Error(String(res.status))

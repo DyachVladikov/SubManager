@@ -74,6 +74,21 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 npm run dev
 ```
 
+## Telegram-бот
+
+Бот живёт в `server/bot` и работает на long polling — публичный URL не нужен.
+
+```bash
+cd server
+npm install
+cp .env.example .env   # вписать BOT_TOKEN от @BotFather
+npm run bot            # привязка аккаунтов через /start
+npm run remind         # разовая рассылка напоминаний
+npm run remind -- --dry  # прогон без отправки (печатает сообщения в консоль)
+```
+
+Ежедневные напоминания крутятся через GitHub Actions (`.github/workflows/reminders.yml`, 10:00 МСК). Для работы workflow добавь в репозитории **Settings → Secrets and variables → Actions** три секрета: `BOT_TOKEN`, `SUPABASE_URL`, `SUPABASE_KEY`.
+
 ## Команды
 
 | Команда | Описание |
@@ -87,11 +102,13 @@ npm run dev
 
 - [x] Инициализация проекта, FSD, алиасы, базовые стили
 - [x] Схема Supabase и RLS-политики
-- [ ] Авторизация (Email + Google OAuth)
-- [ ] CRUD подписок
-- [ ] Дашборд и аналитика
-- [ ] Сплит-оплата
-- [ ] Telegram Bot и линкинг аккаунтов
-- [ ] Cron-напоминания
-- [ ] PWA (offline, manifest)
+- [x] Авторизация (Email + Google OAuth)
+- [x] CRUD подписок
+- [x] Дашборд и аналитика
+- [x] Сплит-оплата
+- [x] Telegram Bot и линкинг аккаунтов
+- [x] Cron-напоминания
+- [x] PWA (offline, manifest)
+- [ ] Inline-кнопки бота («Я перевел»)
+- [ ] Telegram Mini App
 - [ ] Деплой на Vercel

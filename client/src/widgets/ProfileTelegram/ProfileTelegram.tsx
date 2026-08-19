@@ -1,20 +1,44 @@
-import { useState } from 'react'
-import { useAuth } from '@/features/auth'
-import { useLocalStorage } from '@/shared/lib/useLocalStorage'
+import { useEffect, useState } from 'react'
+import { useGetProfileQuery, useUpdateProfileMutation } from '@/entities/profile/api/profileApi'
+import { supabase } from '@/shared/config/supabase'
 import './ProfileTelegram.scss'
 
-export function ProfileTelegram() {
-  const { session } = useAuth()
-  const fallback = session?.user?.email?.split('@')[0] ?? 'user'
-  const [linkedName, setLinkedName] = useLocalStorage<string | null>('sm_tg_username', null)
-  const [waiting, setWaiting] = useState(false)
+const BOT_URL = 'https://t.me/app_sub_manager_bot'
 
-  const handleLink = () => {
+export function ProfileTelegram() {
+  const [waiting, setWaiting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const { data: profile } = useGetProfileQuery(undefined, {
+    pollingInterval: waiting ? 3000 : 0,
+  })
+  const [updateProfile, { isLoading: unlinking }] = useUpdateProfileMutation()
+
+  const linked = Boolean(profile?.telegram_id)
+
+  useEffect(() => {
+    if (linked) setWaiting(false)
+  }, [linked])
+
+  const handleLink = async () => {
+    setError(null)
+    const { data: userData } = await supabase.auth.getUser()
+    if (!userData.user) return
+    const token = `link_${crypto.randomUUID().replaceAll('-', '').slice(0, 10)}`
+    const { error: insertError } = await supabase.from('link_tokens').insert({
+      token,
+      user_id: userData.user.id,
+      expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+    })
+    if (insertError) {
+      setError('Не удалось создать ссылку. Попробуй ещё раз.')
+      return
+    }
     setWaiting(true)
-    setTimeout(() => {
-      setLinkedName(fallback)
-      setWaiting(false)
-    }, 1100)
+    window.open(`${BOT_URL}?start=${token}`, '_blank')
+  }
+
+  const handleUnlink = async () => {
+    await updateProfile({ telegram_id: null, telegram_username: null })
   }
 
   return (
@@ -22,7 +46,7 @@ export function ProfileTelegram() {
       <div className="profile-telegram__label">
         <i></i>Telegram
       </div>
-      {linkedName ? (
+      {linked ? (
         <div className="profile-telegram__row">
           <div className="profile-telegram__icon profile-telegram__icon--ok">
             <svg width="20" height="20" viewBox="0 0 24 24">
@@ -30,10 +54,10 @@ export function ProfileTelegram() {
             </svg>
           </div>
           <div className="profile-telegram__info">
-            <b>@{linkedName}</b>
-            <span>привязан · бот @SubManagerBot · уведомления и split активны</span>
+            <b>@{profile?.telegram_username ?? 'telegram'}</b>
+            <span>привязан · бот @app_sub_manager_bot · уведомления и split активны</span>
           </div>
-          <button className="profile-telegram__unlink" onClick={() => setLinkedName(null)}>
+          <button className="profile-telegram__unlink" onClick={handleUnlink} disabled={unlinking}>
             Отвязать
           </button>
         </div>
@@ -51,13 +75,25 @@ export function ProfileTelegram() {
               <span>Бот напомнит о списаниях и переводах друзей. Без Telegram split недоступен.</span>
             </div>
           </div>
-          <button className="profile-telegram__button" onClick={handleLink} disabled={waiting}>
-            <svg width="14" height="14" viewBox="0 0 24 24">
-              <path d="m22 2-7 20-4-9-9-4Z" />
-              <path d="M22 2 11 13" />
-            </svg>
-            {waiting ? 'Жди код в боте…' : 'Привязать Telegram'}
-          </button>
+          {waiting ? (
+            <>
+              <p className="profile-telegram__hint">
+                Открыл тебе бота — нажми в нём «Start». Ссылка живёт 15 минут, здесь всё обновится само.
+              </p>
+              <button className="profile-telegram__button" onClick={() => setWaiting(false)}>
+                Отмена
+              </button>
+            </>
+          ) : (
+            <button className="profile-telegram__button" onClick={handleLink}>
+              <svg width="14" height="14" viewBox="0 0 24 24">
+                <path d="m22 2-7 20-4-9-9-4Z" />
+                <path d="M22 2 11 13" />
+              </svg>
+              Привязать Telegram
+            </button>
+          )}
+          {error && <p className="profile-telegram__error">{error}</p>}
         </>
       )}
     </div>

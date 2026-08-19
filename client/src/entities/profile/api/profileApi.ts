@@ -5,6 +5,7 @@ export interface Profile {
   id: string
   currency: string
   telegram_id: number | null
+  telegram_username: string | null
   avatar_url: string | null
   created_at: string
 }
@@ -20,7 +21,7 @@ export const profileApi = baseApi.injectEndpoints({
       providesTags: ['Profile'],
     }),
 
-    updateProfile: builder.mutation<Profile, Partial<Pick<Profile, 'currency' | 'telegram_id' | 'avatar_url'>>>({
+    updateProfile: builder.mutation<Profile, Partial<Pick<Profile, 'currency' | 'telegram_id' | 'telegram_username' | 'avatar_url'>>>({
       queryFn: async (updates) => {
         const { data: userData, error: userError } = await supabase.auth.getUser()
         if (userError || !userData.user) return { error: userError ?? { message: 'Нет сессии' } }

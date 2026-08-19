@@ -1,54 +1,40 @@
-import 'dotenv/config'
-import { telegramHttpsAgent, fetchRetry } from './net.js'
-import { Bot } from 'grammy'
+import { Bot, webhookCallback } from 'grammy'
 
 const token = process.env.BOT_TOKEN
 const supabaseUrl = process.env.SUPABASE_URL
 const supabaseKey = process.env.SUPABASE_KEY
 
-if (!token || !supabaseUrl || !supabaseKey) {
-  console.error('Заполни BOT_TOKEN, SUPABASE_URL и SUPABASE_KEY в server/.env')
-  process.exit(1)
-}
-
-const bot = new Bot(token, { client: { baseFetchConfig: { agent: telegramHttpsAgent } } })
-
-async function consumeLinkToken({ linkToken, telegramId, telegramUsername }) {
-  const res = await fetchRetry(`${supabaseUrl}/rest/v1/rpc/consume_link_token`, {
+async function rpc(name, payload) {
+  const res = await fetch(`${supabaseUrl}/rest/v1/rpc/${name}`, {
     method: 'POST',
     headers: {
       apikey: supabaseKey,
       Authorization: `Bearer ${supabaseKey}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      p_token: linkToken,
-      p_telegram_id: telegramId,
-      p_telegram_username: telegramUsername,
-    }),
+    body: JSON.stringify(payload),
   })
-  if (!res.ok) return false
-  return res.json()
+  if (!res.ok) return null
+  const text = await res.text()
+  return text ? JSON.parse(text) : null
 }
 
-function trackBotUser(from) {
-  fetchRetry(`${supabaseUrl}/rest/v1/rpc/track_bot_user`, {
-    method: 'POST',
-    headers: {
-      apikey: supabaseKey,
-      Authorization: `Bearer ${supabaseKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      p_telegram_id: from.id,
-      p_username: from.username ?? null,
-      p_first_name: from.first_name ?? null,
-    }),
-  }).catch((err) => console.error('track_bot_user:', err))
+function formatAmount(amount, currency) {
+  const n = Number(amount)
+  const value = Number.isInteger(n) ? String(n) : n.toFixed(2)
+  return `${value} ${currency === 'RUB' ? '₽' : currency}`
 }
+
+const bot = new Bot(token)
 
 bot.use(async (ctx, next) => {
-  if (ctx.from) trackBotUser(ctx.from)
+  if (ctx.from) {
+    rpc('track_bot_user', {
+      p_telegram_id: ctx.from.id,
+      p_username: ctx.from.username ?? null,
+      p_first_name: ctx.from.first_name ?? null,
+    }).catch((err) => console.error('track_bot_user:', err))
+  }
   await next()
 })
 
@@ -61,10 +47,10 @@ bot.command('start', async (ctx) => {
     return
   }
   try {
-    const ok = await consumeLinkToken({
-      linkToken: payload,
-      telegramId: ctx.from.id,
-      telegramUsername: ctx.from.username ?? null,
+    const ok = await rpc('consume_link_token', {
+      p_token: payload,
+      p_telegram_id: ctx.from.id,
+      p_telegram_username: ctx.from.username ?? null,
     })
     if (ok) {
       await ctx.reply(
@@ -84,17 +70,8 @@ bot.command('start', async (ctx) => {
 bot.callbackQuery(/^pay:(.+)$/, async (ctx) => {
   const splitId = ctx.match[1]
   try {
-    const res = await fetchRetry(`${supabaseUrl}/rest/v1/rpc/pay_split_by_debtor`, {
-      method: 'POST',
-      headers: {
-        apikey: supabaseKey,
-        Authorization: `Bearer ${supabaseKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ p_split_id: splitId, p_telegram_id: ctx.from.id }),
-    })
-    const rows = res.ok ? await res.json() : []
-    const row = rows[0]
+    const rows = await rpc('pay_split_by_debtor', { p_split_id: splitId, p_telegram_id: ctx.from.id })
+    const row = rows?.[0]
     if (!row || row.result === 'not_found') {
       await ctx.answerCallbackQuery('Доля не найдена')
       return
@@ -112,12 +89,9 @@ bot.callbackQuery(/^pay:(.+)$/, async (ctx) => {
     const remaining = keyboard.filter((btnRow) => !btnRow.some((b) => b.callback_data === `pay:${splitId}`))
     await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: remaining } })
     if (row.owner_telegram_id) {
-      const n = Number(row.amount)
-      const value = Number.isInteger(n) ? String(n) : n.toFixed(2)
-      const sum = `${value} ${row.currency === 'RUB' ? '₽' : row.currency}`
       await ctx.api.sendMessage(
         row.owner_telegram_id,
-        `💰 @${row.debtor_username} перевёл(а) ${sum} за «${row.subscription_title}». Split закрыт.`,
+        `💰 @${row.debtor_username} перевёл(а) ${formatAmount(row.amount, row.currency)} за «${row.subscription_title}». Split закрыт.`,
       )
     }
   } catch (err) {
@@ -126,7 +100,4 @@ bot.callbackQuery(/^pay:(.+)$/, async (ctx) => {
   }
 })
 
-bot.catch((err) => console.error(err))
-
-bot.start()
-console.log('SubManager bot запущен (long polling)')
+export default webhookCallback(bot, 'http', { secretToken: process.env.TELEGRAM_WEBHOOK_SECRET })

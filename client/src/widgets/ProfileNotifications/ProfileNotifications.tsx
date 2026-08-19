@@ -23,7 +23,7 @@ export function ProfileNotifications() {
     {
       key: 'friends',
       title: 'Переводы друзей',
-      hint: 'когда друг жмёт «я перевёл»',
+      hint: 'когда друг жмёт «я перевел(а)»',
       value: friends,
       set: setFriends,
       icon: (

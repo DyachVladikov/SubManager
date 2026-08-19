@@ -81,12 +81,12 @@ for (const [chatId, rows] of debtorDms) {
     return `• ${r.subscription_title} — ${formatAmount(r.amount, r.currency)} (${owner})`
   })
   const buttons = rows.map((r) => ({
-    text: `Я перевел · ${r.subscription_title}`,
+    text: `Я перевел(а) · ${r.subscription_title}`,
     callback_data: `pay:${r.split_id}`,
   }))
   await send(
     chatId,
-    `💸 Напоминание по split\n\nТвои долги за подписки:\n\n${lines.join('\n')}\n\nКак переведёшь — жми кнопку под списком, владельцу прилетит уведомление.`,
+    `💸 Напоминание по split\n\nТвои доли в подписках:\n\n${lines.join('\n')}\n\nКак переведёшь — жми кнопку под списком, владельцу прилетит уведомление.`,
     buttons,
   )
 }
@@ -98,12 +98,12 @@ if (new Date().getDay() === 1) {
     const lines = rows.map((r) => `• @${r.debtor_username} — ${formatAmount(r.amount, r.currency)} (${r.subscription_title})`)
     await send(
       chatId,
-      `💸 Сводка по split за неделю.\n\nТебе ещё не вернули:\n\n${lines.join('\n')}\n\nДолжникам уже улетают напоминания с кнопкой «Я перевел».`,
+      `💸 Сводка по split за неделю.\n\nТебе ещё не вернули:\n\n${lines.join('\n')}\n\nДрузьям уже улетают напоминания с кнопкой «Я перевел(а)».`,
     )
   }
   digestChats = ownerDigests.size
 }
 
 console.log(
-  `Готово: списания → ${paymentsByUser.size} чатов, должникам → ${debtorDms.size} чатов, сводки владельцам → ${digestChats}${dry ? ' (dry-run, ничего не отправлено)' : ''}`,
+  `Готово: списания → ${paymentsByUser.size} чатов, друзьям → ${debtorDms.size} чатов, сводки владельцам → ${digestChats}${dry ? ' (dry-run, ничего не отправлено)' : ''}`,
 )

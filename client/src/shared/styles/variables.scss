@@ -11,6 +11,8 @@
   --dim: #8f8fa0;
   --up: #ef8f8f;
   --dn: #8fe3b0;
+  --switch-off: rgba(255, 255, 255, 0.12);
+  --row-border: rgba(255, 255, 255, 0.05);
 
   --cat-Нейросети: #a78bfa;
   --cat-Видео: #7c5cf0;
@@ -32,4 +34,19 @@
 
   --transition-duration: 0.2s;
   --transition-duration-longer: 0.4s;
+}
+
+:root[data-theme='light'] {
+  --bg: #f2f2f7;
+  --surface: #ffffff;
+  --surface2: #e9e9f0;
+  --border: rgba(20, 20, 40, 0.09);
+  --accent: #7c5cf0;
+  --accent-deep: #6444d8;
+  --text: #17171f;
+  --dim: #6b6b7d;
+  --up: #d96a6a;
+  --dn: #37975f;
+  --switch-off: rgba(20, 20, 40, 0.14);
+  --row-border: rgba(20, 20, 40, 0.07);
 }

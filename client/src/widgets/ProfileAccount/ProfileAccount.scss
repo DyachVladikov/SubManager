@@ -62,4 +62,60 @@
     border-radius: 99px;
     margin-top: 7px;
   }
+
+  &__name-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  &__edit-btn {
+    display: flex;
+    background: none;
+    border: 0;
+    padding: 2px;
+    color: var(--dim);
+    cursor: pointer;
+    transition: color 0.2s;
+
+    svg {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    &:hover {
+      color: var(--accent);
+    }
+  }
+
+  &__edit {
+    display: flex;
+    gap: 7px;
+  }
+
+  &__input {
+    flex: 1;
+    min-width: 0;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 7px 10px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  &__save {
+    background: var(--accent);
+    color: #0b0b10;
+    border: 0;
+    border-radius: 10px;
+    padding: 0 12px;
+    font-weight: 800;
+    font-size: 12px;
+    cursor: pointer;
+  }
 }

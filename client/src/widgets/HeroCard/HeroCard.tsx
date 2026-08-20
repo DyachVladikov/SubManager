@@ -21,6 +21,9 @@ export function HeroCard({ mode, onModeChange, subscriptions }: HeroCardProps) {
   const remaining = isMonth ? stats.remainingMonth : stats.remainingYear
   const progress = paid + remaining > 0 ? Math.round((paid / (paid + remaining)) * 100) : 0
 
+  const digits = String(Math.round(value)).length
+  const numFontSize = digits <= 5 ? 80 : digits === 6 ? 64 : 52
+
   const chartWidth = 350
   const chartHeight = 64
   const max = Math.max(...points, 1)
@@ -65,7 +68,9 @@ export function HeroCard({ mode, onModeChange, subscriptions }: HeroCardProps) {
         </div>
       </div>
       <div className="hero-card__sum swap" key={`sum-${mode}`}>
-        <div className="hero-card__num">{value.toLocaleString('ru-RU', { useGrouping: false })}</div>
+        <div className="hero-card__num" style={{ fontSize: numFontSize }}>
+          {value.toLocaleString('ru-RU', { useGrouping: false })}
+        </div>
         <div className="hero-card__per">₽</div>
       </div>
       <div className="hero-card__row swap" key={`row-${mode}`}>

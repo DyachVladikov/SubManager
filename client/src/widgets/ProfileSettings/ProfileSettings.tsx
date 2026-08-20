@@ -1,5 +1,4 @@
 import { useGetProfileQuery, useUpdateProfileMutation } from '@/entities/profile/api/profileApi'
-import { useLocalStorage } from '@/shared/lib/useLocalStorage'
 import './ProfileSettings.scss'
 
 const currencies = [
@@ -11,14 +10,13 @@ const currencies = [
 const themes = [
   { key: 'dark', label: 'Тёмная' },
   { key: 'light', label: 'Светлая' },
-  { key: 'auto', label: 'Авто' },
 ]
 
 export function ProfileSettings() {
   const { data: profile } = useGetProfileQuery()
   const [updateProfile] = useUpdateProfileMutation()
-  const [theme, setTheme] = useLocalStorage('sm_theme', 'dark')
   const currency = profile?.currency ?? 'RUB'
+  const theme = profile?.theme ?? 'dark'
 
   return (
     <div className="profile-settings rise" style={{ animationDelay: '0.18s' }}>
@@ -51,7 +49,8 @@ export function ProfileSettings() {
         <div className="profile-settings__name">
           <div className="profile-settings__icon">
             <svg width="16" height="16" viewBox="0 0 24 24">
-              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
             </svg>
           </div>
           Тема
@@ -61,7 +60,7 @@ export function ProfileSettings() {
             <button
               key={item.key}
               className={`profile-settings__chip${theme === item.key ? ' profile-settings__chip--on' : ''}`}
-              onClick={() => setTheme(item.key)}
+              onClick={() => updateProfile({ theme: item.key })}
             >
               {item.label}
             </button>

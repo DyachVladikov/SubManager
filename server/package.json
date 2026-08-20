@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "bot": "node bot/index.js",
-    "remind": "node bot/remind.js"
+    "remind": "node bot/remind.js",
+    "news": "node bot/news.js"
   },
   "dependencies": {
     "dotenv": "^16.4.5",

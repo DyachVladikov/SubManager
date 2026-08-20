@@ -51,7 +51,7 @@ export default async function handler(req, res) {
       userId = created.user.id
       await supabase
         .from('profiles')
-        .update({ telegram_id: tgUser.id, telegram_username: tgUser.username ?? null })
+        .update({ telegram_id: tgUser.id, telegram_username: tgUser.username ?? null, name: tgUser.first_name ?? null })
         .eq('id', userId)
     }
 

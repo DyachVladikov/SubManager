@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAuth, useTmaAuth } from '@/features/auth'
 import { AuthPage } from '@/features/auth'
+import { useTheme } from '@/shared/lib/useTheme'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { AnalyticsPage } from '@/pages/AnalyticsPage'
 import { FriendsPage } from '@/pages/FriendsPage'
@@ -12,6 +13,7 @@ function App() {
   const { session, loading } = useAuth()
   const tmaAuth = useTmaAuth()
   const [tab, setTab] = useState<TabKey>('home')
+  useTheme(session !== null)
 
   if (loading || tmaAuth === 'signing') {
     return (

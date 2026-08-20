@@ -19,6 +19,22 @@ async function rpc(name, payload) {
   return text ? JSON.parse(text) : null
 }
 
+async function wantsNotification(telegramId, column) {
+  try {
+    const res = await fetch(`${supabaseUrl}/rest/v1/profiles?telegram_id=eq.${telegramId}&select=${column}`, {
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`,
+      },
+    })
+    if (!res.ok) return true
+    const rows = await res.json()
+    return rows[0]?.[column] !== false
+  } catch {
+    return true
+  }
+}
+
 function formatAmount(amount, currency) {
   const n = Number(amount)
   const value = Number.isInteger(n) ? String(n) : n.toFixed(2)
@@ -84,11 +100,14 @@ bot.callbackQuery(/^pay:(.+)$/, async (ctx) => {
       await ctx.answerCallbackQuery('Уже отмечено оплаченным')
       return
     }
-    await ctx.answerCallbackQuery('Принято! Владельцу улетело уведомление ✅')
+    const notifyOwner = row.owner_telegram_id
+      ? await wantsNotification(row.owner_telegram_id, 'notify_payments_received')
+      : false
+    await ctx.answerCallbackQuery(notifyOwner ? 'Принято! Владельцу улетело уведомление ✅' : 'Принято! ✅')
     const keyboard = ctx.callbackQuery.message?.reply_markup?.inline_keyboard ?? []
     const remaining = keyboard.filter((btnRow) => !btnRow.some((b) => b.callback_data === `pay:${splitId}`))
     await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: remaining } })
-    if (row.owner_telegram_id) {
+    if (notifyOwner) {
       await ctx.api.sendMessage(
         row.owner_telegram_id,
         `💰 @${row.debtor_username} перевёл(а) ${formatAmount(row.amount, row.currency)} за «${row.subscription_title}». Split закрыт.`,

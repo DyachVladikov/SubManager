@@ -31,6 +31,22 @@ async function consumeLinkToken({ linkToken, telegramId, telegramUsername }) {
   return res.json()
 }
 
+async function wantsNotification(telegramId, column) {
+  try {
+    const res = await fetchRetry(`${supabaseUrl}/rest/v1/profiles?telegram_id=eq.${telegramId}&select=${column}`, {
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`,
+      },
+    })
+    if (!res.ok) return true
+    const rows = await res.json()
+    return rows[0]?.[column] !== false
+  } catch {
+    return true
+  }
+}
+
 function trackBotUser(from) {
   fetchRetry(`${supabaseUrl}/rest/v1/rpc/track_bot_user`, {
     method: 'POST',
@@ -107,11 +123,14 @@ bot.callbackQuery(/^pay:(.+)$/, async (ctx) => {
       await ctx.answerCallbackQuery('Уже отмечено оплаченным')
       return
     }
-    await ctx.answerCallbackQuery('Принято! Владельцу улетело уведомление ✅')
+    const notifyOwner = row.owner_telegram_id
+      ? await wantsNotification(row.owner_telegram_id, 'notify_payments_received')
+      : false
+    await ctx.answerCallbackQuery(notifyOwner ? 'Принято! Владельцу улетело уведомление ✅' : 'Принято! ✅')
     const keyboard = ctx.callbackQuery.message?.reply_markup?.inline_keyboard ?? []
     const remaining = keyboard.filter((btnRow) => !btnRow.some((b) => b.callback_data === `pay:${splitId}`))
     await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: remaining } })
-    if (row.owner_telegram_id) {
+    if (notifyOwner) {
       const n = Number(row.amount)
       const value = Number.isInteger(n) ? String(n) : n.toFixed(2)
       const sum = `${value} ${row.currency === 'RUB' ? '₽' : row.currency}`

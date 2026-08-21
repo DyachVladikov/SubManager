@@ -60,6 +60,18 @@ export const profileApi = baseApi.injectEndpoints({
         if (error) return { error }
         return { data: data as Profile }
       },
+      async onQueryStarted(updates, { dispatch, queryFulfilled }) {
+        const patch = dispatch(
+          profileApi.util.updateQueryData('getProfile', undefined, (draft) => {
+            if (draft) Object.assign(draft, updates)
+          }),
+        )
+        try {
+          await queryFulfilled
+        } catch {
+          patch.undo()
+        }
+      },
       invalidatesTags: ['Profile'],
     }),
   }),

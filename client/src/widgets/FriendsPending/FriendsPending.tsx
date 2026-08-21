@@ -2,6 +2,7 @@ import type { Split } from '@/entities/split/api/splitApi'
 import type { Subscription } from '@/entities/subscription/model/types'
 import { formatNextDate } from '@/entities/subscription/lib/mapSubscription'
 import { gradientForName } from '@/entities/split/lib/avatarGradients'
+import { useMoney } from '@/shared/lib/useCurrency'
 import './FriendsPending.scss'
 
 interface FriendsPendingProps {
@@ -12,6 +13,7 @@ interface FriendsPendingProps {
 }
 
 export function FriendsPending({ splits, subscriptions, onRemind, onPaid }: FriendsPendingProps) {
+  const { symbol: currency, convert } = useMoney()
   const total = splits.reduce((acc, split) => acc + split.amount, 0)
 
   if (splits.length === 0) {
@@ -37,7 +39,7 @@ export function FriendsPending({ splits, subscriptions, onRemind, onPaid }: Frie
         <h2 className="friends-pending__title">
           <i></i>Ждут перевода
         </h2>
-        <span className="friends-pending__sum">{total.toLocaleString('ru-RU', { useGrouping: false })} ₽</span>
+        <span className="friends-pending__sum">{convert(total).toLocaleString('ru-RU', { useGrouping: false })} {currency}</span>
       </div>
       <div className="friends-pending__list rise" style={{ animationDelay: '0.18s' }}>
         {splits.map((split) => {
@@ -59,7 +61,7 @@ export function FriendsPending({ splits, subscriptions, onRemind, onPaid }: Frie
                 </div>
               </div>
               <div className="friends-pending__right">
-                <b>{split.amount.toLocaleString('ru-RU', { useGrouping: false })} ₽</b>
+                <b>{convert(split.amount).toLocaleString('ru-RU', { useGrouping: false })} {currency}</b>
                 <div className="friends-pending__actions">
                   <button
                     className="friends-pending__remind friends-pending__remind--ok"

@@ -8,6 +8,7 @@ export interface Subscription {
   category: string
   nextDate: string
   daysLeft: string
+  remindBeforeDays?: number
   history: string[]
   split?: Array<{ name: string; username: string; amount: number; paid: boolean }>
   dark?: boolean

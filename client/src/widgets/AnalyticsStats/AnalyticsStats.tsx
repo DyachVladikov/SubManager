@@ -1,5 +1,6 @@
 import { LuUsers } from 'react-icons/lu'
 import type { AnalyticsStats as AnalyticsStatsData } from '@/entities/subscription/lib/analyticsStats'
+import { useMoney } from '@/shared/lib/useCurrency'
 import './AnalyticsStats.scss'
 
 interface AnalyticsStatsProps {
@@ -7,27 +8,29 @@ interface AnalyticsStatsProps {
 }
 
 export function AnalyticsStats({ stats }: AnalyticsStatsProps) {
+  const { symbol: currency, convert } = useMoney()
+
   return (
     <div className="analytics-stats rise" style={{ animationDelay: '0.18s' }}>
       <div className="analytics-stats__card">
         <div className="analytics-stats__label">Проекция на год</div>
         <div className="analytics-stats__value">
-          {stats.yearProjection.toLocaleString('ru-RU', { useGrouping: false })} <span>₽</span>
+          {convert(stats.yearProjection).toLocaleString('ru-RU', { useGrouping: false })} <span>{currency}</span>
         </div>
       </div>
       <div className="analytics-stats__card">
         <div className="analytics-stats__label">В среднем в день</div>
         <div className="analytics-stats__value">
-          {stats.dailyAverage.toLocaleString('ru-RU', { useGrouping: false })} <span>₽</span>
+          {convert(stats.dailyAverage).toLocaleString('ru-RU', { useGrouping: false })} <span>{currency}</span>
         </div>
       </div>
       <div className="analytics-stats__card analytics-stats__card--wide">
         <div>
           <div className="analytics-stats__label">Возврат по split</div>
           <div className="analytics-stats__value">
-            {stats.splitReturn.toLocaleString('ru-RU', { useGrouping: false })}{' '}
+            {convert(stats.splitReturn).toLocaleString('ru-RU', { useGrouping: false })}{' '}
             <span>
-              ₽ / мес · от {stats.splitFriends} {pluralFriends(stats.splitFriends)}
+              {currency} / мес · от {stats.splitFriends} {pluralFriends(stats.splitFriends)}
             </span>
           </div>
         </div>

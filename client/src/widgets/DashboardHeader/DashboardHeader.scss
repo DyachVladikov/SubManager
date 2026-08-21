@@ -1,14 +1,30 @@
+@use '@/shared/styles/helpers/index.scss' as *;
+
 .dashboard-header {
   position: relative;
+  z-index: 30;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 22px 20px 6px;
 
+  @include tablet-above {
+    padding: 22px 0 6px;
+  }
+
   &__brand {
     display: flex;
     align-items: center;
     gap: 11px;
+    cursor: pointer;
+    border-radius: 14px;
+    padding: 4px 8px 4px 4px;
+    margin: -4px -8px -4px -4px;
+    transition: background 0.2s;
+
+    @include hover(false) {
+      background: rgba(167, 139, 250, 0.07);
+    }
   }
 
   &__avatar {
@@ -98,6 +114,12 @@
     padding: 14px;
     z-index: 50;
     box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+    transform-origin: top right;
+    animation: dropdownIn 0.22s cubic-bezier(0.3, 0.8, 0.3, 1);
+
+    @include tablet-above {
+      right: 0;
+    }
   }
 
   &__notifications-title {

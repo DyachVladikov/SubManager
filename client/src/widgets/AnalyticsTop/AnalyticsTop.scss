@@ -10,6 +10,38 @@
 
   @include tablet-above {
     margin: 16px 0 0;
+    padding: 22px;
+
+    .analytics-top__row {
+      padding: 13px 0;
+      gap: 13px;
+
+      &:hover {
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+    }
+
+    .analytics-top__name {
+      font-size: 14px;
+
+      small {
+        font-size: 11px;
+      }
+    }
+
+    .analytics-top__amount {
+      font-size: 14px;
+
+      small {
+        font-size: 11px;
+      }
+    }
+
+    .analytics-top__logo {
+      width: 36px;
+      height: 36px;
+    }
   }
 
   &__label {
@@ -36,10 +68,23 @@
     gap: 11px;
     padding: 12px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    border-radius: 10px;
+    transition: background 0.2s ease, padding 0.2s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.03);
+      padding-left: 8px;
+      padding-right: 8px;
+    }
 
     &:last-child {
       border-bottom: 0;
       padding-bottom: 2px;
+
+      &:hover {
+        padding-bottom: 2px;
+      }
     }
   }
 

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { LuChevronLeft, LuChevronRight } from 'react-icons/lu'
 import type { MonthTotal } from '@/entities/subscription/lib/analyticsStats'
+import { useMoney } from '@/shared/lib/useCurrency'
 import './AnalyticsChart.scss'
 
 interface AnalyticsChartProps {
@@ -8,6 +9,7 @@ interface AnalyticsChartProps {
 }
 
 export function AnalyticsChart({ months }: AnalyticsChartProps) {
+  const { symbol: currency, convert } = useMoney()
   const [selected, setSelected] = useState(months.length - 1)
   const max = Math.max(...months.map((m) => m.total), 1)
   const current = months[selected]
@@ -36,7 +38,7 @@ export function AnalyticsChart({ months }: AnalyticsChartProps) {
       </div>
       <div className="analytics-chart__head">
         <div className="analytics-chart__bignum swap" key={selected}>
-          {current.total.toLocaleString('ru-RU', { useGrouping: false })} ₽
+          {convert(current.total).toLocaleString('ru-RU', { useGrouping: false })} {currency}
         </div>
         {previous && previous.total > 0 && delta !== null && (
           <span className={`analytics-chart__chip analytics-chart__chip--${delta >= 0 ? 'up' : 'dn'}`}>
@@ -52,7 +54,7 @@ export function AnalyticsChart({ months }: AnalyticsChartProps) {
             className={`analytics-chart__col${i === selected ? ' analytics-chart__col--active' : ''}`}
             onClick={() => setSelected(i)}
           >
-            <span className="analytics-chart__value">{month.total.toLocaleString('ru-RU', { useGrouping: false })}</span>
+            <span className="analytics-chart__value">{convert(month.total).toLocaleString('ru-RU', { useGrouping: false })}</span>
             <div className="analytics-chart__bar-wrap">
               <div
                 className="analytics-chart__bar"

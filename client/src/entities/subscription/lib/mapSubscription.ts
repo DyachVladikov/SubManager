@@ -34,6 +34,7 @@ export function mapSubscription(dbSub: DbSubscription, categoryName?: string): M
     category: categoryName || 'Другое',
     nextDate: formatNextDate(dbSub.next_payment_date),
     daysLeft: calculateDaysLeft(dbSub.next_payment_date),
+    remindBeforeDays: dbSub.remind_before_days ?? 1,
     history: [],
     split: undefined,
     dark: false,

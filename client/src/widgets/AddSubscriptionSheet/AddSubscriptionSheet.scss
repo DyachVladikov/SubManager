@@ -7,6 +7,7 @@
     background: rgba(5, 5, 8, 0.62);
     backdrop-filter: blur(3px);
     z-index: 20;
+    animation: overlayIn 0.25s ease;
   }
 
   position: fixed;
@@ -24,16 +25,27 @@
   scrollbar-width: none;
   max-width: 390px;
   margin: 0 auto;
+  animation: sheetIn 0.32s cubic-bezier(0.3, 0.8, 0.3, 1);
+  transition: transform 0.25s ease;
 
   @include tablet-above {
-    max-width: 600px;
+    max-width: 560px;
     left: 50%;
-    transform: translate(-50%, 0);
+    top: 50%;
+    bottom: auto;
+    transform: translate(-50%, -50%);
     border-radius: 26px;
+    border-bottom: 1px solid var(--border);
+    max-height: 86vh;
+    animation: sheetInDesktop 0.32s cubic-bezier(0.3, 0.8, 0.3, 1);
   }
 
   &::-webkit-scrollbar {
     display: none;
+  }
+
+  &__drag-zone {
+    touch-action: pan-y;
   }
 
   &__grab {
@@ -42,6 +54,10 @@
     border-radius: 99px;
     background: rgba(255, 255, 255, 0.14);
     margin: 2px auto 14px;
+
+    @include tablet-above {
+      display: none;
+    }
   }
 
   &__head {

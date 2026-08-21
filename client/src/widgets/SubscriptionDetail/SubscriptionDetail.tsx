@@ -1,6 +1,7 @@
-import { useEffect, type CSSProperties } from 'react'
+import { useCallback, useEffect, useState, type CSSProperties } from 'react'
 import type { Subscription } from '@/mocks/subscriptions'
 import { useGetSplitsBySubscriptionQuery } from '@/entities/split/api/splitApi'
+import { useMoney } from '@/shared/lib/useCurrency'
 import './SubscriptionDetail.scss'
 
 interface SubscriptionDetailProps {
@@ -12,33 +13,63 @@ interface SubscriptionDetailProps {
 }
 
 export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEdit }: SubscriptionDetailProps) {
+  const { symbol: currency, convert } = useMoney()
   const { data: splits = [] } = useGetSplitsBySubscriptionQuery(subscription.id)
+  const remindDays = subscription.remindBeforeDays ?? 1
+  const remindText =
+    remindDays === 0
+      ? 'в день списания, в Telegram'
+      : remindDays === 1
+        ? 'за день до списания, в Telegram'
+        : `за ${remindDays} ${remindDays < 5 ? 'дня' : 'дней'} до списания, в Telegram`
+
+  const [shown, setShown] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (!cancelled) setShown(true)
+      })
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const closeWithAnimation = useCallback(
+    (after?: () => void) => {
+      setShown(false)
+      window.setTimeout(() => (after ? after() : onClose()), 300)
+    },
+    [onClose],
+  )
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') closeWithAnimation()
     }
     window.addEventListener('keydown', handleEsc)
     return () => window.removeEventListener('keydown', handleEsc)
-  }, [onClose])
+  }, [closeWithAnimation])
 
   return (
     <>
       <div
-        className={`subscription-detail__backdrop ${open ? 'subscription-detail__backdrop--open' : ''}`}
-        onClick={onClose}
+        className={`subscription-detail__backdrop ${open && shown ? 'subscription-detail__backdrop--open' : ''}`}
+        onClick={() => closeWithAnimation()}
       ></div>
-      <div className={`subscription-detail ${open ? 'subscription-detail--open' : ''}`}>
+      <div className={`subscription-detail ${open && shown ? 'subscription-detail--open' : ''}`}>
       <div className="subscription-detail__glow" style={{ '--bc': subscription.color } as CSSProperties}></div>
       <div className="subscription-detail__head">
-        <div className="subscription-detail__head-btn" onClick={onClose}>
+        <div className="subscription-detail__head-btn" onClick={() => closeWithAnimation()}>
           <svg width="15" height="15" viewBox="0 0 24 24">
             <path d="M19 12H5" />
             <path d="m12 19-7-7 7-7" />
           </svg>
         </div>
         <span className="subscription-detail__head-label">Подписка</span>
-        <div className="subscription-detail__head-btn" onClick={() => onEdit(subscription.id)}>
+        <div className="subscription-detail__head-btn" onClick={() => closeWithAnimation(() => onEdit(subscription.id))}>
           <svg width="14" height="14" viewBox="0 0 24 24">
             <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
           </svg>
@@ -51,7 +82,7 @@ export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEd
         {subscription.letter}
       </div>
       <div className="subscription-detail__name">{subscription.name}</div>
-      <div className="subscription-detail__price">{subscription.price.toLocaleString('ru-RU', { useGrouping: false })} ₽ / мес</div>
+      <div className="subscription-detail__price">{convert(subscription.price).toLocaleString('ru-RU', { useGrouping: false })} {currency} / мес</div>
       <div className="subscription-detail__chips">
         <span className="subscription-detail__chip subscription-detail__chip--ok">
           <i></i>активна
@@ -65,7 +96,7 @@ export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEd
         <div className="subscription-detail__stat">
           <div className="subscription-detail__stat-label">В год</div>
           <div className="subscription-detail__stat-value">
-            <span>{(subscription.price * 12).toLocaleString('ru-RU', { useGrouping: false })}</span> ₽
+            <span>{convert(subscription.price * 12).toLocaleString('ru-RU', { useGrouping: false })}</span> {currency}
           </div>
         </div>
         <div className="subscription-detail__stat">
@@ -94,7 +125,7 @@ export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEd
                   <small>@{p.debtor_username.replace(/^@/, '')}</small>
                 </div>
                 <div className="subscription-detail__amount">
-                  {p.amount} ₽<br />
+                  {convert(p.amount).toLocaleString('ru-RU', { useGrouping: false })} {currency}<br />
                   <span className={`subscription-detail__status ${p.status === 'paid' ? 'subscription-detail__status--paid' : 'subscription-detail__status--pending'}`}>
                     {p.status === 'paid' ? 'оплатил' : 'ждём'}
                   </span>
@@ -103,7 +134,7 @@ export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEd
             ))}
             <div className="subscription-detail__split-footer">
               <span className="subscription-detail__split-label">Твоя доля</span>
-              <b>{subscription.price - splits.reduce((a, p) => a + p.amount, 0)} ₽/мес</b>
+              <b>{convert(subscription.price - splits.reduce((a, p) => a + p.amount, 0)).toLocaleString('ru-RU', { useGrouping: false })} {currency}/мес</b>
             </div>
           </>
         ) : (
@@ -120,7 +151,7 @@ export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEd
             <div className="subscription-detail__cta-text">
               Добавь друзей по @username — каждый платит свою долю, бот сам напомнит о переводе за день до списания.
             </div>
-            <button className="subscription-detail__cta-btn" onClick={() => onEdit(subscription.id)}>
+            <button className="subscription-detail__cta-btn" onClick={() => closeWithAnimation(() => onEdit(subscription.id))}>
               Настроить split
             </button>
             <div className="subscription-detail__cta-lock">
@@ -145,7 +176,7 @@ export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEd
                 <svg width="11" height="11" viewBox="0 0 24 24">
                   <path d="M20 6 9 17l-5-5" />
                 </svg>
-                {subscription.price.toLocaleString('ru-RU', { useGrouping: false })} ₽
+                {convert(subscription.price).toLocaleString('ru-RU', { useGrouping: false })} {currency}
               </b>
             </div>
           ))}
@@ -154,16 +185,20 @@ export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEd
       <div className="subscription-detail__card">
         <div className="subscription-detail__setting">
           <div>
-            Напоминать о списании<small>за день, в Telegram</small>
+            Напоминание о списании<small>{remindText}</small>
           </div>
-          <div className="subscription-detail__switch subscription-detail__switch--on"></div>
+          <div className="subscription-detail__head-btn" onClick={() => closeWithAnimation(() => onEdit(subscription.id))}>
+            <svg width="14" height="14" viewBox="0 0 24 24">
+              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+            </svg>
+          </div>
         </div>
       </div>
       <div className="subscription-detail__actions">
-        <button className="subscription-detail__edit-btn" onClick={() => onEdit(subscription.id)}>
+        <button className="subscription-detail__edit-btn" onClick={() => closeWithAnimation(() => onEdit(subscription.id))}>
           Редактировать
         </button>
-        <button className="subscription-detail__remove-btn" onClick={() => onDelete(subscription.id)}>
+        <button className="subscription-detail__remove-btn" onClick={() => closeWithAnimation(() => onDelete(subscription.id))}>
           Удалить
         </button>
       </div>

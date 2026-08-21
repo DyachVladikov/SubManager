@@ -34,11 +34,16 @@ export function TabBar({ active, onNavigate, onAdd }: TabBarProps) {
 
   return (
     <div className="tabbar rise" style={{ animationDelay: '0.36s' }}>
+      <div className="tabbar__logo">
+        Sub<b>Manager</b>
+      </div>
       {leftTabs.map(renderTab)}
       <div className="tabbar__fab" onClick={onAdd}>
         <LuPlus size={24} />
+        <span className="tabbar__fab-label">Добавить</span>
       </div>
       {rightTabs.map(renderTab)}
+      <div className="tabbar__version">v0.1 · PWA</div>
     </div>
   )
 }

@@ -1,9 +1,15 @@
+@use '@/shared/styles/helpers/index.scss' as *;
+
 .subscriptions-grid {
   &__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 24px 20px 12px;
+
+    @include tablet-above {
+      padding: 28px 0 14px;
+    }
   }
 
   &__title {
@@ -52,6 +58,16 @@
     grid-template-columns: 1fr 1fr;
     gap: 12px;
     padding: 2px 20px 0;
+
+    @include tablet-above {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      padding: 2px 0 0;
+    }
+
+    @include desktop-above {
+      grid-template-columns: repeat(4, 1fr);
+    }
   }
 }
 
@@ -61,7 +77,7 @@
   border-radius: 18px;
   padding: 14px;
   cursor: pointer;
-  transition: transform 0.12s, border-color 0.2s, opacity 0.3s, scale 0.3s;
+  transition: transform 0.12s, border-color 0.2s, opacity 0.3s, scale 0.3s, box-shadow 0.25s;
   animation: subIn 0.4s cubic-bezier(0.2, 0.7, 0.3, 1);
 
   &--removing {
@@ -73,6 +89,12 @@
 
   &:active {
     transform: scale(0.97);
+  }
+
+  @include hover(false) {
+    transform: translateY(-4px);
+    border-color: rgba(167, 139, 250, 0.4);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
   }
 
   &__top {
@@ -183,6 +205,12 @@
     gap: 9px;
     color: var(--dim);
     min-height: 138px;
+
+    @include hover(false) {
+      border-color: rgba(167, 139, 250, 0.45);
+      color: var(--accent);
+      box-shadow: none;
+    }
   }
 
   &__plus {
@@ -194,6 +222,7 @@
     align-items: center;
     justify-content: center;
     color: var(--accent);
+    transition: transform 0.25s cubic-bezier(0.3, 0.7, 0.3, 1);
 
     svg {
       fill: none;
@@ -202,6 +231,10 @@
       stroke-linecap: round;
       stroke-linejoin: round;
     }
+  }
+
+  &--add:hover &__plus {
+    transform: rotate(90deg);
   }
 
   &__add-text {

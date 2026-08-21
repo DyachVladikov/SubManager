@@ -51,20 +51,24 @@ export function FriendsPage({ onNavigate }: FriendsPageProps) {
     <div className="friends-page">
       <div className="friends-page__glow"></div>
 
-      <DashboardHeader />
+      <DashboardHeader onBrandClick={() => onNavigate('profile')} />
       <div className="friends-page__title rise" style={{ animationDelay: '0.05s' }}>
         Друзья
       </div>
 
       <div className="friends-page__content">
         <FriendsSummary splits={splits} onRemindAll={() => showToast('success')} />
-        <FriendsPending
-          splits={pendingSplits}
-          subscriptions={subscriptionById}
-          onRemind={() => showToast('success')}
-          onPaid={handlePaid}
-        />
-        <FriendsPaid splits={paidSplits} subscriptions={subscriptionById} />
+        <div className="friends-page__column">
+          <FriendsPending
+            splits={pendingSplits}
+            subscriptions={subscriptionById}
+            onRemind={() => showToast('success')}
+            onPaid={handlePaid}
+          />
+        </div>
+        <div className="friends-page__column">
+          <FriendsPaid splits={paidSplits} subscriptions={subscriptionById} />
+        </div>
       </div>
 
       <TabBar active="friends" onNavigate={onNavigate} onAdd={() => setSheetOpen(true)} />

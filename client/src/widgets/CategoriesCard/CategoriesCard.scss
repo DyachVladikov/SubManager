@@ -1,3 +1,5 @@
+@use '@/shared/styles/helpers/index.scss' as *;
+
 .categories-card {
   position: relative;
   background: var(--surface);
@@ -5,6 +7,10 @@
   border-radius: 20px;
   padding: 18px;
   margin: 16px 20px 0;
+
+  @include tablet-above {
+    margin: 16px 0 0;
+  }
 
   &__label {
     display: flex;
@@ -134,6 +140,10 @@
     border: 1px solid transparent;
     cursor: pointer;
     transition: background 0.2s, border-color 0.2s, transform 0.12s;
+
+    @include hover(false) {
+      background: var(--surface2);
+    }
 
     &:active {
       transform: scale(0.98);

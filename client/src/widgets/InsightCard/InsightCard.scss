@@ -44,4 +44,35 @@
     margin-top: 6px;
     line-height: 1.6;
   }
+
+  &__dots {
+    margin-left: auto;
+    display: flex;
+    gap: 5px;
+  }
+
+  &__dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+    transition: background 0.25s ease;
+
+    &--on {
+      background: var(--accent);
+    }
+  }
+
+  @include tablet-above {
+    padding: 24px;
+    cursor: pointer;
+
+    &__title {
+      font-size: 17px;
+    }
+
+    &__text {
+      font-size: 13px;
+    }
+  }
 }

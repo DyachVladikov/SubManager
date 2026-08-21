@@ -1,14 +1,17 @@
 import { useMemo } from 'react'
 import type { Subscription } from '@/entities/subscription/model/types'
+import { useMoney } from '@/shared/lib/useCurrency'
 import './AnalyticsTop.scss'
 
 interface AnalyticsTopProps {
   subscriptions: Subscription[]
   categoryNames: Record<string, string>
   monthTotal: number
+  onOpen: (id: string) => void
 }
 
-export function AnalyticsTop({ subscriptions, categoryNames, monthTotal }: AnalyticsTopProps) {
+export function AnalyticsTop({ subscriptions, categoryNames, monthTotal, onOpen }: AnalyticsTopProps) {
+  const { symbol: currency, convert } = useMoney()
   const top = useMemo(() => [...subscriptions].sort((a, b) => b.amount - a.amount).slice(0, 4), [subscriptions])
 
   if (top.length === 0) return null
@@ -19,7 +22,7 @@ export function AnalyticsTop({ subscriptions, categoryNames, monthTotal }: Analy
         <i></i>Топ по цене
       </div>
       {top.map((sub, i) => (
-        <div className="analytics-top__row" key={sub.id}>
+        <div className="analytics-top__row" key={sub.id} onClick={() => onOpen(sub.id)}>
           <span className="analytics-top__rank">{String(i + 1).padStart(2, '0')}</span>
           <div className="analytics-top__logo" style={{ background: sub.color_hex || '#a78bfa' }}>
             {sub.title[0].toUpperCase()}
@@ -29,7 +32,7 @@ export function AnalyticsTop({ subscriptions, categoryNames, monthTotal }: Analy
             <small>{(sub.category_id && categoryNames[sub.category_id]) || 'Другое'}</small>
           </div>
           <div className="analytics-top__amount">
-            {sub.amount.toLocaleString('ru-RU', { useGrouping: false })} ₽
+            {convert(sub.amount).toLocaleString('ru-RU', { useGrouping: false })} {currency}
             <small>{monthTotal > 0 ? Math.round((sub.amount / monthTotal) * 100) : 0}%</small>
           </div>
         </div>

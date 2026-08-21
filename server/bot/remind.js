@@ -33,6 +33,14 @@ function formatAmount(amount, currency) {
   return `${value} ${currency === 'RUB' ? '₽' : currency}`
 }
 
+function pluralDays(n) {
+  const mod10 = n % 10
+  const mod100 = n % 100
+  if (mod10 === 1 && mod100 !== 11) return 'день'
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return 'дня'
+  return 'дней'
+}
+
 function groupBy(rows, key) {
   const map = new Map()
   for (const row of rows) {
@@ -81,10 +89,11 @@ let paymentChats = 0
 for (const [chatId, rows] of paymentsByUser) {
   const lines = []
   for (const r of rows) {
-    const isToday = r.next_payment_date === today
-    if (isToday && !flag(chatId, 'notify_charge_day')) continue
-    if (!isToday && !flag(chatId, 'notify_charge_before')) continue
-    lines.push(`• ${r.title} — ${formatAmount(r.amount, r.currency)} (${isToday ? 'сегодня' : 'завтра'})`)
+    const left = r.days_left ?? (r.next_payment_date === today ? 0 : 1)
+    if (left === 0 && !flag(chatId, 'notify_charge_day')) continue
+    if (left > 0 && !flag(chatId, 'notify_charge_before')) continue
+    const when = left === 0 ? 'сегодня' : left === 1 ? 'завтра' : `через ${left} ${pluralDays(left)}`
+    lines.push(`• ${r.title} — ${formatAmount(r.amount, r.currency)} (${when})`)
   }
   if (!lines.length) continue
   await send(chatId, `⏰ Ближайшие списания:\n\n${lines.join('\n')}`)

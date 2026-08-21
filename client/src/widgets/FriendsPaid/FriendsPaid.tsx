@@ -2,6 +2,7 @@ import type { Split } from '@/entities/split/api/splitApi'
 import type { Subscription } from '@/entities/subscription/model/types'
 import { formatNextDate } from '@/entities/subscription/lib/mapSubscription'
 import { gradientForName } from '@/entities/split/lib/avatarGradients'
+import { useMoney } from '@/shared/lib/useCurrency'
 import './FriendsPaid.scss'
 
 interface FriendsPaidProps {
@@ -10,6 +11,7 @@ interface FriendsPaidProps {
 }
 
 export function FriendsPaid({ splits, subscriptions }: FriendsPaidProps) {
+  const { symbol: currency, convert } = useMoney()
   const total = splits.reduce((acc, split) => acc + split.amount, 0)
   if (splits.length === 0) return null
 
@@ -19,7 +21,7 @@ export function FriendsPaid({ splits, subscriptions }: FriendsPaidProps) {
         <h2 className="friends-paid__title">
           <i></i>Оплатили
         </h2>
-        <span className="friends-paid__sum">{total.toLocaleString('ru-RU', { useGrouping: false })} ₽</span>
+        <span className="friends-paid__sum">{convert(total).toLocaleString('ru-RU', { useGrouping: false })} {currency}</span>
       </div>
       <div className="friends-paid__card rise" style={{ animationDelay: '0.26s' }}>
         {splits.map((split) => {
@@ -39,7 +41,7 @@ export function FriendsPaid({ splits, subscriptions }: FriendsPaidProps) {
                 <div className="friends-paid__sub">{subscription ? subscription.title : 'Подписка удалена'}</div>
               </div>
               <div className="friends-paid__right">
-                <b>{split.amount.toLocaleString('ru-RU', { useGrouping: false })} ₽</b>
+                <b>{convert(split.amount).toLocaleString('ru-RU', { useGrouping: false })} {currency}</b>
                 <span className="friends-paid__check">
                   <svg width="10" height="10" viewBox="0 0 24 24">
                     <path d="M20 6 9 17l-5-5" />

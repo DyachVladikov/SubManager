@@ -9,6 +9,23 @@
 
   @include tablet-above {
     padding: 2px 0 0;
+    gap: 16px;
+
+    .analytics-stats__card {
+      padding: 22px;
+    }
+
+    .analytics-stats__value {
+      font-size: 31px;
+
+      span {
+        font-size: 15px;
+      }
+    }
+
+    .analytics-stats__label {
+      font-size: 10px;
+    }
   }
 
   &__card {

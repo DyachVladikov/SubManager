@@ -9,6 +9,13 @@ import './AddSubscriptionForm.scss'
 
 const presetColors = ['#e50914', '#ff7a00', '#ffd34d', '#1db954', '#3a9bf0', '#a78bfa']
 
+const remindOptions = [
+  { value: '0', label: 'В день списания' },
+  { value: '1', label: 'За день до списания' },
+  { value: '3', label: 'За 3 дня' },
+  { value: '7', label: 'За 7 дней' },
+]
+
 const getDefaultDate = () => {
   const date = new Date()
   date.setMonth(date.getMonth() + 1)
@@ -25,14 +32,16 @@ interface AddSubscriptionFormProps {
   initialDate?: string
   initialColor?: string
   initialCategoryId?: string | null
+  initialRemindDays?: number
 }
 
-export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName = '', initialPrice = '', initialDate = '', initialColor = '#a78bfa', initialCategoryId = null }: AddSubscriptionFormProps) {
+export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName = '', initialPrice = '', initialDate = '', initialColor = '#a78bfa', initialCategoryId = null, initialRemindDays = 1 }: AddSubscriptionFormProps) {
   const [name, setName] = useState(initialName)
   const [price, setPrice] = useState(initialPrice)
   const [date, setDate] = useState(initialDate || getDefaultDate())
   const [color, setColor] = useState(initialColor)
   const [categoryId, setCategoryId] = useState<string | null>(initialCategoryId)
+  const [remindDays, setRemindDays] = useState(String(initialRemindDays))
   const [presetCategory, setPresetCategory] = useState('')
   const [selectedService, setSelectedService] = useState('')
   const [isSplit, setIsSplit] = useState(false)
@@ -131,6 +140,7 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
           next_payment_date: date,
           color_hex: color,
           category_id: categoryId,
+          remind_before_days: Number(remindDays),
         }).unwrap()
 
         if (isSplit && splitUsername.trim()) {
@@ -149,6 +159,7 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
           color_hex: color,
           category_id: categoryId,
           user_id: userId,
+          remind_before_days: Number(remindDays),
         }).unwrap()
 
         if (isSplit && subscription) {
@@ -235,6 +246,10 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
         }}
         error={errors.date}
       />
+      <div className="add-form__row">
+        <span className="add-form__label">Напоминание в Telegram</span>
+        <Select options={remindOptions} value={remindDays} onChange={setRemindDays} placeholder="Когда напомнить" />
+      </div>
       <div className="add-form__row">
         <span className="add-form__label">Цвет карточки</span>
         <div className="add-form__colors">

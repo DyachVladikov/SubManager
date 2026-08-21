@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import type { Subscription } from '@/entities/subscription/model/types'
 import { computeCategoryStats } from '@/entities/subscription/lib/subscriptionStats'
 import { getCategoryColor } from '@/entities/subscription/lib/categoryColors'
+import { useMoney } from '@/shared/lib/useCurrency'
 import './AnalyticsCategories.scss'
 
 interface AnalyticsCategoriesProps {
@@ -11,6 +12,7 @@ interface AnalyticsCategoriesProps {
 
 export function AnalyticsCategories({ subscriptions, categoryNames }: AnalyticsCategoriesProps) {
   const stats = useMemo(() => computeCategoryStats(subscriptions, categoryNames), [subscriptions, categoryNames])
+  const { symbol: currency, convert } = useMoney()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -31,7 +33,7 @@ export function AnalyticsCategories({ subscriptions, categoryNames }: AnalyticsC
             <div className="analytics-categories__row-head">
               <span>{cat.name}</span>
               <span>
-                {cat.percent}%&nbsp;&nbsp;<b>{cat.amount.toLocaleString('ru-RU', { useGrouping: false })} ₽</b>
+                {cat.percent}%&nbsp;&nbsp;<b>{convert(cat.amount).toLocaleString('ru-RU', { useGrouping: false })} {currency}</b>
               </span>
             </div>
             <div className="analytics-categories__bar">

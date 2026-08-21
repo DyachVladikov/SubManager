@@ -14,7 +14,6 @@ import { SubscriptionsGrid } from '@/widgets/SubscriptionsGrid'
 import { TabBar, type TabKey } from '@/widgets/TabBar'
 import { SubscriptionDetail } from '@/widgets/SubscriptionDetail'
 import { AddSubscriptionSheet } from '@/widgets/AddSubscriptionSheet'
-import { AllPaymentsSheet } from '@/widgets/AllPaymentsSheet'
 import './DashboardPage.scss'
 
 interface DashboardPageProps {
@@ -26,7 +25,6 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
   const [detailOpen, setDetailOpen] = useState(false)
   const [selectedSub, setSelectedSub] = useState<string | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
-  const [allPaymentsOpen, setAllPaymentsOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const { toast, showToast } = useToast()
   const { removingIds, removeSubscription } = useRemoveSubscription({
@@ -73,7 +71,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
   }
 
   const selected = subscriptions.find((s) => s.id === selectedSub)
-  useBodyScrollLock(sheetOpen || selectedSub !== null || allPaymentsOpen)
+  useBodyScrollLock(sheetOpen || selectedSub !== null)
   const editingRaw = dbSubscriptions.find((s) => s.id === editingId)
   const editing = editingRaw
     ? {
@@ -83,6 +81,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
         date: editingRaw.next_payment_date,
         color: editingRaw.color_hex || '#a78bfa',
         categoryId: editingRaw.category_id,
+        remindDays: editingRaw.remind_before_days,
       }
     : null
 
@@ -101,10 +100,12 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
     <div className="dashboard-page">
       <div className="dashboard-page__glow"></div>
 
-      <DashboardHeader />
-      <HeroCard mode={mode} onModeChange={setMode} subscriptions={dbSubscriptions} />
-      <CategoriesCard subscriptions={dbSubscriptions} categoryNames={categoryNames} />
-      <UpcomingRail subscriptions={subscriptions} onShowAll={() => setAllPaymentsOpen(true)} />
+      <DashboardHeader onBrandClick={() => onNavigate('profile')} />
+      <div className="dashboard-page__top">
+        <HeroCard mode={mode} onModeChange={setMode} subscriptions={dbSubscriptions} />
+        <CategoriesCard subscriptions={dbSubscriptions} categoryNames={categoryNames} />
+      </div>
+      <UpcomingRail subscriptions={subscriptions} onOpen={openDetail} />
       <SubscriptionsGrid
         subscriptions={subscriptions}
         removingIds={removingIds}
@@ -126,17 +127,6 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
 
       {sheetOpen && (
         <AddSubscriptionSheet onClose={closeSheet} onSuccess={() => showToast('success')} editing={editing} />
-      )}
-
-      {allPaymentsOpen && (
-        <AllPaymentsSheet
-          subscriptions={subscriptions}
-          onClose={() => setAllPaymentsOpen(false)}
-          onOpen={(id) => {
-            setAllPaymentsOpen(false)
-            openDetail(id)
-          }}
-        />
       )}
 
       {toast && <Toast type={toast} />}

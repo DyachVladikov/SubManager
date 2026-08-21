@@ -8,6 +8,7 @@ export interface Subscription {
   next_payment_date: string
   color_hex: string | null
   period: string | null
+  remind_before_days: number
   created_at: string
   updated_at: string
 }
@@ -21,6 +22,7 @@ export interface CreateSubscriptionInput {
   category_id?: string | null
   color_hex?: string | null
   period?: string | null
+  remind_before_days?: number
 }
 
 export interface UpdateSubscriptionInput extends Partial<CreateSubscriptionInput> {

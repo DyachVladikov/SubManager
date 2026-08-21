@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import type { Subscription } from '@/entities/subscription/model/types'
 import { computeCategoryStats } from '@/entities/subscription/lib/subscriptionStats'
 import { getCategoryColor } from '@/entities/subscription/lib/categoryColors'
+import { useMoney } from '@/shared/lib/useCurrency'
 import './CategoriesCard.scss'
 
 const circumference = 2 * Math.PI * 54
@@ -13,6 +14,7 @@ interface CategoriesCardProps {
 }
 
 export function CategoriesCard({ subscriptions, categoryNames }: CategoriesCardProps) {
+  const { symbol: currency, convert } = useMoney()
   const stats = useMemo(() => computeCategoryStats(subscriptions, categoryNames), [subscriptions, categoryNames])
   const total = stats.reduce((acc, cat) => acc + cat.amount, 0)
   const [active, setActive] = useState<string | null>(null)
@@ -83,7 +85,7 @@ export function CategoriesCard({ subscriptions, categoryNames }: CategoriesCardP
                   {activeSeg.percent}% расходов
                 </span>
               )}
-              <b>{(activeSeg ? activeSeg.amount : total).toLocaleString('ru-RU', { useGrouping: false })} ₽</b>
+              <b>{convert(activeSeg ? activeSeg.amount : total).toLocaleString('ru-RU', { useGrouping: false })} {currency}</b>
               <span className="categories-card__donut-label">{activeSeg ? activeSeg.name : 'в месяц'}</span>
             </div>
             <div
@@ -110,7 +112,7 @@ export function CategoriesCard({ subscriptions, categoryNames }: CategoriesCardP
                 <span className="categories-card__row-dot" style={{ background: cat.color }}></span>
                 <span className="categories-card__row-name">{cat.name}</span>
                 <span className="categories-card__row-percent">{cat.percent}%</span>
-                <b>{cat.amount.toLocaleString('ru-RU', { useGrouping: false })} ₽</b>
+                <b>{convert(cat.amount).toLocaleString('ru-RU', { useGrouping: false })} {currency}</b>
               </div>
             ))}
           </div>

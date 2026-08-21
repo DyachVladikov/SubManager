@@ -1,6 +1,8 @@
 import { useMemo } from 'react'
 import type { Subscription } from '@/entities/subscription/model/types'
 import { computeHeroStats } from '@/entities/subscription/lib/subscriptionStats'
+import { useCountUp } from '@/shared/lib/useCountUp'
+import { useMoney } from '@/shared/lib/useCurrency'
 import './HeroCard.scss'
 
 interface HeroCardProps {
@@ -21,8 +23,10 @@ export function HeroCard({ mode, onModeChange, subscriptions }: HeroCardProps) {
   const remaining = isMonth ? stats.remainingMonth : stats.remainingYear
   const progress = paid + remaining > 0 ? Math.round((paid / (paid + remaining)) * 100) : 0
 
-  const digits = String(Math.round(value)).length
+  const { symbol: currency, convert } = useMoney()
+  const digits = String(Math.round(convert(value))).length
   const numFontSize = digits <= 5 ? 80 : digits === 6 ? 64 : 52
+  const animatedValue = useCountUp(value)
 
   const chartWidth = 350
   const chartHeight = 64
@@ -67,18 +71,19 @@ export function HeroCard({ mode, onModeChange, subscriptions }: HeroCardProps) {
           </button>
         </div>
       </div>
-      <div className="hero-card__sum swap" key={`sum-${mode}`}>
+      <div className="hero-card__sum">
         <div className="hero-card__num" style={{ fontSize: numFontSize }}>
-          {value.toLocaleString('ru-RU', { useGrouping: false })}
+          {convert(animatedValue).toLocaleString('ru-RU', { useGrouping: false })}
         </div>
-        <div className="hero-card__per">₽</div>
+        <div className="hero-card__per">{currency}</div>
       </div>
       <div className="hero-card__row swap" key={`row-${mode}`}>
         <span className="hero-card__servs">
-          {isMonth ? `${stats.servicesCount} активных сервисов` : `в среднем ${stats.monthTotal.toLocaleString('ru-RU', { useGrouping: false })} ₽ / мес`}
+          {isMonth ? `${stats.servicesCount} активных сервисов` : `в среднем ${convert(stats.monthTotal).toLocaleString('ru-RU', { useGrouping: false })} ${currency} / мес`}
         </span>
       </div>
       <div className="hero-card__chart">
+        <div className="hero-card__plot">
         <svg width="100%" height="64" viewBox="0 0 350 64" preserveAspectRatio="none">
           <defs>
             <linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
@@ -89,7 +94,15 @@ export function HeroCard({ mode, onModeChange, subscriptions }: HeroCardProps) {
           <line x1="0" y1="20" x2="350" y2="20" style={{ stroke: 'rgba(255,255,255,.05)' }} strokeDasharray="3 5" />
           <line x1="0" y1="44" x2="350" y2="44" style={{ stroke: 'rgba(255,255,255,.05)' }} strokeDasharray="3 5" />
           {areaPath && <path d={areaPath} fill="url(#sg)" />}
-          <path d={paidPath} fill="none" style={{ stroke: '#a78bfa' }} strokeWidth="2" strokeLinecap="round" />
+          <path
+            key={`paid-${mode}`}
+            className="hero-card__chart-line"
+            d={paidPath}
+            fill="none"
+            style={{ stroke: '#a78bfa' }}
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
           {forecastCoords.length > 1 && (
             <path
               d={forecastPath}
@@ -102,7 +115,8 @@ export function HeroCard({ mode, onModeChange, subscriptions }: HeroCardProps) {
             />
           )}
         </svg>
-        <div className="hero-card__chart-dot" style={{ left: `${(dot.x / chartWidth) * 100}%`, top: `${dot.y}px` }}></div>
+        <div className="hero-card__chart-dot" style={{ left: `${(dot.x / chartWidth) * 100}%`, top: `${(dot.y / chartHeight) * 100}%` }}></div>
+        </div>
         <div className="hero-card__range">
           <span>{labels[0]}</span>
           <span>{labels[labels.length - 1]}</span>
@@ -112,11 +126,11 @@ export function HeroCard({ mode, onModeChange, subscriptions }: HeroCardProps) {
         <div className="hero-card__progress-row">
           <span>
             <i className="hero-card__dot hero-card__dot--paid"></i>
-            <span>{isMonth ? 'Списано' : `Списано в ${stats.currentYear}`}</span> · <b>{paid.toLocaleString('ru-RU', { useGrouping: false })} ₽</b>
+            <span>{isMonth ? 'Списано' : `Списано в ${stats.currentYear}`}</span> · <b>{convert(paid).toLocaleString('ru-RU', { useGrouping: false })} {currency}</b>
           </span>
           <span>
             <i className="hero-card__dot hero-card__dot--remaining"></i>
-            <span>{isMonth ? 'Осталось' : 'До конца года'}</span> · <b>{remaining.toLocaleString('ru-RU', { useGrouping: false })} ₽</b>
+            <span>{isMonth ? 'Осталось' : 'До конца года'}</span> · <b>{convert(remaining).toLocaleString('ru-RU', { useGrouping: false })} {currency}</b>
           </span>
         </div>
         <div className="hero-card__progress-bar">

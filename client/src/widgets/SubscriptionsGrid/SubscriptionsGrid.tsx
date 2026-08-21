@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import type { Subscription } from '@/mocks/subscriptions'
 import { useFlipGrid } from '@/shared/lib/useFlipGrid'
+import { useMoney } from '@/shared/lib/useCurrency'
 import './SubscriptionsGrid.scss'
 
 const collapsedCount = 6
@@ -15,6 +16,7 @@ interface SubscriptionsGridProps {
 
 export function SubscriptionsGrid({ subscriptions, removingIds, splitCounts, onOpen, onAdd }: SubscriptionsGridProps) {
   const [expanded, setExpanded] = useState(false)
+  const { symbol: currency, convert } = useMoney()
   const gridRef = useRef<HTMLDivElement>(null)
   useFlipGrid(gridRef)
 
@@ -63,7 +65,7 @@ export function SubscriptionsGrid({ subscriptions, removingIds, splitCounts, onO
             </div>
             <h3 className="sub-card__name">{sub.name}</h3>
             <div className="sub-card__price">
-              <b>{sub.price.toLocaleString('ru-RU', { useGrouping: false })} ₽</b> <span>/ мес</span>
+              <b>{convert(sub.price).toLocaleString('ru-RU', { useGrouping: false })} {currency}</b> <span>/ мес</span>
             </div>
             <div className="sub-card__dates">
               <span>{sub.nextDate}</span>

@@ -4,6 +4,7 @@ import { useAuth } from '@/features/auth'
 import { useGetProfileQuery } from '@/entities/profile/api/profileApi'
 import { displayName } from '@/entities/profile/lib/displayName'
 import { useGetSubscriptionsQuery } from '@/entities/subscription/api/subscriptionApi'
+import { useMoney } from '@/shared/lib/useCurrency'
 import './DashboardHeader.scss'
 
 const MONTHS = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек']
@@ -23,10 +24,15 @@ function greeting() {
   return 'Доброй ночи'
 }
 
-export function DashboardHeader() {
+interface DashboardHeaderProps {
+  onBrandClick?: () => void
+}
+
+export function DashboardHeader({ onBrandClick }: DashboardHeaderProps) {
   const { session, signOut } = useAuth()
   const { data: profile } = useGetProfileQuery()
   const { data: subscriptions } = useGetSubscriptionsQuery()
+  const { symbol: currency, convert } = useMoney()
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLElement>(null)
 
@@ -56,7 +62,7 @@ export function DashboardHeader() {
 
   return (
     <header className="dashboard-header rise" style={{ animationDelay: '0.02s' }} ref={rootRef}>
-      <div className="dashboard-header__brand">
+      <div className="dashboard-header__brand" onClick={onBrandClick} title="Открыть профиль">
         <div className="dashboard-header__avatar">{name[0]?.toUpperCase()}</div>
         <div className="dashboard-header__greeting">
           <small>{greeting()}</small>
@@ -91,7 +97,7 @@ export function DashboardHeader() {
                 <small>{whenLabel(days, sub.next_payment_date)}</small>
               </div>
               <div className="dashboard-header__notification-amount">
-                {sub.amount.toLocaleString('ru-RU', { useGrouping: false })} ₽
+                {convert(sub.amount).toLocaleString('ru-RU', { useGrouping: false })} {currency}
               </div>
             </div>
           ))}

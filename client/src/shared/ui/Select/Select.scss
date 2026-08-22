@@ -39,6 +39,13 @@
     flex: 0 0 auto;
   }
 
+  &__logo {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+    flex: 0 0 auto;
+  }
+
   &__arrow {
     flex: 0 0 auto;
     color: var(--dim);

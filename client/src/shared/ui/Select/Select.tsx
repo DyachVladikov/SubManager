@@ -5,6 +5,7 @@ export interface SelectOption {
   value: string
   label: string
   color?: string
+  icon?: string
 }
 
 interface SelectProps {
@@ -58,7 +59,13 @@ export function Select({ options, value, onChange, placeholder = 'Выбери �
       <div className="select__trigger" onClick={() => setOpen(!open)}>
         {selected ? (
           <span className="select__value">
-            {selected.color && <i className="select__dot" style={{ background: selected.color }}></i>}
+            {selected.icon ? (
+              <svg className="select__logo" viewBox="0 0 24 24" style={{ color: selected.color }}>
+                <path d={selected.icon} />
+              </svg>
+            ) : (
+              selected.color && <i className="select__dot" style={{ background: selected.color }}></i>
+            )}
             {selected.label}
           </span>
         ) : (
@@ -79,7 +86,13 @@ export function Select({ options, value, onChange, placeholder = 'Выбери �
                 setOpen(false)
               }}
             >
-              {option.color && <i className="select__dot" style={{ background: option.color }}></i>}
+              {option.icon ? (
+                <svg className="select__logo" viewBox="0 0 24 24" style={{ color: option.color }}>
+                  <path d={option.icon} />
+                </svg>
+              ) : (
+                option.color && <i className="select__dot" style={{ background: option.color }}></i>
+              )}
               {option.label}
             </div>
           ))}

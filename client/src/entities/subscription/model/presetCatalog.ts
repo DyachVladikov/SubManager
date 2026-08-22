@@ -19,6 +19,7 @@ export const presetCatalog: PresetCategory[] = [
       { name: "Grok Premium", color: "#555c66", price: 1900 },
       { name: "Midjourney", color: "#8f76f2", price: 990 },
       { name: "Kandinsky", color: "#7c5cf0", price: 550 },
+      { name: "Kimi", color: "#4e6ef2" },
     ],
   },
   {
@@ -81,9 +82,12 @@ export const presetCatalog: PresetCategory[] = [
   {
     name: "Спорт и здоровье",
     services: [
+      { name: "Фитнес-клуб", color: "#7c5cf0", price: 2500 },
+      { name: "DDX Fitness", color: "#8a3ffc", price: 2190 },
+      { name: "World Class", color: "#e01e2b", price: 9900 },
+      { name: "Sekta", color: "#00c48c", price: 4900 },
+      { name: "FitStars", color: "#38b000", price: 250 },
       { name: "Strava", color: "#fc4c02", price: 799 },
-      { name: "Fitbit Premium", color: "#00b0b9", price: 899 },
-      { name: "Levels Fitness", color: "#5fca6a", price: 490 },
     ],
   },
   {

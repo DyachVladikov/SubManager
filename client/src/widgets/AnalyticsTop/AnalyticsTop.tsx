@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import type { Subscription } from '@/entities/subscription/model/types'
+import SubscriptionLogo from '@/entities/subscription/ui/SubscriptionLogo'
 import { useMoney } from '@/shared/lib/useCurrency'
 import './AnalyticsTop.scss'
 
@@ -24,9 +25,11 @@ export function AnalyticsTop({ subscriptions, categoryNames, monthTotal, onOpen 
       {top.map((sub, i) => (
         <div className="analytics-top__row" key={sub.id} onClick={() => onOpen(sub.id)}>
           <span className="analytics-top__rank">{String(i + 1).padStart(2, '0')}</span>
-          <div className="analytics-top__logo" style={{ background: sub.color_hex || '#a78bfa' }}>
-            {sub.title[0].toUpperCase()}
-          </div>
+          <SubscriptionLogo
+            name={sub.title}
+            color={sub.color_hex || '#a78bfa'}
+            className="analytics-top__logo"
+          />
           <div className="analytics-top__name">
             {sub.title}
             <small>{(sub.category_id && categoryNames[sub.category_id]) || 'Другое'}</small>

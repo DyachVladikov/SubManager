@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useCreateSubscriptionMutation, useUpdateSubscriptionMutation, useGetCategoriesQuery } from '@/entities/subscription/api/subscriptionApi'
 import { useCreateSplitMutation } from '@/entities/split/api/splitApi'
 import { presetCatalog } from '@/entities/subscription/model/presetCatalog'
+import { brandIcons } from '@/entities/subscription/model/brandIcons'
 import { FormField } from '@/shared/ui/FormField'
 import { Select } from '@/shared/ui/Select'
 import { supabase } from '@/shared/config/supabase'
@@ -66,6 +67,7 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
     value: service.name,
     label: service.name,
     color: service.color,
+    icon: brandIcons[service.name],
   }))
 
   useEffect(() => {

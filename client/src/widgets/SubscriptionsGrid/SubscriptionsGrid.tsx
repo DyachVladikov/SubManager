@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import type { Subscription } from '@/mocks/subscriptions'
+import SubscriptionLogo from '@/entities/subscription/ui/SubscriptionLogo'
 import { useFlipGrid } from '@/shared/lib/useFlipGrid'
 import { useMoney } from '@/shared/lib/useCurrency'
 import './SubscriptionsGrid.scss'
@@ -48,9 +49,13 @@ export function SubscriptionsGrid({ subscriptions, removingIds, splitCounts, onO
             onClick={() => onOpen(sub.id)}
           >
             <div className="sub-card__top">
-              <div className="sub-card__logo" style={{ background: sub.color, color: sub.dark ? '#1a1a1a' : '#fff' }}>
-                {sub.letter}
-              </div>
+              <SubscriptionLogo
+                name={sub.name}
+                color={sub.color}
+                dark={sub.dark}
+                className="sub-card__logo"
+                iconClassName="sub-card__logo-icon"
+              />
               {(splitCounts[sub.id] ?? 0) > 0 && (
                 <span className="sub-card__split">
                   <svg width="9" height="9" viewBox="0 0 24 24">

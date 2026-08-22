@@ -4,6 +4,7 @@ import { useAuth } from '@/features/auth'
 import { useGetProfileQuery } from '@/entities/profile/api/profileApi'
 import { displayName } from '@/entities/profile/lib/displayName'
 import { useGetSubscriptionsQuery } from '@/entities/subscription/api/subscriptionApi'
+import SubscriptionLogo from '@/entities/subscription/ui/SubscriptionLogo'
 import { useMoney } from '@/shared/lib/useCurrency'
 import './DashboardHeader.scss'
 
@@ -86,12 +87,11 @@ export function DashboardHeader({ onBrandClick }: DashboardHeaderProps) {
           )}
           {upcoming.map(({ sub, days }) => (
             <div className="dashboard-header__notification" key={sub.id}>
-              <div
+              <SubscriptionLogo
+                name={sub.title}
+                color={sub.color_hex ?? 'var(--accent)'}
                 className="dashboard-header__notification-logo"
-                style={{ background: sub.color_hex ?? 'var(--accent)' }}
-              >
-                {sub.title[0]}
-              </div>
+              />
               <div className="dashboard-header__notification-info">
                 <b>{sub.title}</b>
                 <small>{whenLabel(days, sub.next_payment_date)}</small>

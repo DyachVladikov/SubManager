@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Subscription } from '@/mocks/subscriptions'
+import SubscriptionLogo from '@/entities/subscription/ui/SubscriptionLogo'
 import { useMoney } from '@/shared/lib/useCurrency'
 import './UpcomingRail.scss'
 
@@ -49,9 +50,13 @@ export function UpcomingRail({ subscriptions, onOpen }: UpcomingRailProps) {
               <span>{sub.nextDate.split(' ')[1]}</span>
             </div>
             <div className="upcoming-card__sep"></div>
-            <div className="upcoming-card__logo" style={{ background: sub.color, color: sub.dark ? '#1a1a1a' : '#fff' }}>
-              {sub.letter}
-            </div>
+            <SubscriptionLogo
+              name={sub.name}
+              color={sub.color}
+              dark={sub.dark}
+              className="upcoming-card__logo"
+              iconClassName="upcoming-card__logo-icon"
+            />
             <div>
               <div className="upcoming-card__name">{sub.name}</div>
               <div className="upcoming-card__amount">

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import type { Subscription } from '@/mocks/subscriptions'
+import SubscriptionLogo from '@/entities/subscription/ui/SubscriptionLogo'
 import { useGetSplitsBySubscriptionQuery } from '@/entities/split/api/splitApi'
 import { useMoney } from '@/shared/lib/useCurrency'
 import './SubscriptionDetail.scss'
@@ -111,12 +112,13 @@ export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEd
           </svg>
         </div>
       </div>
-      <div
+      <SubscriptionLogo
+        name={subscription.name}
+        color={subscription.color}
+        dark={subscription.dark}
         className="subscription-detail__logo"
-        style={{ background: subscription.color, color: subscription.dark ? '#1a1a1a' : '#fff' }}
-      >
-        {subscription.letter}
-      </div>
+        iconClassName="subscription-detail__logo-icon"
+      />
       <div className="subscription-detail__name">{subscription.name}</div>
       <div className="subscription-detail__price">{convert(subscription.price).toLocaleString('ru-RU', { useGrouping: false })} {currency} / мес</div>
       <div className="subscription-detail__chips">

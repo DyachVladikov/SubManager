@@ -21,10 +21,11 @@ interface ProfilePageProps {
 export function ProfilePage({ onNavigate }: ProfilePageProps) {
   const [sheetOpen, setSheetOpen] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState(false)
+  const [logoutConfirm, setLogoutConfirm] = useState(false)
   const { toast, showToast } = useToast()
   const { signOut } = useAuth()
   const { deleteAccount } = useDeleteAccount()
-  useBodyScrollLock(sheetOpen || deleteConfirm)
+  useBodyScrollLock(sheetOpen || deleteConfirm || logoutConfirm)
 
   const handleDelete = async () => {
     try {
@@ -53,7 +54,7 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
           <ProfileSettings />
           <ProfileData onNotify={() => showToast('success')} />
         </div>
-        <button className="profile-page__logout rise" style={{ animationDelay: '0.3s' }} onClick={() => signOut()}>
+        <button className="profile-page__logout rise" style={{ animationDelay: '0.3s' }} onClick={() => setLogoutConfirm(true)}>
           <svg width="16" height="16" viewBox="0 0 24 24">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
             <path d="m16 17 5-5-5-5" />
@@ -80,6 +81,16 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
           confirmLabel="Удалить"
           onConfirm={handleDelete}
           onCancel={() => setDeleteConfirm(false)}
+        />
+      )}
+
+      {logoutConfirm && (
+        <ConfirmModal
+          title="Выйти из аккаунта?"
+          text="Локальный кеш и очередь офлайн-операций на этом устройстве будут очищены."
+          confirmLabel="Выйти"
+          onConfirm={() => signOut()}
+          onCancel={() => setLogoutConfirm(false)}
         />
       )}
 

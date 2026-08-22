@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import type { Subscription } from '@/mocks/subscriptions'
 import SubscriptionLogo from '@/entities/subscription/ui/SubscriptionLogo'
 import { useFlipGrid } from '@/shared/lib/useFlipGrid'
@@ -6,6 +6,8 @@ import { useMoney } from '@/shared/lib/useCurrency'
 import './SubscriptionsGrid.scss'
 
 const collapsedCount = 6
+
+type SortKey = 'price' | 'date'
 
 interface SubscriptionsGridProps {
   subscriptions: Subscription[]
@@ -17,12 +19,22 @@ interface SubscriptionsGridProps {
 
 export function SubscriptionsGrid({ subscriptions, removingIds, splitCounts, onOpen, onAdd }: SubscriptionsGridProps) {
   const [expanded, setExpanded] = useState(false)
+  const [sortKey, setSortKey] = useState<SortKey>('price')
+  const [categoryFilter, setCategoryFilter] = useState('all')
   const { symbol: currency, convert } = useMoney()
   const gridRef = useRef<HTMLDivElement>(null)
   useFlipGrid(gridRef)
 
-  const hasMore = subscriptions.length > collapsedCount
-  const visibleSubscriptions = expanded ? subscriptions : subscriptions.slice(0, collapsedCount)
+  const categories = useMemo(() => [...new Set(subscriptions.map((sub) => sub.category))], [subscriptions])
+
+  const sorted = useMemo(() => {
+    const list = categoryFilter === 'all' ? [...subscriptions] : subscriptions.filter((sub) => sub.category === categoryFilter)
+    list.sort((a, b) => (sortKey === 'price' ? b.price - a.price : (a.rawDate ?? '').localeCompare(b.rawDate ?? '')))
+    return list
+  }, [subscriptions, sortKey, categoryFilter])
+
+  const hasMore = sorted.length > collapsedCount
+  const visibleSubscriptions = expanded ? sorted : sorted.slice(0, collapsedCount)
 
   return (
     <>
@@ -40,12 +52,48 @@ export function SubscriptionsGrid({ subscriptions, removingIds, splitCounts, onO
           </span>
         )}
       </div>
+      <div className="subscriptions-grid__filters rise" style={{ animationDelay: '0.28s' }}>
+        <div className="subscriptions-grid__sort">
+          <span
+            className={`subscriptions-grid__chip${sortKey === 'price' ? ' subscriptions-grid__chip--active' : ''}`}
+            onClick={() => setSortKey('price')}
+          >
+            по цене
+          </span>
+          <span
+            className={`subscriptions-grid__chip${sortKey === 'date' ? ' subscriptions-grid__chip--active' : ''}`}
+            onClick={() => setSortKey('date')}
+          >
+            по дате
+          </span>
+        </div>
+        {categories.length > 1 && (
+          <div className="subscriptions-grid__cats">
+            <span
+              className={`subscriptions-grid__chip${categoryFilter === 'all' ? ' subscriptions-grid__chip--active' : ''}`}
+              onClick={() => setCategoryFilter('all')}
+            >
+              все
+            </span>
+            {categories.map((category) => (
+              <span
+                key={category}
+                className={`subscriptions-grid__chip${categoryFilter === category ? ' subscriptions-grid__chip--active' : ''}`}
+                onClick={() => setCategoryFilter(category)}
+              >
+                {category}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
       <div className="subscriptions-grid__list rise" style={{ animationDelay: '0.3s' }} ref={gridRef}>
-        {visibleSubscriptions.map((sub) => (
+        {visibleSubscriptions.map((sub, index) => (
           <div
             className={`sub-card${removingIds.includes(sub.id) ? ' sub-card--removing' : ''}${(sub.overdueDays ?? 0) > 0 ? ' sub-card--overdue' : ''}`}
             key={sub.id}
             data-flip-id={sub.id}
+            style={{ animationDelay: `${index * 45}ms` }}
             onClick={() => onOpen(sub.id)}
           >
             <div className="sub-card__top">

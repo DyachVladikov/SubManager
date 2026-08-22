@@ -69,6 +69,56 @@
       grid-template-columns: repeat(4, 1fr);
     }
   }
+
+  &__filters {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 20px 12px;
+
+    @include tablet-above {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 0 14px;
+    }
+  }
+
+  &__sort {
+    display: flex;
+    gap: 6px;
+  }
+
+  &__cats {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  &__chip {
+    flex: 0 0 auto;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 11px;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--dim);
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+
+    &--active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+  }
 }
 
 .sub-card {
@@ -78,7 +128,7 @@
   padding: 14px;
   cursor: pointer;
   transition: transform 0.12s, border-color 0.2s, opacity 0.3s, scale 0.3s, box-shadow 0.25s;
-  animation: subIn 0.4s cubic-bezier(0.2, 0.7, 0.3, 1);
+  animation: subIn 0.4s cubic-bezier(0.2, 0.7, 0.3, 1) both;
 
   &--removing {
     opacity: 0;

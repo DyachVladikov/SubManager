@@ -102,6 +102,15 @@ const overdue = await rpc('get_overdue_subscriptions')
 const overdueByUser = groupBy(overdue, 'telegram_id')
 let overdueChats = 0
 for (const [chatId, rows] of overdueByUser) {
+  if (!dry) {
+    for (const r of rows) {
+      await fetchRetry(`${supabaseUrl}/rest/v1/subscriptions?id=eq.${r.id}`, {
+        method: 'PATCH',
+        headers: supabaseHeaders,
+        body: JSON.stringify({ overdue_notified_for: r.next_payment_date }),
+      })
+    }
+  }
   if (!flag(chatId, 'notify_charge_day')) continue
   const lines = rows.map(
     (r) => `• ${r.title} — ${formatAmount(r.amount, r.currency)} (не оплачено ${r.days_overdue} ${pluralDays(r.days_overdue)})`,

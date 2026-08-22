@@ -151,6 +151,16 @@ export function AuthPage() {
             </span>
           </button>
 
+          <button
+            className="auth-page__tg-btn"
+            onClick={() => window.open("https://t.me/app_sub_manager_bot?start=login", "_blank")}
+          >
+            <svg width="17" height="17" viewBox="0 0 24 24">
+              <path d="M9.04 15.51l-.38 5.34c.54 0 .78-.23 1.06-.51l2.55-2.44 5.28 3.87c.97.53 1.66.25 1.92-.9L21.9 4.6c.31-1.42-.51-1.97-1.46-1.63L2.7 9.92c-1.39.54-1.37 1.31-.24 1.66l4.55 1.42 10.57-6.66c.5-.31.95-.14.58.19L9.04 15.51z" />
+            </svg>
+            <span>Войти через Telegram</span>
+          </button>
+
           <div className="auth-page__divider">или</div>
 
           <form onSubmit={handleAuth}>

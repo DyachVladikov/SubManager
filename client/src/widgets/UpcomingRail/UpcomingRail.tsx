@@ -38,10 +38,11 @@ export function UpcomingRail({ subscriptions, onOpen }: UpcomingRailProps) {
         className={`upcoming-rail__list rise${expanded ? ' upcoming-rail__list--expanded' : ''}`}
         style={{ animationDelay: '0.22s' }}
       >
-        {visibleSubscriptions.map((sub) => (
+        {visibleSubscriptions.map((sub, index) => (
           <div
             className={`upcoming-card${sub.daysLeft === 'завтра' ? ' upcoming-card--hot' : ''}${(sub.overdueDays ?? 0) > 0 ? ' upcoming-card--overdue' : ''}`}
             key={sub.id}
+            style={{ animationDelay: `${index * 45}ms` }}
             onClick={() => onOpen(sub.id)}
           >
             <div className="upcoming-card__date">

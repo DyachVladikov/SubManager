@@ -6,7 +6,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 22px 20px 6px;
+  padding: calc(22px + env(safe-area-inset-top)) 20px 6px;
 
   @include tablet-above {
     padding: 22px 0 6px;
@@ -105,7 +105,7 @@
 
   &__notifications {
     position: absolute;
-    top: 66px;
+    top: calc(66px + env(safe-area-inset-top));
     right: 20px;
     width: min(320px, calc(100vw - 40px));
     background: var(--surface);

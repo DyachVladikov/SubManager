@@ -4,7 +4,7 @@
   position: fixed;
   left: 14px;
   right: 14px;
-  bottom: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
   background: color-mix(in srgb, var(--surface) 92%, transparent);
   backdrop-filter: blur(14px);
   border: 1px solid var(--border);

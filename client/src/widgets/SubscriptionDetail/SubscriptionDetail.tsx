@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type CSSProperties } from 'react'
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import type { Subscription } from '@/mocks/subscriptions'
 import { useGetSplitsBySubscriptionQuery } from '@/entities/split/api/splitApi'
 import { useMoney } from '@/shared/lib/useCurrency'
@@ -45,6 +45,36 @@ export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEd
     [onClose],
   )
 
+  const [dragX, setDragX] = useState(0)
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null)
+  const swipingRef = useRef(false)
+
+  const onTouchStart = (event: React.TouchEvent) => {
+    if (window.matchMedia('(width > 1023px)').matches) return
+    touchStartRef.current = { x: event.touches[0].clientX, y: event.touches[0].clientY }
+    swipingRef.current = false
+  }
+
+  const onTouchMove = (event: React.TouchEvent) => {
+    const start = touchStartRef.current
+    if (!start) return
+    const dx = event.touches[0].clientX - start.x
+    const dy = event.touches[0].clientY - start.y
+    if (!swipingRef.current) {
+      if (dx > 12 && Math.abs(dx) > Math.abs(dy)) swipingRef.current = true
+      else if (Math.abs(dy) > 12) touchStartRef.current = null
+    }
+    if (swipingRef.current) setDragX(Math.max(0, dx))
+  }
+
+  const onTouchEnd = () => {
+    const shouldClose = dragX > 90
+    setDragX(0)
+    touchStartRef.current = null
+    swipingRef.current = false
+    if (shouldClose) closeWithAnimation()
+  }
+
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') closeWithAnimation()
@@ -59,7 +89,13 @@ export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEd
         className={`subscription-detail__backdrop ${open && shown ? 'subscription-detail__backdrop--open' : ''}`}
         onClick={() => closeWithAnimation()}
       ></div>
-      <div className={`subscription-detail ${open && shown ? 'subscription-detail--open' : ''}`}>
+      <div
+        className={`subscription-detail ${open && shown ? 'subscription-detail--open' : ''}`}
+        style={dragX > 0 ? { transform: `translateX(${dragX}px)`, transition: 'none' } : undefined}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
       <div className="subscription-detail__glow" style={{ '--bc': subscription.color } as CSSProperties}></div>
       <div className="subscription-detail__head">
         <div className="subscription-detail__head-btn" onClick={() => closeWithAnimation()}>

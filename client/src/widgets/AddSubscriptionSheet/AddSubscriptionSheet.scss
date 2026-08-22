@@ -18,9 +18,9 @@
   border: 1px solid var(--border);
   border-bottom: 0;
   border-radius: 26px 26px 0 0;
-  padding: 10px 20px 26px;
+  padding: 10px 20px calc(26px + env(safe-area-inset-bottom));
   z-index: 51;
-  max-height: 74vh;
+  max-height: calc(100dvh - env(safe-area-inset-top) - 16px);
   overflow-y: auto;
   scrollbar-width: none;
   max-width: 390px;
@@ -53,7 +53,7 @@
     height: 4px;
     border-radius: 99px;
     background: rgba(255, 255, 255, 0.14);
-    margin: 2px auto 14px;
+    margin: 2px auto 10px;
 
     @include tablet-above {
       display: none;
@@ -64,7 +64,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
 
   &__title {

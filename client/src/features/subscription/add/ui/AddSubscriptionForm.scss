@@ -1,7 +1,7 @@
 .add-form {
   display: flex;
   flex-direction: column;
-  gap: 13px;
+  gap: 11px;
 
   &__row {
     display: flex;
@@ -119,7 +119,7 @@
 
   &__submit {
     width: 100%;
-    margin-top: 18px;
+    margin-top: 8px;
     background: linear-gradient(135deg, var(--accent), var(--accent-deep));
     color: #0b0b10;
     font-family: inherit;

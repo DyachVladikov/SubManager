@@ -8,6 +8,7 @@ import './SubscriptionsGrid.scss'
 const collapsedCount = 6
 
 type SortKey = 'price' | 'date'
+type SortDir = 'asc' | 'desc'
 
 interface SubscriptionsGridProps {
   subscriptions: Subscription[]
@@ -20,18 +21,35 @@ interface SubscriptionsGridProps {
 export function SubscriptionsGrid({ subscriptions, removingIds, splitCounts, onOpen, onAdd }: SubscriptionsGridProps) {
   const [expanded, setExpanded] = useState(false)
   const [sortKey, setSortKey] = useState<SortKey>('price')
+  const [sortDir, setSortDir] = useState<SortDir>('desc')
   const [categoryFilter, setCategoryFilter] = useState('all')
+  const [onlySplit, setOnlySplit] = useState(false)
+  const [onlyOverdue, setOnlyOverdue] = useState(false)
   const { symbol: currency, convert } = useMoney()
   const gridRef = useRef<HTMLDivElement>(null)
   useFlipGrid(gridRef)
 
   const categories = useMemo(() => [...new Set(subscriptions.map((sub) => sub.category))], [subscriptions])
 
+  const handleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortDir(sortDir === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortKey(key)
+      setSortDir(key === 'price' ? 'desc' : 'asc')
+    }
+  }
+
   const sorted = useMemo(() => {
-    const list = categoryFilter === 'all' ? [...subscriptions] : subscriptions.filter((sub) => sub.category === categoryFilter)
-    list.sort((a, b) => (sortKey === 'price' ? b.price - a.price : (a.rawDate ?? '').localeCompare(b.rawDate ?? '')))
+    let list = categoryFilter === 'all' ? [...subscriptions] : subscriptions.filter((sub) => sub.category === categoryFilter)
+    if (onlySplit) list = list.filter((sub) => (splitCounts[sub.id] ?? 0) > 0)
+    if (onlyOverdue) list = list.filter((sub) => (sub.overdueDays ?? 0) > 0)
+    list.sort((a, b) => {
+      const cmp = sortKey === 'price' ? a.price - b.price : (a.rawDate ?? '').localeCompare(b.rawDate ?? '')
+      return sortDir === 'asc' ? cmp : -cmp
+    })
     return list
-  }, [subscriptions, sortKey, categoryFilter])
+  }, [subscriptions, sortKey, sortDir, categoryFilter, onlySplit, onlyOverdue, splitCounts])
 
   const hasMore = sorted.length > collapsedCount
   const visibleSubscriptions = expanded ? sorted : sorted.slice(0, collapsedCount)
@@ -56,15 +74,27 @@ export function SubscriptionsGrid({ subscriptions, removingIds, splitCounts, onO
         <div className="subscriptions-grid__sort">
           <span
             className={`subscriptions-grid__chip${sortKey === 'price' ? ' subscriptions-grid__chip--active' : ''}`}
-            onClick={() => setSortKey('price')}
+            onClick={() => handleSort('price')}
           >
-            по цене
+            по цене{sortKey === 'price' ? (sortDir === 'desc' ? ' ↓' : ' ↑') : ''}
           </span>
           <span
             className={`subscriptions-grid__chip${sortKey === 'date' ? ' subscriptions-grid__chip--active' : ''}`}
-            onClick={() => setSortKey('date')}
+            onClick={() => handleSort('date')}
           >
-            по дате
+            по дате{sortKey === 'date' ? (sortDir === 'asc' ? ' ↓' : ' ↑') : ''}
+          </span>
+          <span
+            className={`subscriptions-grid__chip${onlySplit ? ' subscriptions-grid__chip--active' : ''}`}
+            onClick={() => setOnlySplit(!onlySplit)}
+          >
+            со сплитом
+          </span>
+          <span
+            className={`subscriptions-grid__chip${onlyOverdue ? ' subscriptions-grid__chip--active' : ''}`}
+            onClick={() => setOnlyOverdue(!onlyOverdue)}
+          >
+            просроченные
           </span>
         </div>
         {categories.length > 1 && (
@@ -87,6 +117,7 @@ export function SubscriptionsGrid({ subscriptions, removingIds, splitCounts, onO
           </div>
         )}
       </div>
+      {sorted.length === 0 && <div className="subscriptions-grid__empty">Ничего не подходит под фильтры</div>}
       <div className="subscriptions-grid__list rise" style={{ animationDelay: '0.3s' }} ref={gridRef}>
         {visibleSubscriptions.map((sub, index) => (
           <div

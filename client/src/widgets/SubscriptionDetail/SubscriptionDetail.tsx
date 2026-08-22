@@ -2,6 +2,9 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties } from 're
 import type { Subscription } from '@/mocks/subscriptions'
 import SubscriptionLogo from '@/entities/subscription/ui/SubscriptionLogo'
 import { useGetSplitsBySubscriptionQuery } from '@/entities/split/api/splitApi'
+import { useUpdateSubscriptionMutation } from '@/entities/subscription/api/subscriptionApi'
+import { formatNextDate } from '@/entities/subscription/lib/mapSubscription'
+import { addMonths, periodLabel, periodToMonths, toDateString } from '@/entities/subscription/lib/period'
 import { useMoney } from '@/shared/lib/useCurrency'
 import './SubscriptionDetail.scss'
 
@@ -16,6 +19,18 @@ interface SubscriptionDetailProps {
 export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEdit }: SubscriptionDetailProps) {
   const { symbol: currency, convert } = useMoney()
   const { data: splits = [] } = useGetSplitsBySubscriptionQuery(subscription.id)
+  const [updateSubscription, { isLoading: isConfirming }] = useUpdateSubscriptionMutation()
+  const overdueDays = subscription.overdueDays ?? 0
+
+  const todayStart = new Date()
+  todayStart.setHours(0, 0, 0, 0)
+  const scheduledDate = subscription.rawDate ? new Date(`${subscription.rawDate}T00:00:00`) : todayStart
+  const payBase = scheduledDate > todayStart ? scheduledDate : todayStart
+  const nextPaymentPreview = addMonths(payBase, periodToMonths(subscription.period))
+
+  const handleConfirmPayment = () => {
+    void updateSubscription({ id: subscription.id, next_payment_date: toDateString(nextPaymentPreview) })
+  }
   const remindDays = subscription.remindBeforeDays ?? 1
   const remindText =
     remindDays === 0
@@ -122,12 +137,22 @@ export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEd
       <div className="subscription-detail__name">{subscription.name}</div>
       <div className="subscription-detail__price">{convert(subscription.price).toLocaleString('ru-RU', { useGrouping: false })} {currency} / мес</div>
       <div className="subscription-detail__chips">
-        <span className="subscription-detail__chip subscription-detail__chip--ok">
-          <i></i>активна
-        </span>
+        {overdueDays > 0 ? (
+          <span className="subscription-detail__chip subscription-detail__chip--overdue">
+            <i></i>не оплачена
+          </span>
+        ) : (
+          <span className="subscription-detail__chip subscription-detail__chip--ok">
+            <i></i>активна
+          </span>
+        )}
         <span className="subscription-detail__chip">
           <i></i>
           {subscription.nextDate} · {subscription.daysLeft}
+        </span>
+        <span className="subscription-detail__chip">
+          <i></i>
+          {periodLabel(subscription.period)}
         </span>
       </div>
       <div className="subscription-detail__grid">
@@ -231,6 +256,18 @@ export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEd
             </svg>
           </div>
         </div>
+      </div>
+      <div className="subscription-detail__pay">
+        <button
+          className={`subscription-detail__pay-btn${overdueDays > 0 ? ' subscription-detail__pay-btn--overdue' : ''}`}
+          onClick={handleConfirmPayment}
+          disabled={isConfirming}
+        >
+          {isConfirming ? 'Сохраняем…' : `Оплатить · ${convert(subscription.price).toLocaleString('ru-RU', { useGrouping: false })} ${currency}`}
+        </button>
+        <span className="subscription-detail__pay-hint">
+          следующее списание — {formatNextDate(toDateString(nextPaymentPreview))}
+        </span>
       </div>
       <div className="subscription-detail__actions">
         <button className="subscription-detail__edit-btn" onClick={() => closeWithAnimation(() => onEdit(subscription.id))}>

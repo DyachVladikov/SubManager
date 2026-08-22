@@ -43,7 +43,7 @@ export function SubscriptionsGrid({ subscriptions, removingIds, splitCounts, onO
       <div className="subscriptions-grid__list rise" style={{ animationDelay: '0.3s' }} ref={gridRef}>
         {visibleSubscriptions.map((sub) => (
           <div
-            className={`sub-card ${removingIds.includes(sub.id) ? 'sub-card--removing' : ''}`}
+            className={`sub-card${removingIds.includes(sub.id) ? ' sub-card--removing' : ''}${(sub.overdueDays ?? 0) > 0 ? ' sub-card--overdue' : ''}`}
             key={sub.id}
             data-flip-id={sub.id}
             onClick={() => onOpen(sub.id)}

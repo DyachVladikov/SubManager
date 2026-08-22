@@ -161,6 +161,12 @@
       background: rgba(143, 227, 176, 0.08);
     }
 
+    &--overdue {
+      color: var(--up);
+      border-color: rgba(239, 143, 143, 0.35);
+      background: rgba(239, 143, 143, 0.1);
+    }
+
     i {
       width: 6px;
       height: 6px;
@@ -483,6 +489,48 @@
     display: flex;
     gap: 10px;
     padding: 16px 20px 0;
+  }
+
+  &__pay {
+    padding: 16px 20px 0;
+  }
+
+  &__pay-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 14px;
+    border: 0;
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+    color: #0b0b10;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 13px;
+    cursor: pointer;
+    transition: transform 0.12s;
+    box-shadow: 0 8px 24px rgba(124, 92, 240, 0.35);
+
+    &:active {
+      transform: scale(0.97);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: default;
+    }
+
+    &--overdue {
+      background: linear-gradient(135deg, #ef8f8f, #d96a6a);
+      box-shadow: 0 8px 24px rgba(217, 106, 106, 0.3);
+    }
+  }
+
+  &__pay-hint {
+    display: block;
+    margin-top: 8px;
+    text-align: center;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--dim);
   }
 
   &__edit-btn {

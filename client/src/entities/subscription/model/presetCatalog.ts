@@ -91,6 +91,19 @@ export const presetCatalog: PresetCategory[] = [
     ],
   },
   {
+    name: "Связь",
+    services: [
+      { name: "Т2", color: "#4671eb", price: 550 },
+      { name: "Yota", color: "#00c8f5", price: 600 },
+      { name: "МегаФон", color: "#00b956", price: 650 },
+      { name: "МТС", color: "#e30611", price: 700 },
+      { name: "Билайн", color: "#ffd200", price: 600 },
+      { name: "Т-Банк Мобайл", color: "#ffdd2d", price: 500 },
+      { name: "Ростелеком", color: "#7700ff", price: 800 },
+      { name: "Дом.ру", color: "#6f2dff", price: 750 },
+    ],
+  },
+  {
     name: "Другое",
     services: [],
   },

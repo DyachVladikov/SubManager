@@ -17,6 +17,13 @@
     color: var(--dim);
   }
 
+  &__hint {
+    margin-top: -5px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--dim);
+  }
+
   &__colors {
     display: flex;
     gap: 9px;

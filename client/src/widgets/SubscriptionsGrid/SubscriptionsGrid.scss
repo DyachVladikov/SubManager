@@ -87,6 +87,11 @@
     pointer-events: none;
   }
 
+  &--overdue {
+    border-color: rgba(239, 143, 143, 0.45);
+    background: linear-gradient(180deg, rgba(239, 143, 143, 0.07), var(--surface) 70%);
+  }
+
   &:active {
     transform: scale(0.97);
   }

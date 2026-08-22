@@ -102,6 +102,11 @@
     background: linear-gradient(180deg, rgba(167, 139, 250, 0.12), var(--surface) 70%);
   }
 
+  &--overdue {
+    border-color: rgba(239, 143, 143, 0.45);
+    background: linear-gradient(180deg, rgba(239, 143, 143, 0.08), var(--surface) 70%);
+  }
+
   &__date {
     text-align: center;
     min-width: 32px;
@@ -131,6 +136,10 @@
     text-transform: uppercase;
     color: var(--accent);
     margin-bottom: 2px;
+
+    &--overdue {
+      color: var(--up);
+    }
   }
 
   &__sep {

@@ -3,6 +3,7 @@ import { useCreateSubscriptionMutation, useUpdateSubscriptionMutation, useGetCat
 import { useCreateSplitMutation } from '@/entities/split/api/splitApi'
 import { presetCatalog } from '@/entities/subscription/model/presetCatalog'
 import { brandIcons } from '@/entities/subscription/model/brandIcons'
+import { inferPeriod, periodLabel } from '@/entities/subscription/lib/period'
 import { FormField } from '@/shared/ui/FormField'
 import { Select } from '@/shared/ui/Select'
 import { supabase } from '@/shared/config/supabase'
@@ -34,9 +35,10 @@ interface AddSubscriptionFormProps {
   initialColor?: string
   initialCategoryId?: string | null
   initialRemindDays?: number
+  initialPeriod?: string | null
 }
 
-export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName = '', initialPrice = '', initialDate = '', initialColor = '#a78bfa', initialCategoryId = null, initialRemindDays = 1 }: AddSubscriptionFormProps) {
+export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName = '', initialPrice = '', initialDate = '', initialColor = '#a78bfa', initialCategoryId = null, initialRemindDays = 1, initialPeriod = null }: AddSubscriptionFormProps) {
   const [name, setName] = useState(initialName)
   const [price, setPrice] = useState(initialPrice)
   const [date, setDate] = useState(initialDate || getDefaultDate())
@@ -63,6 +65,7 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
     return acc
   }, {})
   const activePresetCategory = presetCatalog.find((cat) => cat.name === presetCategory) || null
+  const effectivePeriod = editingId && date === initialDate ? (initialPeriod ?? '1 month') : inferPeriod(date)
   const serviceOptions = (activePresetCategory?.services || []).map((service) => ({
     value: service.name,
     label: service.name,
@@ -149,6 +152,7 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
           color_hex: color,
           category_id: categoryId,
           remind_before_days: Number(remindDays),
+          ...(date !== initialDate ? { period: inferPeriod(date) } : {}),
         }).unwrap()
 
         if (isSplit && splitUsername.trim()) {
@@ -168,6 +172,7 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
           category_id: categoryId,
           user_id: userId,
           remind_before_days: Number(remindDays),
+          period: inferPeriod(date),
         }).unwrap()
 
         if (isSplit && subscription) {
@@ -256,6 +261,7 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
         }}
         error={errors.date}
       />
+      <span className="add-form__hint">Повторять: {periodLabel(effectivePeriod)}</span>
       <div className="add-form__row">
         <span className="add-form__label">Напоминание в Telegram</span>
         <Select options={remindOptions} value={remindDays} onChange={setRemindDays} placeholder="Когда напомнить" />

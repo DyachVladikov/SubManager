@@ -7,7 +7,10 @@ export interface Subscription {
   icon?: string
   category: string
   nextDate: string
+  rawDate?: string
   daysLeft: string
+  period?: string | null
+  overdueDays?: number
   remindBeforeDays?: number
   history: string[]
   split?: Array<{ name: string; username: string; amount: number; paid: boolean }>

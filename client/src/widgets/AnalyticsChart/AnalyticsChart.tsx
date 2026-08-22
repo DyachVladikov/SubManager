@@ -54,11 +54,11 @@ export function AnalyticsChart({ months }: AnalyticsChartProps) {
             className={`analytics-chart__col${i === selected ? ' analytics-chart__col--active' : ''}`}
             onClick={() => setSelected(i)}
           >
-            <span className="analytics-chart__value">{convert(month.total).toLocaleString('ru-RU', { useGrouping: false })}</span>
             <div className="analytics-chart__bar-wrap">
+              <span className="analytics-chart__value">{convert(month.total).toLocaleString('ru-RU', { useGrouping: false })}</span>
               <div
                 className="analytics-chart__bar"
-                style={{ height: `${Math.max(Math.round((month.total / max) * 100), 3)}%`, ['--i' as string]: i }}
+                style={{ height: `calc((100% - 18px) * ${Math.max(month.total / max, 0.04)})`, ['--i' as string]: i }}
               ></div>
             </div>
             <span className="analytics-chart__bar-label">{month.label}</span>

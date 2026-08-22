@@ -72,8 +72,6 @@ async function send(chatId, text, buttons) {
 
 const today = new Date().toLocaleDateString('sv-SE')
 
-const rolled = await rpc('roll_subscriptions_forward')
-
 const profilesRes = await fetchRetry(
   `${supabaseUrl}/rest/v1/profiles?select=telegram_id,notify_charge_day,notify_charge_before,notify_splits,notify_weekly_digest&telegram_id=not.is.null`,
   { headers: supabaseHeaders },
@@ -98,6 +96,21 @@ for (const [chatId, rows] of paymentsByUser) {
   if (!lines.length) continue
   await send(chatId, `⏰ Ближайшие списания:\n\n${lines.join('\n')}`)
   paymentChats++
+}
+
+const overdue = await rpc('get_overdue_subscriptions')
+const overdueByUser = groupBy(overdue, 'telegram_id')
+let overdueChats = 0
+for (const [chatId, rows] of overdueByUser) {
+  if (!flag(chatId, 'notify_charge_day')) continue
+  const lines = rows.map(
+    (r) => `• ${r.title} — ${formatAmount(r.amount, r.currency)} (не оплачено ${r.days_overdue} ${pluralDays(r.days_overdue)})`,
+  )
+  await send(
+    chatId,
+    `⚠️ Просроченные подписки:\n\n${lines.join('\n')}\n\nПодтверди оплату в приложении — дата следующего списания пересчитается автоматически. Если подписка отменена — удали её.`,
+  )
+  overdueChats++
 }
 
 const splits = await rpc('get_pending_splits')
@@ -137,5 +150,5 @@ if (new Date().getDay() === 1) {
 }
 
 console.log(
-  `Готово: списания → ${paymentChats} чатов, друзьям → ${debtorChats} чатов, сводки владельцам → ${digestChats}, перенесено дат: ${rolled}${dry ? ' (dry-run, ничего не отправлено)' : ''}`,
+  `Готово: списания → ${paymentChats} чатов, просрочка → ${overdueChats} чатов, друзьям → ${debtorChats} чатов, сводки владельцам → ${digestChats}${dry ? ' (dry-run, ничего не отправлено)' : ''}`,
 )

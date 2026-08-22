@@ -10,6 +10,7 @@ export interface EditingSubscription {
   color: string
   categoryId: string | null
   remindDays?: number
+  period?: string | null
 }
 
 interface AddSubscriptionSheetProps {
@@ -78,6 +79,7 @@ export function AddSubscriptionSheet({ onClose, onSuccess, editing }: AddSubscri
           initialColor={editing?.color}
           initialCategoryId={editing?.categoryId}
           initialRemindDays={editing?.remindDays}
+          initialPeriod={editing?.period}
         />
       </div>
     </>

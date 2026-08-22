@@ -81,6 +81,7 @@ export function AnalyticsPage({ onNavigate }: AnalyticsPageProps) {
         color: editingRaw.color_hex || '#a78bfa',
         categoryId: editingRaw.category_id,
         remindDays: editingRaw.remind_before_days,
+        period: editingRaw.period,
       }
     : null
 

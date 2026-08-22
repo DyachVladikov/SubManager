@@ -40,12 +40,13 @@ export function UpcomingRail({ subscriptions, onOpen }: UpcomingRailProps) {
       >
         {visibleSubscriptions.map((sub) => (
           <div
-            className={`upcoming-card ${sub.daysLeft === 'завтра' ? 'upcoming-card--hot' : ''}`}
+            className={`upcoming-card${sub.daysLeft === 'завтра' ? ' upcoming-card--hot' : ''}${(sub.overdueDays ?? 0) > 0 ? ' upcoming-card--overdue' : ''}`}
             key={sub.id}
             onClick={() => onOpen(sub.id)}
           >
             <div className="upcoming-card__date">
               {sub.daysLeft === 'завтра' && <span className="upcoming-card__badge">завтра</span>}
+              {(sub.overdueDays ?? 0) > 0 && <span className="upcoming-card__badge upcoming-card__badge--overdue">не оплачено</span>}
               <b>{sub.nextDate.split(' ')[0]}</b>
               <span>{sub.nextDate.split(' ')[1]}</span>
             </div>

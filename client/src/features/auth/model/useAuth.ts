@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/shared/config/supabase'
 import { withTimeout } from '@/shared/lib/withTimeout'
+import { clearOfflineData } from '@/shared/lib/offlineDb'
 import type { Session } from '@supabase/supabase-js'
 
 export function useAuth() {
@@ -33,7 +34,10 @@ export function useAuth() {
     }
   }, [])
 
-  const signOut = () => supabase.auth.signOut()
+  const signOut = async () => {
+    await clearOfflineData()
+    return supabase.auth.signOut()
+  }
 
   return { session, loading, signOut }
 }

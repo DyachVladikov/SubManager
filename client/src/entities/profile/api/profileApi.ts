@@ -1,5 +1,6 @@
 import { baseApi } from '@/shared/api/baseApi'
 import { supabase } from '@/shared/config/supabase'
+import { isOfflineError, readCache, writeCache } from '@/shared/lib/offlineDb'
 
 export interface Profile {
   id: string
@@ -36,13 +37,24 @@ export type ProfilePatch = Partial<
   >
 >
 
+const PROFILE_KEY = 'profile'
+
 export const profileApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getProfile: builder.query<Profile | null, void>({
       queryFn: async () => {
-        const { data, error } = await supabase.from('profiles').select('*').single()
-        if (error) return { error }
-        return { data: data as Profile }
+        try {
+          const { data, error } = await supabase.from('profiles').select('*').single()
+          if (error) throw error
+          void writeCache(PROFILE_KEY, data)
+          return { data: data as Profile }
+        } catch (error) {
+          if (isOfflineError(error)) {
+            const cached = await readCache<Profile>(PROFILE_KEY)
+            if (cached) return { data: cached }
+          }
+          return { error: error as { message: string } }
+        }
       },
       providesTags: ['Profile'],
     }),

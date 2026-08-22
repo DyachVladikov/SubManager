@@ -31,7 +31,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
     onDeleted: () => showToast('delete'),
   })
 
-  const { data: dbSubscriptions = [], isLoading } = useGetSubscriptionsQuery()
+  const { data: dbSubscriptions = [], isLoading, error: subsError } = useGetSubscriptionsQuery()
   const { data: splits = [] } = useGetSplitsQuery()
   const { data: categories = [] } = useGetCategoriesQuery()
   const categoryNames = categories.reduce<Record<string, string>>((acc, cat) => {
@@ -101,6 +101,11 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
       <div className="dashboard-page__glow"></div>
 
       <DashboardHeader onBrandClick={() => onNavigate('profile')} />
+      {subsError !== undefined && (
+        <div className="dashboard-page__error">
+          Не удалось загрузить подписки: {String((subsError as { message?: string })?.message ?? JSON.stringify(subsError))}
+        </div>
+      )}
       <div className="dashboard-page__top">
         <HeroCard mode={mode} onModeChange={setMode} subscriptions={dbSubscriptions} />
         <CategoriesCard subscriptions={dbSubscriptions} categoryNames={categoryNames} />

@@ -6,7 +6,7 @@
   width: 100%;
   max-width: 430px;
   background: var(--bg);
-  z-index: 16;
+  z-index: 46;
   transform: translateX(102%);
   transition: transform 0.4s cubic-bezier(0.3, 0.8, 0.3, 1);
   overflow-y: auto;
@@ -25,7 +25,7 @@
   &__backdrop {
     position: fixed;
     inset: 0;
-    z-index: 15;
+    z-index: 45;
     background: rgba(5, 5, 8, 0.55);
     backdrop-filter: blur(4px);
     opacity: 0;

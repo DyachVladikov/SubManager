@@ -50,6 +50,7 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
   const [splitMode, setSplitMode] = useState<'rub' | 'pct'>('rub')
   const [userId, setUserId] = useState<string | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [submitError, setSubmitError] = useState('')
   const [createSubscription, { isLoading: isCreating }] = useCreateSubscriptionMutation()
   const [updateSubscription, { isLoading: isUpdating }] = useUpdateSubscriptionMutation()
   const { data: categories = [] } = useGetCategoriesQuery()
@@ -97,8 +98,8 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
   }
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUserId(data.user?.id || null)
+    supabase.auth.getSession().then(({ data }) => {
+      setUserId(data.session?.user?.id || null)
     })
   }, [])
 
@@ -127,7 +128,12 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!validate() || !userId) return
+    setSubmitError('')
+    if (!validate()) return
+    if (!userId) {
+      setSubmitError('Сессия не найдена — перезайди в аккаунт')
+      return
+    }
 
     try {
       const splitAmountValue = splitMode === 'pct' ? Math.round((Number(price) * Number(splitAmount)) / 100) : Number(splitAmount)
@@ -175,6 +181,8 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
       onClose()
     } catch (error) {
       console.error('Failed to save subscription:', error)
+      const detail = (error as { message?: string })?.message ?? String(error)
+      setSubmitError(`Не удалось сохранить: ${detail}`)
     }
   }
 
@@ -320,6 +328,7 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
         </>
       )}
 
+      {submitError && <div className="add-form__error">{submitError}</div>}
       <button className="add-form__submit" type="submit" disabled={isLoading || !userId}>
         {isLoading ? 'Сохранение...' : editingId ? 'Сохранить' : 'Добавить подписку'}
       </button>

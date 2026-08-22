@@ -4,5 +4,6 @@ export const baseApi = createApi({
   reducerPath: 'api',
   baseQuery: fakeBaseQuery(),
   tagTypes: ['Subscription', 'Category', 'Profile'],
+  refetchOnReconnect: true,
   endpoints: () => ({}),
 })

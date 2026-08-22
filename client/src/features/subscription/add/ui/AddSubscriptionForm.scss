@@ -106,7 +106,7 @@
     transition: transform 0.12s, border-color 0.2s;
 
     &--active {
-      border-color: #fff;
+      border-color: var(--text);
       transform: scale(1.12);
     }
   }
@@ -169,7 +169,7 @@
     width: 42px;
     height: 24px;
     border-radius: 99px;
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--switch-off);
     position: relative;
     cursor: pointer;
     transition: background 0.2s;

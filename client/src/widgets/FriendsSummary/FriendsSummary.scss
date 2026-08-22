@@ -47,6 +47,12 @@
     color: transparent;
   }
 
+  :root[data-theme='light'] &__num {
+    background: linear-gradient(180deg, #17171f 25%, #6b6b7d);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
   &__per {
     font-size: 13px;
     font-weight: 600;
@@ -63,7 +69,7 @@
 
   &__divider {
     height: 1px;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--row-border);
     margin: 14px 0;
   }
 

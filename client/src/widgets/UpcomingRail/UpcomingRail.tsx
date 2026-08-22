@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { Subscription } from '@/mocks/subscriptions'
 import SubscriptionLogo from '@/entities/subscription/ui/SubscriptionLogo'
 import { useMoney } from '@/shared/lib/useCurrency'
+import { useFlipGrid } from '@/shared/lib/useFlipGrid'
 import './UpcomingRail.scss'
 
 const collapsedCount = 5
@@ -14,6 +15,8 @@ interface UpcomingRailProps {
 export function UpcomingRail({ subscriptions, onOpen }: UpcomingRailProps) {
   const [expanded, setExpanded] = useState(false)
   const { symbol: currency, convert } = useMoney()
+  const listRef = useRef<HTMLDivElement>(null)
+  useFlipGrid(listRef)
 
   const hasMore = subscriptions.length > collapsedCount
   const visibleSubscriptions = expanded ? subscriptions : subscriptions.slice(0, collapsedCount)
@@ -37,11 +40,13 @@ export function UpcomingRail({ subscriptions, onOpen }: UpcomingRailProps) {
       <div
         className={`upcoming-rail__list rise${expanded ? ' upcoming-rail__list--expanded' : ''}`}
         style={{ animationDelay: '0.22s' }}
+        ref={listRef}
       >
         {visibleSubscriptions.map((sub, index) => (
           <div
             className={`upcoming-card${sub.daysLeft === 'завтра' ? ' upcoming-card--hot' : ''}${(sub.overdueDays ?? 0) > 0 ? ' upcoming-card--overdue' : ''}`}
             key={sub.id}
+            data-flip-id={sub.id}
             style={{ animationDelay: `${index * 45}ms` }}
             onClick={() => onOpen(sub.id)}
           >

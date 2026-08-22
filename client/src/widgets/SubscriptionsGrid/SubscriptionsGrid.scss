@@ -263,7 +263,7 @@
   }
 
   &--add {
-    border: 1px dashed rgba(255, 255, 255, 0.16);
+    border: 1px dashed var(--dash-border);
     background: transparent;
     display: flex;
     flex-direction: column;

@@ -14,7 +14,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: #12121a;
+  background: var(--bg);
   border: 1px solid var(--border);
   border-bottom: 0;
   border-radius: 26px 26px 0 0;
@@ -52,7 +52,7 @@
     width: 38px;
     height: 4px;
     border-radius: 99px;
-    background: rgba(255, 255, 255, 0.14);
+    background: var(--switch-off);
     margin: 2px auto 10px;
 
     @include tablet-above {
@@ -173,7 +173,7 @@
       content: '';
       flex: 1;
       height: 1px;
-      background: rgba(255, 255, 255, 0.06);
+      background: var(--row-border);
     }
   }
 
@@ -183,7 +183,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    border: 1px dashed rgba(255, 255, 255, 0.18);
+    border: 1px dashed var(--dash-border);
     background: transparent;
     color: var(--dim);
     font-family: inherit;

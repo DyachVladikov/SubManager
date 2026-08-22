@@ -43,6 +43,48 @@ function formatAmount(amount, currency) {
 
 const bot = new Bot(token)
 
+async function sendLoginLink(ctx) {
+  const appUrl = process.env.APP_URL
+  const serviceKey = process.env.SUPABASE_SERVICE_KEY || supabaseKey
+  if (!appUrl) {
+    await ctx.reply('Вход через Telegram пока не настроен на сервере.')
+    return
+  }
+  try {
+    const email = await rpc('get_login_email', { p_telegram_id: ctx.from.id })
+    if (!email) {
+      await ctx.reply(
+        'Этот Telegram не привязан ни к одному аккаунту SubManager.\n\nСначала привяжи: приложение → Профиль → «Привязать Telegram».',
+      )
+      return
+    }
+    const linkRes = await fetch(`${supabaseUrl}/auth/v1/admin/generate_link`, {
+      method: 'POST',
+      headers: {
+        apikey: serviceKey,
+        Authorization: `Bearer ${serviceKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ type: 'magiclink', email, options: { redirectTo: appUrl } }),
+    })
+    const data = await linkRes.json().catch(() => null)
+    const actionLink = data?.properties?.action_link || data?.action_link
+    if (!linkRes.ok || !actionLink) {
+      console.error('generate_link:', linkRes.status, data)
+      await ctx.reply('Не получилось создать ссылку для входа. Попробуй позже.')
+      return
+    }
+    await ctx.reply('Жми кнопку — откроется SubManager, и ты сразу окажешься внутри. Ссылка одноразовая и живёт недолго.', {
+      reply_markup: { inline_keyboard: [[{ text: 'Открыть SubManager', url: actionLink }]] },
+    })
+  } catch (err) {
+    console.error(err)
+    await ctx.reply('Что-то пошло не так. Попробуй ещё раз чуть позже.')
+  }
+}
+
+bot.command('login', sendLoginLink)
+
 bot.use(async (ctx, next) => {
   if (ctx.from) {
     rpc('track_bot_user', {
@@ -58,8 +100,12 @@ bot.command('start', async (ctx) => {
   const payload = ctx.match?.trim()
   if (!payload) {
     await ctx.reply(
-      'Привет! Я бот SubManager.\n\nЧтобы привязать Telegram к аккаунту, открой SubManager → Профиль → «Привязать Telegram» и перейди по ссылке.',
+      'Привет! Я бот SubManager.\n\nЧтобы привязать Telegram к аккаунту, открой SubManager → Профиль → «Привязать Telegram» и перейди по ссылке.\n\nВойти в приложение без пароля — команда /login.',
     )
+    return
+  }
+  if (payload === 'login') {
+    await sendLoginLink(ctx)
     return
   }
   try {

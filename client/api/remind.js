@@ -1,0 +1,160 @@
+const token = process.env.BOT_TOKEN
+const supabaseUrl = process.env.SUPABASE_URL
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY
+
+const supabaseHeaders = {
+  apikey: supabaseKey,
+  Authorization: `Bearer ${supabaseKey}`,
+  'Content-Type': 'application/json',
+}
+
+async function rpc(name) {
+  const res = await fetch(`${supabaseUrl}/rest/v1/rpc/${name}`, {
+    method: 'POST',
+    headers: supabaseHeaders,
+    body: '{}',
+  })
+  if (!res.ok) throw new Error(`${name}: ${res.status} ${await res.text()}`)
+  return res.json()
+}
+
+function formatAmount(amount, currency) {
+  const n = Number(amount)
+  const value = Number.isInteger(n) ? String(n) : n.toFixed(2)
+  return `${value} ${currency === 'RUB' ? '₽' : currency}`
+}
+
+function pluralDays(n) {
+  const mod10 = n % 10
+  const mod100 = n % 100
+  if (mod10 === 1 && mod100 !== 11) return 'день'
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return 'дня'
+  return 'дней'
+}
+
+function groupBy(rows, key) {
+  const map = new Map()
+  for (const row of rows) {
+    const id = row[key]
+    if (id === null || id === undefined) continue
+    if (!map.has(id)) map.set(id, [])
+    map.get(id).push(row)
+  }
+  return map
+}
+
+async function send(chatId, text, buttons) {
+  const body = { chat_id: chatId, text }
+  if (buttons?.length) {
+    body.reply_markup = { inline_keyboard: buttons.map((b) => [{ text: b.text, callback_data: b.callback_data }]) }
+  }
+  const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) console.error(`sendMessage в чат ${chatId}: ${res.status} ${await res.text()}`)
+}
+
+export default async function handler(req, res) {
+  const cronSecret = process.env.CRON_SECRET
+  if (cronSecret && req.headers.authorization !== `Bearer ${cronSecret}`) {
+    return res.status(401).json({ error: 'unauthorized' })
+  }
+  if (!token || !supabaseUrl || !supabaseKey) {
+    return res.status(500).json({ error: 'server_not_configured' })
+  }
+
+  try {
+    const today = new Date().toLocaleDateString('sv-SE')
+
+    const profilesRes = await fetch(
+      `${supabaseUrl}/rest/v1/profiles?select=telegram_id,notify_charge_day,notify_charge_before,notify_splits,notify_weekly_digest&telegram_id=not.is.null`,
+      { headers: supabaseHeaders },
+    )
+    if (!profilesRes.ok) throw new Error(`profiles: ${profilesRes.status} ${await profilesRes.text()}`)
+    const profileRows = await profilesRes.json()
+    const flagsByTg = new Map(profileRows.map((p) => [Number(p.telegram_id), p]))
+    const flag = (tg, name) => flagsByTg.get(Number(tg))?.[name] !== false
+
+    const payments = await rpc('get_payment_reminders')
+    const paymentsByUser = groupBy(payments, 'telegram_id')
+    let paymentChats = 0
+    for (const [chatId, rows] of paymentsByUser) {
+      const lines = []
+      for (const r of rows) {
+        const left = r.days_left ?? (r.next_payment_date === today ? 0 : 1)
+        if (left === 0 && !flag(chatId, 'notify_charge_day')) continue
+        if (left > 0 && !flag(chatId, 'notify_charge_before')) continue
+        const when = left === 0 ? 'сегодня' : left === 1 ? 'завтра' : `через ${left} ${pluralDays(left)}`
+        lines.push(`• ${r.title} — ${formatAmount(r.amount, r.currency)} (${when})`)
+      }
+      if (!lines.length) continue
+      await send(chatId, `⏰ Ближайшие списания:\n\n${lines.join('\n')}`)
+      paymentChats++
+    }
+
+    const overdue = await rpc('get_overdue_subscriptions')
+    const overdueByUser = groupBy(overdue, 'telegram_id')
+    let overdueChats = 0
+    for (const [chatId, rows] of overdueByUser) {
+      for (const r of rows) {
+        await fetch(`${supabaseUrl}/rest/v1/subscriptions?id=eq.${r.id}`, {
+          method: 'PATCH',
+          headers: supabaseHeaders,
+          body: JSON.stringify({ overdue_notified_for: r.next_payment_date }),
+        })
+      }
+      if (!flag(chatId, 'notify_charge_day')) continue
+      const lines = rows.map(
+        (r) => `• ${r.title} — ${formatAmount(r.amount, r.currency)} (не оплачено ${r.days_overdue} ${pluralDays(r.days_overdue)})`,
+      )
+      await send(
+        chatId,
+        `⚠️ Просроченные подписки:\n\n${lines.join('\n')}\n\nПодтверди оплату в приложении — дата следующего списания пересчитается автоматически. Если подписка отменена — удали её.`,
+      )
+      overdueChats++
+    }
+
+    const splits = await rpc('get_pending_splits')
+
+    const debtorDms = groupBy(splits, 'debtor_telegram_id')
+    let debtorChats = 0
+    for (const [chatId, rows] of debtorDms) {
+      if (!flag(chatId, 'notify_splits')) continue
+      const lines = rows.map((r) => {
+        const owner = r.owner_telegram_username ? `@${r.owner_telegram_username}` : 'владельцу SubManager'
+        return `• ${r.subscription_title} — ${formatAmount(r.amount, r.currency)} (${owner})`
+      })
+      const buttons = rows.map((r) => ({
+        text: `Я перевел(а) · ${r.subscription_title}`,
+        callback_data: `pay:${r.split_id}`,
+      }))
+      await send(
+        chatId,
+        `💸 Напоминание по split\n\nТвои доли в подписках:\n\n${lines.join('\n')}\n\nКак переведёшь — жми кнопку под списком, владельцу прилетит уведомление.`,
+        buttons,
+      )
+      debtorChats++
+    }
+
+    let digestChats = 0
+    if (new Date().getDay() === 1) {
+      const ownerDigests = groupBy(splits, 'owner_telegram_id')
+      for (const [chatId, rows] of ownerDigests) {
+        if (!flag(chatId, 'notify_weekly_digest')) continue
+        const lines = rows.map((r) => `• @${r.debtor_username} — ${formatAmount(r.amount, r.currency)} (${r.subscription_title})`)
+        await send(
+          chatId,
+          `💸 Сводка по split за неделю.\n\nТебе ещё не вернули:\n\n${lines.join('\n')}\n\nДрузьям уже улетают напоминания с кнопкой «Я перевел(а)».`,
+        )
+        digestChats++
+      }
+    }
+
+    return res.status(200).json({ paymentChats, overdueChats, debtorChats, digestChats })
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({ error: String(err?.message ?? err) })
+  }
+}

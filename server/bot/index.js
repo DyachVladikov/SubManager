@@ -174,6 +174,7 @@ bot.command("start", async (ctx) => {
     ctx.from?.username,
   );
   const payload = ctx.match?.trim();
+  console.log("PAYLOAD:", JSON.stringify(payload));
   if (!payload) {
     const text = [
       "👋 Привет! Это SubManager — все твои подписки в одном месте.",

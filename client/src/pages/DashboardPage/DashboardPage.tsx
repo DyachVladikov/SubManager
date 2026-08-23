@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useGetSubscriptionsQuery, useGetCategoriesQuery } from '@/entities/subscription/api/subscriptionApi'
 import { useGetSplitsQuery } from '@/entities/split/api/splitApi'
 import { mapSubscription } from '@/entities/subscription/lib/mapSubscription'
@@ -16,6 +16,7 @@ import { TabBar, type TabKey } from '@/widgets/TabBar'
 import { SubscriptionDetail } from '@/widgets/SubscriptionDetail'
 import { AddSubscriptionSheet } from '@/widgets/AddSubscriptionSheet'
 import { CalendarModal } from '@/widgets/CalendarModal'
+import { OnboardingModal } from '@/widgets/OnboardingModal'
 import './DashboardPage.scss'
 
 interface DashboardPageProps {
@@ -29,12 +30,24 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
   const [sheetOpen, setSheetOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [calendarOpen, setCalendarOpen] = useState(false)
+  const [onboardingOpen, setOnboardingOpen] = useState(false)
   const { toast, showToast } = useToast()
   const { removingIds, removeSubscription } = useRemoveSubscription({
     onDeleted: () => showToast('delete'),
   })
 
   const { data: dbSubscriptions = [], isLoading, error: subsError } = useGetSubscriptionsQuery()
+
+  useEffect(() => {
+    if (!isLoading && localStorage.getItem('submanager_onboarding_v1') !== '1') {
+      setOnboardingOpen(true)
+    }
+  }, [isLoading])
+
+  const closeOnboarding = () => {
+    localStorage.setItem('submanager_onboarding_v1', '1')
+    setOnboardingOpen(false)
+  }
   const { data: splits = [] } = useGetSplitsQuery()
   const { data: categories = [] } = useGetCategoriesQuery()
   const categoryNames = categories.reduce<Record<string, string>>((acc, cat) => {
@@ -74,7 +87,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
   }
 
   const selected = subscriptions.find((s) => s.id === selectedSub)
-  useBodyScrollLock(sheetOpen || selectedSub !== null || calendarOpen)
+  useBodyScrollLock(sheetOpen || selectedSub !== null || calendarOpen || onboardingOpen)
   const editingRaw = dbSubscriptions.find((s) => s.id === editingId)
   const editing = editingRaw
     ? {
@@ -146,6 +159,8 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
           }}
         />
       )}
+
+      {onboardingOpen && <OnboardingModal onClose={closeOnboarding} />}
 
       {toast && <Toast type={toast} />}
     </div>

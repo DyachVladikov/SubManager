@@ -1,0 +1,146 @@
+@use '@/shared/styles/helpers/index.scss' as *;
+
+.onboarding {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, calc(-50% + 22px)) scale(0.96);
+  opacity: 0;
+  transition:
+    transform 0.35s cubic-bezier(0.2, 0.8, 0.3, 1),
+    opacity 0.3s ease;
+  z-index: 51;
+  width: min(360px, calc(100vw - 28px));
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 16px 22px 22px;
+  text-align: center;
+
+  &--open {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+
+  &__backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: rgba(5, 5, 8, 0.6);
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+
+    &--open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  &__skip {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--dim);
+    cursor: pointer;
+    transition: color 0.2s;
+
+    &:hover {
+      color: var(--accent);
+    }
+  }
+
+  &__slide {
+    transition: transform 0.25s ease;
+    touch-action: pan-y;
+
+    &--enter-next {
+      animation: calEnterNext 0.3s cubic-bezier(0.2, 0.8, 0.3, 1);
+    }
+
+    &--enter-prev {
+      animation: calEnterPrev 0.3s cubic-bezier(0.2, 0.8, 0.3, 1);
+    }
+  }
+
+  &__illustration {
+    width: 92px;
+    height: 92px;
+    margin: 26px auto 0;
+    border-radius: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background: var(--oc, var(--accent));
+    box-shadow: 0 14px 44px -10px var(--oc, var(--accent));
+  }
+
+  &__title {
+    margin-top: 18px;
+    font-size: 19px;
+    font-weight: 800;
+  }
+
+  &__text {
+    margin: 10px auto 0;
+    max-width: 280px;
+    min-height: 60px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--dim);
+  }
+
+  &__dots {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--switch-off);
+    cursor: pointer;
+    transition:
+      width 0.25s,
+      background 0.25s;
+
+    &--active {
+      width: 18px;
+      background: var(--accent);
+    }
+  }
+
+  &__next {
+    margin-top: 20px;
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+    color: #fff;
+    font-size: 14px;
+    font-weight: 800;
+    font-family: inherit;
+    cursor: pointer;
+    transition:
+      transform 0.15s,
+      opacity 0.2s;
+
+    &:hover {
+      opacity: 0.92;
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+}

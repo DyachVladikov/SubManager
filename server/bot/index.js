@@ -121,9 +121,23 @@ bot.command('login', sendLoginLink)
 bot.command('start', async (ctx) => {
   const payload = ctx.match?.trim()
   if (!payload) {
-    await ctx.reply(
-      'Привет! Я бот SubManager.\n\nЧтобы привязать Telegram к аккаунту, открой SubManager → Профиль → «Привязать Telegram» и перейди по ссылке.\n\nВойти в приложение без пароля — команда /login.',
-    )
+    const text = [
+      '👋 Привет! Это SubManager — все твои подписки в одном месте.',
+      '',
+      'Что он умеет:',
+      '• 💳 считает, сколько уходит на подписки в месяц и в год;',
+      '• ⏰ напоминает здесь о предстоящих списаниях и просрочках;',
+      '• 💸 делит оплату с друзьями: каждый видит свою долю, а я напомню о переводе;',
+      '• 📅 показывает календарь списаний и аналитику по категориям;',
+      '📱 устанавливается на экран «Домой» и работает даже без интернета.',
+      '',
+      'Войти в приложение без пароля — команда /login.',
+    ].join('\n')
+    await ctx.reply(text, {
+      reply_markup: appUrl
+        ? { inline_keyboard: [[{ text: 'Открыть SubManager', web_app: { url: appUrl } }]] }
+        : undefined,
+    })
     return
   }
   if (payload === 'login') {

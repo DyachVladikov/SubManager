@@ -67,7 +67,35 @@ function groupBy(rows, key) {
   return map
 }
 
-async function send(chatId, text, buttons) {
+async function forgetPrevious(chatId, kind) {
+  try {
+    const res = await fetchRetry(
+      `${supabaseUrl}/rest/v1/bot_messages?chat_id=eq.${chatId}&kind=eq.${kind}&select=message_id`,
+      { headers: supabaseHeaders },
+    )
+    if (!res.ok) return
+    const rows = await res.json()
+    const prevId = rows[0]?.message_id
+    if (!prevId) return
+    await fetch(`https://api.telegram.org/bot${token}/deleteMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, message_id: prevId }),
+    })
+  } catch {}
+}
+
+async function remember(chatId, kind, messageId) {
+  try {
+    await fetchRetry(`${supabaseUrl}/rest/v1/bot_messages`, {
+      method: 'POST',
+      headers: { ...supabaseHeaders, Prefer: 'resolution=merge-duplicates' },
+      body: JSON.stringify({ chat_id: chatId, kind, message_id: messageId }),
+    })
+  } catch {}
+}
+
+async function send(chatId, text, buttons, kind) {
   if (dry) {
     const labels = buttons?.length ? `\nкнопки: ${buttons.map((b) => `[${b.text}]`).join(' ')}` : ''
     console.log(`--- → чат ${chatId}\n${text}${labels}\n`)
@@ -82,7 +110,16 @@ async function send(chatId, text, buttons) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   })
-  if (!res.ok) console.error(`sendMessage в чат ${chatId}: ${res.status} ${await res.text()}`)
+  if (!res.ok) {
+    console.error(`sendMessage в чат ${chatId}: ${res.status} ${await res.text()}`)
+    return
+  }
+  if (!kind) return
+  const data = await res.json().catch(() => null)
+  const messageId = data?.result?.message_id
+  if (!messageId) return
+  await forgetPrevious(chatId, kind)
+  await remember(chatId, kind, messageId)
 }
 
 const today = new Date().toLocaleDateString('sv-SE')
@@ -112,7 +149,7 @@ for (const [chatId, rows] of paymentsByUser) {
     lines.push(`• ${r.title} — ${formatAmount(r.amount, currencyOf(chatId))} (${when})`)
   }
   if (!lines.length) continue
-  await send(chatId, `⏰ Ближайшие списания:\n\n${lines.join('\n')}`)
+  await send(chatId, `⏰ Ближайшие списания:\n\n${lines.join('\n')}`, undefined, 'payments')
   paymentChats++
 }
 
@@ -136,6 +173,8 @@ for (const [chatId, rows] of overdueByUser) {
   await send(
     chatId,
     `⚠️ Просроченные подписки:\n\n${lines.join('\n')}\n\nПодтверди оплату в приложении — дата следующего списания пересчитается автоматически. Если подписка отменена — удали её.`,
+    undefined,
+    'overdue',
   )
   overdueChats++
 }
@@ -158,6 +197,7 @@ for (const [chatId, rows] of debtorDms) {
     chatId,
     `💸 Напоминание по split\n\nТвои доли в подписках:\n\n${lines.join('\n')}\n\nКак переведёшь — жми кнопку под списком, владельцу прилетит уведомление.`,
     buttons,
+    'splits',
   )
   debtorChats++
 }
@@ -171,6 +211,8 @@ if (new Date().getDay() === 1) {
     await send(
       chatId,
       `💸 Сводка по split за неделю.\n\nТебе ещё не вернули:\n\n${lines.join('\n')}\n\nДрузьям уже улетают напоминания с кнопкой «Я перевел(а)».`,
+      undefined,
+      'digest',
     )
     digestChats++
   }

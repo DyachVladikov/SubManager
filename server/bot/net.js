@@ -3,16 +3,7 @@ import { lookup as dnsLookup } from "node:dns";
 import { Agent as HttpsAgent } from "node:https";
 import { setGlobalDispatcher, Agent, ProxyAgent } from "undici";
 
-const pinnedHosts = {
-  "api.telegram.org": "149.154.167.220",
-};
-
-const supabaseUrl = process.env.SUPABASE_URL;
-if (supabaseUrl) {
-  try {
-    pinnedHosts[new URL(supabaseUrl).hostname] = "8.6.112.6";
-  } catch {}
-}
+const pinnedHosts = {};
 
 function lookup(hostname, options, callback) {
   const pinned = pinnedHosts[hostname];
@@ -49,4 +40,3 @@ export async function fetchRetry(url, options, attempts = 6) {
   }
   throw lastError;
 }
-console.log("ds");

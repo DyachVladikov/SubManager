@@ -270,11 +270,11 @@ app.listen(port, () => {
   console.log(`Webhook server listening on port ${port}`)
   
   // Set up webhook if RENDER_EXTERNAL_URL is available
-  const webhookUrl = process.env.RENDER_EXTERNAL_URL 
-    ? `https://${process.env.RENDER_EXTERNAL_URL}/webhook` 
-    : null
-  
-  if (webhookUrl) {
+  const renderUrl = process.env.RENDER_EXTERNAL_URL
+  if (renderUrl) {
+    // Remove https:// if it exists, then add it back properly
+    const cleanUrl = renderUrl.replace(/^https?:\/\//, '')
+    const webhookUrl = `https://${cleanUrl}/webhook`
     console.log('Setting up webhook:', webhookUrl)
     bot.api.setWebhook(webhookUrl)
       .then(() => console.log('Webhook set successfully'))

@@ -15,6 +15,7 @@ import { SubscriptionsGrid } from '@/widgets/SubscriptionsGrid'
 import { TabBar, type TabKey } from '@/widgets/TabBar'
 import { SubscriptionDetail } from '@/widgets/SubscriptionDetail'
 import { AddSubscriptionSheet } from '@/widgets/AddSubscriptionSheet'
+import { CalendarModal } from '@/widgets/CalendarModal'
 import './DashboardPage.scss'
 
 interface DashboardPageProps {
@@ -27,6 +28,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
   const [selectedSub, setSelectedSub] = useState<string | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [calendarOpen, setCalendarOpen] = useState(false)
   const { toast, showToast } = useToast()
   const { removingIds, removeSubscription } = useRemoveSubscription({
     onDeleted: () => showToast('delete'),
@@ -72,7 +74,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
   }
 
   const selected = subscriptions.find((s) => s.id === selectedSub)
-  useBodyScrollLock(sheetOpen || selectedSub !== null)
+  useBodyScrollLock(sheetOpen || selectedSub !== null || calendarOpen)
   const editingRaw = dbSubscriptions.find((s) => s.id === editingId)
   const editing = editingRaw
     ? {
@@ -100,7 +102,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
     <div className="dashboard-page">
       <div className="dashboard-page__glow"></div>
 
-      <DashboardHeader onBrandClick={() => onNavigate('profile')} />
+      <DashboardHeader onBrandClick={() => onNavigate('profile')} onCalendarClick={() => setCalendarOpen(true)} />
       {subsError !== undefined && (
         <div className="dashboard-page__error">
           Не удалось загрузить подписки: {String((subsError as { message?: string })?.message ?? JSON.stringify(subsError))}
@@ -132,6 +134,17 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
 
       {sheetOpen && (
         <AddSubscriptionSheet onClose={closeSheet} onSuccess={() => showToast('success')} editing={editing} />
+      )}
+
+      {calendarOpen && (
+        <CalendarModal
+          subscriptions={dbSubscriptions}
+          onClose={() => setCalendarOpen(false)}
+          onOpenSubscription={(id) => {
+            setCalendarOpen(false)
+            openDetail(id)
+          }}
+        />
       )}
 
       {toast && <Toast type={toast} />}

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { LuBell, LuLogOut } from 'react-icons/lu'
+import { LuBell, LuCalendarDays, LuLogOut } from 'react-icons/lu'
 import { useAuth } from '@/features/auth'
 import { useGetProfileQuery } from '@/entities/profile/api/profileApi'
 import { displayName } from '@/entities/profile/lib/displayName'
@@ -27,9 +27,10 @@ function greeting() {
 
 interface DashboardHeaderProps {
   onBrandClick?: () => void
+  onCalendarClick?: () => void
 }
 
-export function DashboardHeader({ onBrandClick }: DashboardHeaderProps) {
+export function DashboardHeader({ onBrandClick, onCalendarClick }: DashboardHeaderProps) {
   const { session, signOut } = useAuth()
   const { data: profile } = useGetProfileQuery()
   const { data: subscriptions } = useGetSubscriptionsQuery()
@@ -71,6 +72,11 @@ export function DashboardHeader({ onBrandClick }: DashboardHeaderProps) {
         </div>
       </div>
       <div className="dashboard-header__actions">
+        {onCalendarClick && (
+          <div className="dashboard-header__icon-btn" onClick={onCalendarClick} title="Календарь списаний">
+            <LuCalendarDays size={18} />
+          </div>
+        )}
         <div className="dashboard-header__icon-btn" onClick={() => setOpen((value) => !value)} title="Уведомления">
           <LuBell size={18} />
           {hasHot && <span className="dashboard-header__dot"></span>}

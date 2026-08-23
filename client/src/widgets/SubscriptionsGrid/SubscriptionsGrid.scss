@@ -77,9 +77,6 @@
     padding: 0 20px 12px;
 
     @include tablet-above {
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
       padding: 0 0 14px;
     }
   }
@@ -106,7 +103,8 @@
     }
 
     @include tablet-above {
-      min-width: 0;
+      flex-wrap: wrap;
+      overflow: visible;
     }
   }
 

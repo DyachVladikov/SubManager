@@ -1,16 +1,14 @@
 {
-  "name": "submanager-server",
-  "private": true,
-  "version": "0.1.0",
+  "name": "submanager-bot",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "bot": "node bot/index.js",
-    "remind": "node bot/remind.js",
-    "news": "node bot/news.js"
+    "start": "node bot/index.js"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
     "grammy": "^1.30.0",
-    "undici": "^8.10.0"
+    "undici": "^8.10.0",
+    "express": "^4.18.2"
   }
 }

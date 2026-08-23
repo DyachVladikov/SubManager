@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import express from 'express'
 import { telegramHttpsAgent, fetchRetry } from './net.js'
 import { Bot } from 'grammy'
 
@@ -7,12 +8,20 @@ const supabaseUrl = process.env.SUPABASE_URL
 const supabaseKey = process.env.SUPABASE_KEY
 const appUrl = process.env.APP_URL
 
+console.log('Environment variables:')
+console.log('BOT_TOKEN:', token ? 'SET (hidden)' : 'MISSING')
+console.log('SUPABASE_URL:', supabaseUrl)
+console.log('SUPABASE_KEY:', supabaseKey ? 'SET (hidden)' : 'MISSING')
+console.log('APP_URL:', appUrl)
+
 if (!token || !supabaseUrl || !supabaseKey) {
   console.error('Заполни BOT_TOKEN, SUPABASE_URL и SUPABASE_KEY в server/.env')
   process.exit(1)
 }
 
+console.log('Initializing bot...')
 const bot = new Bot(token, { client: { baseFetchConfig: { agent: telegramHttpsAgent } } })
+console.log('Bot initialized successfully')
 
 async function consumeLinkToken({ linkToken, telegramId, telegramUsername }) {
   const res = await fetchRetry(`${supabaseUrl}/rest/v1/rpc/consume_link_token`, {
@@ -87,7 +96,7 @@ async function sendLoginLink(ctx) {
     const email = emailRes.ok ? await emailRes.json() : null
     if (!email) {
       await ctx.reply(
-        'Этот Telegram не привязан ни к одному аккаунту SubManager.\n\nСначала привяжи: приложение → Профиль → «Привязать Telegram».',
+        'Этот Telegram не привязан ни к одному аккаунту SubManager.\\n\\nСначала привяжи: приложение → Профиль → «Привязать Telegram».',
       )
       return
     }
@@ -116,9 +125,17 @@ async function sendLoginLink(ctx) {
   }
 }
 
-bot.command('login', sendLoginLink)
+bot.command('login', async (ctx) => {
+  console.log('Command /login received from:', ctx.from?.id, ctx.from?.username)
+  try {
+    await sendLoginLink(ctx)
+  } catch (err) {
+    console.error('Error in /login:', err)
+  }
+})
 
 bot.command('start', async (ctx) => {
+  console.log('Command /start received from:', ctx.from?.id, ctx.from?.username)
   const payload = ctx.match?.trim()
   if (!payload) {
     const text = [
@@ -133,11 +150,16 @@ bot.command('start', async (ctx) => {
       '',
       'Войти в приложение без пароля — команда /login.',
     ].join('\n')
-    await ctx.reply(text, {
-      reply_markup: appUrl
-        ? { inline_keyboard: [[{ text: 'Открыть SubManager', web_app: { url: appUrl } }]] }
-        : undefined,
-    })
+    try {
+      await ctx.reply(text, {
+        reply_markup: appUrl
+          ? { inline_keyboard: [[{ text: 'Открыть SubManager', web_app: { url: appUrl } }]] }
+          : undefined,
+      })
+      console.log('Start message sent successfully')
+    } catch (err) {
+      console.error('Error sending start message:', err)
+    }
     return
   }
   if (payload === 'login') {
@@ -166,6 +188,7 @@ bot.command('start', async (ctx) => {
 })
 
 bot.callbackQuery(/^pay:(.+)$/, async (ctx) => {
+  console.log('Callback query pay received from:', ctx.from?.id, ctx.from?.username)
   const splitId = ctx.match[1]
   try {
     const res = await fetchRetry(`${supabaseUrl}/rest/v1/rpc/pay_split_by_debtor`, {
@@ -213,7 +236,48 @@ bot.callbackQuery(/^pay:(.+)$/, async (ctx) => {
   }
 })
 
-bot.catch((err) => console.error(err))
+bot.catch((err) => {
+  console.error('Bot error:', err)
+  if (err.error_code === 403) {
+    console.error('Bot was blocked by user or not started')
+  } else if (err.error_code === 401) {
+    console.error('Invalid bot token')
+  } else if (err.error_code === 429) {
+    console.error('Telegram API rate limit exceeded')
+  }
+})
 
-bot.start()
-console.log('SubManager bot запущен (long polling)')
+// Express app for webhook
+const app = express()
+app.use(express.json())
+
+app.post('/webhook', async (req, res) => {
+  try {
+    await bot.handleUpdate(req.body)
+    res.status(200).json({ ok: true })
+  } catch (err) {
+    console.error('Error handling update:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
+app.get('/', (req, res) => {
+  res.json({ status: 'SubManager bot is running' })
+})
+
+const port = process.env.PORT || 3000
+app.listen(port, () => {
+  console.log(`Webhook server listening on port ${port}`)
+  
+  // Set up webhook if RENDER_EXTERNAL_URL is available
+  const webhookUrl = process.env.RENDER_EXTERNAL_URL 
+    ? `https://${process.env.RENDER_EXTERNAL_URL}/webhook` 
+    : null
+  
+  if (webhookUrl) {
+    console.log('Setting up webhook:', webhookUrl)
+    bot.api.setWebhook(webhookUrl)
+      .then(() => console.log('Webhook set successfully'))
+      .catch(err => console.error('Failed to set webhook:', err))
+  }
+})

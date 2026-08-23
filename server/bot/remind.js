@@ -1,10 +1,17 @@
 import 'dotenv/config'
 import { fetchRetry } from './net.js'
 
+console.log('=== REMIND SCRIPT START ===')
+
 const token = process.env.BOT_TOKEN
 const supabaseUrl = process.env.SUPABASE_URL
 const supabaseKey = process.env.SUPABASE_KEY
 const dry = process.argv.includes('--dry')
+
+console.log('BOT_TOKEN:', token ? 'SET (hidden)' : 'MISSING')
+console.log('SUPABASE_URL:', supabaseUrl)
+console.log('SUPABASE_KEY:', supabaseKey ? 'SET (hidden)' : 'MISSING')
+console.log('DRY RUN:', dry)
 
 if (!token || !supabaseUrl || !supabaseKey) {
   console.error('Заполни BOT_TOKEN, SUPABASE_URL и SUPABASE_KEY в server/.env')
@@ -16,6 +23,11 @@ const supabaseHeaders = {
   Authorization: `Bearer ${supabaseKey}`,
   'Content-Type': 'application/json',
 }
+
+console.log('Environment variables:')
+console.log('BOT_TOKEN:', token ? 'SET (hidden)' : 'MISSING')
+console.log('SUPABASE_URL:', supabaseUrl)
+console.log('SUPABASE_KEY:', supabaseKey ? 'SET (hidden)' : 'MISSING')
 
 async function rpc(name) {
   const res = await fetchRetry(`${supabaseUrl}/rest/v1/rpc/${name}`, {
@@ -64,6 +76,7 @@ function groupBy(rows, key) {
     if (!map.has(id)) map.set(id, [])
     map.get(id).push(row)
   }
+  console.log(`groupBy by ${key}:`, map.size, 'unique keys')
   return map
 }
 
@@ -96,6 +109,7 @@ async function remember(chatId, kind, messageId) {
 }
 
 async function send(chatId, text, buttons, kind) {
+  console.log(`Отправка сообщения в чат ${chatId}:`, text.substring(0, 100))
   if (dry) {
     const labels = buttons?.length ? `\nкнопки: ${buttons.map((b) => `[${b.text}]`).join(' ')}` : ''
     console.log(`--- → чат ${chatId}\n${text}${labels}\n`)
@@ -110,6 +124,7 @@ async function send(chatId, text, buttons, kind) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   })
+  console.log(`Ответ от Telegram API: ${res.status} ${res.ok ? 'OK' : 'ERROR'}`)
   if (!res.ok) {
     console.error(`sendMessage в чат ${chatId}: ${res.status} ${await res.text()}`)
     return
@@ -130,16 +145,21 @@ const profilesRes = await fetchRetry(
   `${supabaseUrl}/rest/v1/profiles?select=telegram_id,currency,notify_charge_day,notify_charge_before,notify_splits,notify_weekly_digest&telegram_id=not.is.null`,
   { headers: supabaseHeaders },
 )
+console.log('Profiles response status:', profilesRes.status)
 if (!profilesRes.ok) throw new Error(`profiles: ${profilesRes.status} ${await profilesRes.text()}`)
 const profileRows = await profilesRes.json()
+console.log('Profiles count:', profileRows.length)
 const flagsByTg = new Map(profileRows.map((p) => [Number(p.telegram_id), p]))
 const flag = (tg, name) => flagsByTg.get(Number(tg))?.[name] !== false
 const currencyOf = (tg) => flagsByTg.get(Number(tg))?.currency ?? 'RUB'
 
 const payments = await rpc('get_payment_reminders')
+console.log('Payments count:', payments.length)
 const paymentsByUser = groupBy(payments, 'telegram_id')
+console.log('Payments by user:', paymentsByUser.size, 'users')
 let paymentChats = 0
 for (const [chatId, rows] of paymentsByUser) {
+  console.log(`Processing payments for chat ${chatId}, ${rows.length} rows`)
   const lines = []
   for (const r of rows) {
     const left = r.days_left ?? (r.next_payment_date === today ? 0 : 1)
@@ -154,6 +174,7 @@ for (const [chatId, rows] of paymentsByUser) {
 }
 
 const overdue = await rpc('get_overdue_subscriptions')
+console.log('Overdue count:', overdue.length)
 const overdueByUser = groupBy(overdue, 'telegram_id')
 let overdueChats = 0
 for (const [chatId, rows] of overdueByUser) {
@@ -180,6 +201,7 @@ for (const [chatId, rows] of overdueByUser) {
 }
 
 const splits = await rpc('get_pending_splits')
+console.log('Splits count:', splits.length)
 
 const debtorDms = groupBy(splits, 'debtor_telegram_id')
 let debtorChats = 0
@@ -221,3 +243,4 @@ if (new Date().getDay() === 1) {
 console.log(
   `Готово: списания → ${paymentChats} чатов, просрочка → ${overdueChats} чатов, друзьям → ${debtorChats} чатов, сводки владельцам → ${digestChats}${dry ? ' (dry-run, ничего не отправлено)' : ''}`,
 )
+console.log('=== REMIND SCRIPT END ===')

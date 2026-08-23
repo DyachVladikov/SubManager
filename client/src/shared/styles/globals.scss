@@ -144,7 +144,7 @@ fieldset {
   }
 
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--switch-off);
     border-radius: 99px;
   }
 
@@ -158,6 +158,12 @@ fieldset {
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+    scrollbar-color: var(--switch-off) transparent;
   }
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.22s;
+  animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1);
 }

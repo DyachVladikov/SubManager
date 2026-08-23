@@ -7,7 +7,7 @@ interface CacheRow {
 
 export interface OutboxEntry {
   id?: number
-  table: 'subscriptions' | 'splits'
+  table: 'subscriptions' | 'splits' | 'payments'
   op: 'insert' | 'update' | 'delete'
   payload: Record<string, unknown>
   createdAt: number

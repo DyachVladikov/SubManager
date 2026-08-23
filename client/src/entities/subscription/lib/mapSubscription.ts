@@ -53,7 +53,6 @@ export function mapSubscription(dbSub: DbSubscription, categoryName?: string): M
     period: dbSub.period ?? '1 month',
     overdueDays: calculateOverdueDays(dbSub.next_payment_date),
     remindBeforeDays: dbSub.remind_before_days ?? 1,
-    history: [],
     split: undefined,
     dark: false,
   }

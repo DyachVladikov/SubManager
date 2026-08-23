@@ -3,10 +3,18 @@ import type { Subscription } from '@/mocks/subscriptions'
 import SubscriptionLogo from '@/entities/subscription/ui/SubscriptionLogo'
 import { useGetSplitsBySubscriptionQuery } from '@/entities/split/api/splitApi'
 import { useUpdateSubscriptionMutation } from '@/entities/subscription/api/subscriptionApi'
+import { useGetPaymentsQuery, useAddPaymentMutation } from '@/entities/payment/api/paymentApi'
+import { useAuth } from '@/features/auth'
 import { formatNextDate } from '@/entities/subscription/lib/mapSubscription'
 import { addMonths, periodLabel, periodToMonths, toDateString } from '@/entities/subscription/lib/period'
 import { useMoney } from '@/shared/lib/useCurrency'
 import './SubscriptionDetail.scss'
+
+function formatPaidAt(date: string): string {
+  const parsed = new Date(`${date}T00:00:00`)
+  const base = formatNextDate(date)
+  return parsed.getFullYear() === new Date().getFullYear() ? base : `${base} ${parsed.getFullYear()}`
+}
 
 interface SubscriptionDetailProps {
   subscription: Subscription
@@ -18,7 +26,10 @@ interface SubscriptionDetailProps {
 
 export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEdit }: SubscriptionDetailProps) {
   const { symbol: currency, convert } = useMoney()
+  const { session } = useAuth()
   const { data: splits = [] } = useGetSplitsBySubscriptionQuery(subscription.id)
+  const { data: payments = [] } = useGetPaymentsQuery(subscription.id)
+  const [addPayment] = useAddPaymentMutation()
   const [updateSubscription, { isLoading: isConfirming }] = useUpdateSubscriptionMutation()
   const overdueDays = subscription.overdueDays ?? 0
 
@@ -29,6 +40,10 @@ export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEd
   const nextPaymentPreview = addMonths(payBase, periodToMonths(subscription.period))
 
   const handleConfirmPayment = () => {
+    const userId = session?.user.id
+    if (userId) {
+      void addPayment({ user_id: userId, subscription_id: subscription.id, amount: subscription.price })
+    }
     void updateSubscription({ id: subscription.id, next_payment_date: toDateString(nextPaymentPreview) })
   }
   const remindDays = subscription.remindBeforeDays ?? 1
@@ -232,17 +247,21 @@ export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEd
           <i></i>История платежей
         </div>
         <div style={{ marginTop: '6px' }}>
-          {subscription.history.map((h) => (
-            <div className="subscription-detail__history-row" key={h}>
-              <span className="subscription-detail__history-date">{h}</span>
-              <b>
-                <svg width="11" height="11" viewBox="0 0 24 24">
-                  <path d="M20 6 9 17l-5-5" />
-                </svg>
-                {convert(subscription.price).toLocaleString('ru-RU', { useGrouping: false })} {currency}
-              </b>
-            </div>
-          ))}
+          {payments.length === 0 ? (
+            <div className="subscription-detail__history-empty">Пока нет подтверждённых платежей</div>
+          ) : (
+            payments.map((payment) => (
+              <div className="subscription-detail__history-row" key={payment.id}>
+                <span className="subscription-detail__history-date">{formatPaidAt(payment.paid_at)}</span>
+                <b>
+                  <svg width="11" height="11" viewBox="0 0 24 24">
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                  {convert(payment.amount).toLocaleString('ru-RU', { useGrouping: false })} {currency}
+                </b>
+              </div>
+            ))
+          )}
         </div>
       </div>
       <div className="subscription-detail__card">

@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { useAuth, useTmaAuth } from '@/features/auth'
 import { AuthPage } from '@/features/auth'
 import { useTheme } from '@/shared/lib/useTheme'
@@ -16,6 +17,18 @@ function App() {
   const tmaAuth = useTmaAuth()
   const [tab, setTab] = useState<TabKey>('home')
   useTheme(session !== null)
+
+  const navigate = (next: TabKey) => {
+    if (next === tab) return
+    const doc = document as Document & { startViewTransition?: (update: () => void) => void }
+    if (!doc.startViewTransition) {
+      setTab(next)
+      return
+    }
+    doc.startViewTransition(() => {
+      flushSync(() => setTab(next))
+    })
+  }
 
   useEffect(() => {
     const root = document.documentElement
@@ -36,7 +49,7 @@ function App() {
   if (tab === 'analytics') {
     return (
       <Suspense fallback={<Loader fullscreen />}>
-        <AnalyticsPage onNavigate={setTab} />
+        <AnalyticsPage onNavigate={navigate} />
       </Suspense>
     )
   }
@@ -44,7 +57,7 @@ function App() {
   if (tab === 'friends') {
     return (
       <Suspense fallback={<Loader fullscreen />}>
-        <FriendsPage onNavigate={setTab} />
+        <FriendsPage onNavigate={navigate} />
       </Suspense>
     )
   }
@@ -52,12 +65,12 @@ function App() {
   if (tab === 'profile') {
     return (
       <Suspense fallback={<Loader fullscreen />}>
-        <ProfilePage onNavigate={setTab} />
+        <ProfilePage onNavigate={navigate} />
       </Suspense>
     )
   }
 
-  return <DashboardPage onNavigate={setTab} />
+  return <DashboardPage onNavigate={navigate} />
 }
 
 export default App

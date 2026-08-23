@@ -27,10 +27,25 @@ async function rpc(name) {
   return res.json()
 }
 
+const currencySymbols = { RUB: '₽', USD: '$', EUR: '€' }
+let fxRates = { RUB: 1, USD: 1 / 80, EUR: 1 / 93 }
+
+async function loadFxRates() {
+  try {
+    const res = await fetchRetry('https://open.er-api.com/v6/latest/RUB')
+    if (!res.ok) return
+    const data = await res.json()
+    if (data?.rates?.USD && data?.rates?.EUR) {
+      fxRates = { RUB: 1, USD: data.rates.USD, EUR: data.rates.EUR }
+    }
+  } catch {}
+}
+
 function formatAmount(amount, currency) {
-  const n = Number(amount)
-  const value = Number.isInteger(n) ? String(n) : n.toFixed(2)
-  return `${value} ${currency === 'RUB' ? '₽' : currency}`
+  const code = currencySymbols[currency] ? currency : 'RUB'
+  const converted = Number(amount) * (fxRates[code] ?? 1)
+  const value = code === 'RUB' ? String(Math.round(converted)) : converted.toFixed(2)
+  return `${value} ${currencySymbols[code]}`
 }
 
 function pluralDays(n) {
@@ -72,14 +87,17 @@ async function send(chatId, text, buttons) {
 
 const today = new Date().toLocaleDateString('sv-SE')
 
+await loadFxRates()
+
 const profilesRes = await fetchRetry(
-  `${supabaseUrl}/rest/v1/profiles?select=telegram_id,notify_charge_day,notify_charge_before,notify_splits,notify_weekly_digest&telegram_id=not.is.null`,
+  `${supabaseUrl}/rest/v1/profiles?select=telegram_id,currency,notify_charge_day,notify_charge_before,notify_splits,notify_weekly_digest&telegram_id=not.is.null`,
   { headers: supabaseHeaders },
 )
 if (!profilesRes.ok) throw new Error(`profiles: ${profilesRes.status} ${await profilesRes.text()}`)
 const profileRows = await profilesRes.json()
 const flagsByTg = new Map(profileRows.map((p) => [Number(p.telegram_id), p]))
 const flag = (tg, name) => flagsByTg.get(Number(tg))?.[name] !== false
+const currencyOf = (tg) => flagsByTg.get(Number(tg))?.currency ?? 'RUB'
 
 const payments = await rpc('get_payment_reminders')
 const paymentsByUser = groupBy(payments, 'telegram_id')
@@ -91,7 +109,7 @@ for (const [chatId, rows] of paymentsByUser) {
     if (left === 0 && !flag(chatId, 'notify_charge_day')) continue
     if (left > 0 && !flag(chatId, 'notify_charge_before')) continue
     const when = left === 0 ? 'сегодня' : left === 1 ? 'завтра' : `через ${left} ${pluralDays(left)}`
-    lines.push(`• ${r.title} — ${formatAmount(r.amount, r.currency)} (${when})`)
+    lines.push(`• ${r.title} — ${formatAmount(r.amount, currencyOf(chatId))} (${when})`)
   }
   if (!lines.length) continue
   await send(chatId, `⏰ Ближайшие списания:\n\n${lines.join('\n')}`)
@@ -113,7 +131,7 @@ for (const [chatId, rows] of overdueByUser) {
   }
   if (!flag(chatId, 'notify_charge_day')) continue
   const lines = rows.map(
-    (r) => `• ${r.title} — ${formatAmount(r.amount, r.currency)} (не оплачено ${r.days_overdue} ${pluralDays(r.days_overdue)})`,
+    (r) => `• ${r.title} — ${formatAmount(r.amount, currencyOf(chatId))} (не оплачено ${r.days_overdue} ${pluralDays(r.days_overdue)})`,
   )
   await send(
     chatId,
@@ -130,7 +148,7 @@ for (const [chatId, rows] of debtorDms) {
   if (!flag(chatId, 'notify_splits')) continue
   const lines = rows.map((r) => {
     const owner = r.owner_telegram_username ? `@${r.owner_telegram_username}` : 'владельцу SubManager'
-    return `• ${r.subscription_title} — ${formatAmount(r.amount, r.currency)} (${owner})`
+    return `• ${r.subscription_title} — ${formatAmount(r.amount, currencyOf(chatId))} (${owner})`
   })
   const buttons = rows.map((r) => ({
     text: `Я перевел(а) · ${r.subscription_title}`,
@@ -149,7 +167,7 @@ if (new Date().getDay() === 1) {
   const ownerDigests = groupBy(splits, 'owner_telegram_id')
   for (const [chatId, rows] of ownerDigests) {
     if (!flag(chatId, 'notify_weekly_digest')) continue
-    const lines = rows.map((r) => `• @${r.debtor_username} — ${formatAmount(r.amount, r.currency)} (${r.subscription_title})`)
+    const lines = rows.map((r) => `• @${r.debtor_username} — ${formatAmount(r.amount, currencyOf(chatId))} (${r.subscription_title})`)
     await send(
       chatId,
       `💸 Сводка по split за неделю.\n\nТебе ещё не вернули:\n\n${lines.join('\n')}\n\nДрузьям уже улетают напоминания с кнопкой «Я перевел(а)».`,

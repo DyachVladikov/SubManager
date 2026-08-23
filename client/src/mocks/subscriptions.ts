@@ -12,7 +12,6 @@ export interface Subscription {
   period?: string | null
   overdueDays?: number
   remindBeforeDays?: number
-  history: string[]
   split?: Array<{ name: string; username: string; amount: number; paid: boolean }>
   dark?: boolean
 }
@@ -28,7 +27,6 @@ export const subscriptions: Subscription[] = [
     category: 'Видео',
     nextDate: '28 июля',
     daysLeft: 'через 4 дня',
-    history: ['28 июня', '28 мая', '28 апреля'],
     split: [
       { name: 'Костя', username: '@kostya', amount: 266, paid: false },
       { name: 'Егор', username: '@egor', amount: 266, paid: true },
@@ -43,7 +41,6 @@ export const subscriptions: Subscription[] = [
     category: 'Другое',
     nextDate: '25 июля',
     daysLeft: 'завтра',
-    history: ['25 июня', '25 мая', '25 апреля'],
     dark: true,
   },
   {
@@ -56,7 +53,6 @@ export const subscriptions: Subscription[] = [
     category: 'Нейросети',
     nextDate: '1 авг',
     daysLeft: 'через 8 дн',
-    history: ['1 июля', '1 июня', '1 мая'],
   },
   {
     id: 'spotify',
@@ -68,7 +64,6 @@ export const subscriptions: Subscription[] = [
     category: 'Музыка',
     nextDate: '3 авг',
     daysLeft: 'через 10 дн',
-    history: ['3 июля', '3 июня', '3 мая'],
     split: [
       { name: 'Даня', username: '@danya', amount: 90, paid: false },
       { name: 'Миша', username: '@misha', amount: 90, paid: true },
@@ -85,7 +80,6 @@ export const subscriptions: Subscription[] = [
     category: 'Облако',
     nextDate: '10 авг',
     daysLeft: 'через 17 дн',
-    history: ['10 июля', '10 июня', '10 мая'],
   },
   {
     id: 'youtube',
@@ -97,7 +91,6 @@ export const subscriptions: Subscription[] = [
     category: 'Видео',
     nextDate: '15 авг',
     daysLeft: 'через 22 дн',
-    history: ['15 июля', '15 июня', '15 мая'],
   },
   {
     id: 'kion',
@@ -108,7 +101,6 @@ export const subscriptions: Subscription[] = [
     category: 'Видео',
     nextDate: '20 авг',
     daysLeft: 'через 27 дн',
-    history: ['20 июля', '20 июня', '20 мая'],
   },
 ]
 

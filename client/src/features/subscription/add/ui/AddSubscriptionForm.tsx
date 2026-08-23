@@ -7,6 +7,7 @@ import { inferPeriod, periodLabel } from '@/entities/subscription/lib/period'
 import { FormField } from '@/shared/ui/FormField'
 import { Select } from '@/shared/ui/Select'
 import { supabase } from '@/shared/config/supabase'
+import { useMoney } from '@/shared/lib/useCurrency'
 import './AddSubscriptionForm.scss'
 
 const presetColors = ['#e50914', '#ff7a00', '#ffd34d', '#1db954', '#3a9bf0', '#a78bfa']
@@ -58,6 +59,7 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
   const [updateSubscription, { isLoading: isUpdating }] = useUpdateSubscriptionMutation()
   const { data: categories = [] } = useGetCategoriesQuery()
   const [createSplit] = useCreateSplitMutation()
+  const { symbol: currencySymbol, unconvert } = useMoney()
   const isLoading = isCreating || isUpdating
 
   const nameToCategoryId = categories.reduce<Record<string, string>>((acc, cat) => {
@@ -141,7 +143,7 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
     }
 
     try {
-      const splitAmountValue = splitMode === 'pct' ? Math.round((Number(price) * Number(splitAmount)) / 100) : Number(splitAmount)
+      const splitAmountValue = splitMode === 'pct' ? Math.round((Number(price) * Number(splitAmount)) / 100) : Math.round(unconvert(Number(splitAmount)))
 
       if (editingId) {
         await updateSubscription({
@@ -311,7 +313,7 @@ export function AddSubscriptionForm({ onClose, onSuccess, editingId, initialName
                   className={`add-form__unit ${splitMode === 'rub' ? 'add-form__unit--active' : ''}`}
                   onClick={() => setSplitMode('rub')}
                 >
-                  ₽
+                  {currencySymbol}
                 </span>
                 <span
                   className={`add-form__unit ${splitMode === 'pct' ? 'add-form__unit--active' : ''}`}

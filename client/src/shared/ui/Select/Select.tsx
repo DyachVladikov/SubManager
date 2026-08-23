@@ -43,7 +43,7 @@ export function Select({ options, value, onChange, placeholder = 'Выбери �
     return (
       <div className="select">
         <select className="select__native" value={value} onChange={(e) => onChange(e.target.value)}>
-          <option value="">{placeholder}</option>
+          {value === '' && <option value="">{placeholder}</option>}
           {options.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}

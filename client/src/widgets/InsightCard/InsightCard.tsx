@@ -128,7 +128,7 @@ export function InsightCard({ subscriptions, categoryNames, monthTotal }: Insigh
         text: 'Открой карточку подписки и нажми «Оплатить» — дата следующего списания пересчитается автоматически.',
       })
     }
-    return list
+    return [...list].sort(() => Math.random() - 0.5).slice(0, 3)
   }, [stats, subscriptions, monthTotal, currency, convert])
 
   if (insights.length === 0) return null

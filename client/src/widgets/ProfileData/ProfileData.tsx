@@ -1,27 +1,32 @@
-import { useMemo } from 'react'
+import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { baseApi } from '@/shared/api/baseApi'
 import { useGetSubscriptionsQuery, useGetCategoriesQuery } from '@/entities/subscription/api/subscriptionApi'
 import { downloadCsv } from '@/shared/lib/exportCsv'
+import { useBodyScrollLock } from '@/shared/lib/useBodyScrollLock'
+import { ConfirmModal } from '@/shared/ui/ConfirmModal'
 import './ProfileData.scss'
 
 interface ProfileDataProps {
   onNotify: () => void
 }
 
+const computeCacheSize = () => {
+  let total = 0
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)
+    if (key) total += key.length + (localStorage.getItem(key)?.length ?? 0)
+  }
+  return total < 1024 ? `${total} Б` : `${(total / 1024).toFixed(1).replace('.', ',')} КБ`
+}
+
 export function ProfileData({ onNotify }: ProfileDataProps) {
   const dispatch = useDispatch()
   const { data: subscriptions = [] } = useGetSubscriptionsQuery()
   const { data: categories = [] } = useGetCategoriesQuery()
-
-  const cacheSize = useMemo(() => {
-    let total = 0
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
-      if (key) total += key.length + (localStorage.getItem(key)?.length ?? 0)
-    }
-    return total < 1024 ? `${total} Б` : `${(total / 1024).toFixed(1).replace('.', ',')} КБ`
-  }, [])
+  const [clearConfirm, setClearConfirm] = useState(false)
+  const [cacheSize, setCacheSize] = useState(computeCacheSize)
+  useBodyScrollLock(clearConfirm)
 
   const handleExport = () => {
     const categoryById = categories.reduce<Record<string, string>>((acc, cat) => {
@@ -43,7 +48,15 @@ export function ProfileData({ onNotify }: ProfileDataProps) {
   }
 
   const handleClearCache = () => {
+    const removable: string[] = []
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (key && !key.startsWith('sb-')) removable.push(key)
+    }
+    removable.forEach((key) => localStorage.removeItem(key))
     dispatch(baseApi.util.resetApiState())
+    setCacheSize(computeCacheSize())
+    setClearConfirm(false)
     onNotify()
   }
 
@@ -69,7 +82,7 @@ export function ProfileData({ onNotify }: ProfileDataProps) {
           </svg>
         </span>
       </div>
-      <div className="profile-data__row" onClick={handleClearCache}>
+      <div className="profile-data__row" onClick={() => setClearConfirm(true)}>
         <div className="profile-data__name">
           <div className="profile-data__icon">
             <svg width="16" height="16" viewBox="0 0 24 24">
@@ -87,6 +100,16 @@ export function ProfileData({ onNotify }: ProfileDataProps) {
           </svg>
         </span>
       </div>
+
+      {clearConfirm && (
+        <ConfirmModal
+          title="Очистить кэш?"
+          text="Локальные данные на этом устройстве будут удалены и загружены заново. Подписки и аккаунт не пострадают."
+          confirmLabel="Очистить"
+          onConfirm={handleClearCache}
+          onCancel={() => setClearConfirm(false)}
+        />
+      )}
     </div>
   )
 }

@@ -33,7 +33,7 @@ export function TabBar({ active, onNavigate, onAdd }: TabBarProps) {
   )
 
   return (
-    <div className="tabbar rise" style={{ animationDelay: '0.36s' }}>
+    <div className="tabbar">
       <div className="tabbar__logo">
         Sub<b>Manager</b>
       </div>
@@ -43,7 +43,7 @@ export function TabBar({ active, onNavigate, onAdd }: TabBarProps) {
         <span className="tabbar__fab-label">Добавить</span>
       </div>
       {rightTabs.map(renderTab)}
-      <div className="tabbar__version">v0.1 · PWA</div>
+      <div className="tabbar__version">© 2026 SubManager</div>
     </div>
   )
 }

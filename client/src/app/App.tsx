@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth, useTmaAuth } from '@/features/auth'
 import { AuthPage } from '@/features/auth'
 import { useTheme } from '@/shared/lib/useTheme'
@@ -14,6 +14,14 @@ function App() {
   const tmaAuth = useTmaAuth()
   const [tab, setTab] = useState<TabKey>('home')
   useTheme(session !== null)
+
+  useEffect(() => {
+    const root = document.documentElement
+    const prevBehavior = root.style.scrollBehavior
+    root.style.scrollBehavior = 'auto'
+    window.scrollTo(0, 0)
+    root.style.scrollBehavior = prevBehavior
+  }, [tab])
 
   if (loading || tmaAuth === 'signing') {
     return (

@@ -88,6 +88,11 @@
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
+
+    @include tablet-above {
+      flex-wrap: nowrap;
+      flex-shrink: 0;
+    }
   }
 
   &__cats {
@@ -98,6 +103,10 @@
 
     &::-webkit-scrollbar {
       display: none;
+    }
+
+    @include tablet-above {
+      min-width: 0;
     }
   }
 

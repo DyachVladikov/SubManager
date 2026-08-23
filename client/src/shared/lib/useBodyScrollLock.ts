@@ -23,7 +23,11 @@ export function useBodyScrollLock(locked: boolean) {
       body.style.left = previous.left
       body.style.right = previous.right
       body.style.overflow = previous.overflow
+      const root = document.documentElement
+      const prevBehavior = root.style.scrollBehavior
+      root.style.scrollBehavior = 'auto'
       window.scrollTo(0, scrollY)
+      root.style.scrollBehavior = prevBehavior
     }
   }, [locked])
 }

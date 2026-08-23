@@ -66,7 +66,7 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
           Удалить аккаунт
         </button>
         <div className="profile-page__version rise" style={{ animationDelay: '0.34s' }}>
-          SubManager · v0.1 · PWA
+          © 2026 SubManager · Все права защищены
         </div>
       </div>
 

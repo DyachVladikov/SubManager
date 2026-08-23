@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from 'react'
+import { useCallback, useSyncExternalStore } from 'react'
 import { useGetProfileQuery } from '@/entities/profile/api/profileApi'
 
 const symbols: Record<string, string> = {
@@ -64,9 +64,13 @@ export function useMoney() {
   const currentRates = useSyncExternalStore(subscribe, getRates)
   const rate = currentRates[code] ?? 1
   const symbol = symbols[code] ?? '₽'
-  const convert = (amount: number) => {
-    const converted = amount * rate
-    return code === 'RUB' ? Math.round(converted) : Math.round(converted * 100) / 100
-  }
-  return { symbol, convert }
+  const convert = useCallback(
+    (amount: number) => {
+      const converted = amount * rate
+      return code === 'RUB' ? Math.round(converted) : Math.round(converted * 100) / 100
+    },
+    [rate, code]
+  )
+  const unconvert = useCallback((amount: number) => amount / rate, [rate])
+  return { symbol, convert, unconvert }
 }

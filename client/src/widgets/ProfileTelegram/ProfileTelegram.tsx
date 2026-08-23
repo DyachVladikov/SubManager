@@ -1,48 +1,61 @@
-import { useEffect, useState } from 'react'
-import { useGetProfileQuery, useUpdateProfileMutation } from '@/entities/profile/api/profileApi'
-import { supabase } from '@/shared/config/supabase'
-import './ProfileTelegram.scss'
+import { useEffect, useState } from "react";
+import {
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+} from "@/entities/profile/api/profileApi";
+import { supabase } from "@/shared/config/supabase";
+import "./ProfileTelegram.scss";
 
-const BOT_URL = 'https://t.me/app_sub_manager_bot'
+const BOT_URL = "https://t.me/app_sub_manager_bot";
 
 export function ProfileTelegram() {
-  const [waiting, setWaiting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [waiting, setWaiting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { data: profile } = useGetProfileQuery(undefined, {
     pollingInterval: waiting ? 3000 : 0,
-  })
-  const [updateProfile, { isLoading: unlinking }] = useUpdateProfileMutation()
+  });
+  const [updateProfile, { isLoading: unlinking }] = useUpdateProfileMutation();
 
-  const linked = Boolean(profile?.telegram_id)
+  const linked = Boolean(profile?.telegram_id);
 
   useEffect(() => {
-    if (linked) setWaiting(false)
-  }, [linked])
+    if (linked) setWaiting(false);
+  }, [linked]);
 
   const handleLink = async () => {
-    setError(null)
-    const { data: userData } = await supabase.auth.getUser()
-    if (!userData.user) return
-    const token = `link_${crypto.randomUUID().replaceAll('-', '').slice(0, 10)}`
-    const { error: insertError } = await supabase.from('link_tokens').insert({
+    setError(null);
+    const tgWindow = window.open("", "_blank");
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) {
+      tgWindow?.close();
+      return;
+    }
+    const token = `link_${crypto.randomUUID().replaceAll("-", "").slice(0, 10)}`;
+    const { error: insertError } = await supabase.from("link_tokens").insert({
       token,
       user_id: userData.user.id,
       expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
-    })
+    });
     if (insertError) {
-      setError('Не удалось создать ссылку. Попробуй ещё раз.')
-      return
+      tgWindow?.close();
+      setError("Не удалось создать ссылку. Попробуй ещё раз.");
+      return;
     }
-    setWaiting(true)
-    window.open(`${BOT_URL}?start=${token}`, '_blank')
-  }
+    setWaiting(true);
+    const url = `${BOT_URL}?start=${token}`;
+    if (tgWindow) {
+      tgWindow.location.href = url;
+    } else {
+      window.location.href = url;
+    }
+  };
 
   const handleUnlink = async () => {
-    await updateProfile({ telegram_id: null, telegram_username: null })
-  }
+    await updateProfile({ telegram_id: null, telegram_username: null });
+  };
 
   return (
-    <div className="profile-telegram rise" style={{ animationDelay: '0.14s' }}>
+    <div className="profile-telegram rise" style={{ animationDelay: "0.14s" }}>
       <div className="profile-telegram__label">
         <i></i>Telegram
       </div>
@@ -54,10 +67,16 @@ export function ProfileTelegram() {
             </svg>
           </div>
           <div className="profile-telegram__info">
-            <b>@{profile?.telegram_username ?? 'telegram'}</b>
-            <span>привязан · бот @app_sub_manager_bot · уведомления и split активны</span>
+            <b>@{profile?.telegram_username ?? "telegram"}</b>
+            <span>
+              привязан · бот @app_sub_manager_bot · уведомления и split активны
+            </span>
           </div>
-          <button className="profile-telegram__unlink" onClick={handleUnlink} disabled={unlinking}>
+          <button
+            className="profile-telegram__unlink"
+            onClick={handleUnlink}
+            disabled={unlinking}
+          >
             Отвязать
           </button>
         </div>
@@ -72,15 +91,22 @@ export function ProfileTelegram() {
             </div>
             <div className="profile-telegram__info">
               <b>Не привязан</b>
-              <span>Бот напомнит о списаниях и переводах друзей. Без Telegram split недоступен.</span>
+              <span>
+                Бот напомнит о списаниях и переводах друзей. Без Telegram split
+                недоступен.
+              </span>
             </div>
           </div>
           {waiting ? (
             <>
               <p className="profile-telegram__hint">
-                Открыл тебе бота — нажми в нём «Start». Ссылка живёт 15 минут, здесь всё обновится само.
+                Открыл тебе бота — нажми в нём «Start». Ссылка живёт 15 минут,
+                здесь всё обновится само.
               </p>
-              <button className="profile-telegram__button" onClick={() => setWaiting(false)}>
+              <button
+                className="profile-telegram__button"
+                onClick={() => setWaiting(false)}
+              >
                 Отмена
               </button>
             </>
@@ -97,5 +123,5 @@ export function ProfileTelegram() {
         </>
       )}
     </div>
-  )
+  );
 }

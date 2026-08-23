@@ -87,7 +87,6 @@ export function AddSubscriptionForm({
   const [createSplit] = useCreateSplitMutation();
   const { symbol: currencySymbol, unconvert } = useMoney();
   const isLoading = isCreating || isUpdating;
-  console.log("ds");
 
   const nameToCategoryId = categories.reduce<Record<string, string>>(
     (acc, cat) => {

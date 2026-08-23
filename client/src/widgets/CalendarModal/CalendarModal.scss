@@ -178,6 +178,10 @@
     }
   }
 
+  &__day-content {
+    animation: swap 0.28s cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+
   &__day-title {
     margin-top: 10px;
     font-size: 13px;
@@ -194,6 +198,7 @@
     background: var(--surface);
     border: 1px solid var(--border);
     cursor: pointer;
+    animation: subIn 0.32s cubic-bezier(0.2, 0.7, 0.3, 1) backwards;
     transition: border-color 0.15s;
 
     &:hover {

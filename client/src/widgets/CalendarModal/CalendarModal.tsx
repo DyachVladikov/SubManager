@@ -204,31 +204,38 @@ export function CalendarModal({ subscriptions, onClose, onOpenSubscription }: Ca
           Всего за месяц: <b>{Math.round(monthTotal).toLocaleString('ru-RU')} {currency}</b> · {charges.length}{' '}
           {pluralCharges(charges.length)}
         </div>
-        <div className="calendar-modal__day-title">
-          {selectedDay !== null ? `${selectedDay} ${MONTHS_GEN[month]}` : 'Выбери день'}
+        <div className="calendar-modal__day-content" key={`${monthKey}-${selectedDay ?? 'none'}`}>
+          <div className="calendar-modal__day-title">
+            {selectedDay !== null ? `${selectedDay} ${MONTHS_GEN[month]}` : 'Выбери день'}
+          </div>
+          {selectedDay === null ? (
+            <div className="calendar-modal__empty">Нажми на дату, чтобы увидеть списания</div>
+          ) : selectedCharges.length === 0 ? (
+            <div className="calendar-modal__empty">В этот день списаний нет</div>
+          ) : (
+            selectedCharges.map((sub, index) => (
+              <div
+                className="calendar-modal__charge"
+                key={sub.id}
+                style={{ animationDelay: `${index * 50}ms` }}
+                onClick={() => onOpenSubscription?.(sub.id)}
+              >
+                <SubscriptionLogo
+                  name={sub.title}
+                  color={sub.color_hex ?? 'var(--accent)'}
+                  className="calendar-modal__charge-logo"
+                />
+                <div className="calendar-modal__charge-info">
+                  <b>{sub.title}</b>
+                  <small>{periodLabel(sub.period)}</small>
+                </div>
+                <div className="calendar-modal__charge-amount">
+                  {convert(sub.amount).toLocaleString('ru-RU', { useGrouping: false })} {currency}
+                </div>
+              </div>
+            ))
+          )}
         </div>
-        {selectedDay === null ? (
-          <div className="calendar-modal__empty">Нажми на дату, чтобы увидеть списания</div>
-        ) : selectedCharges.length === 0 ? (
-          <div className="calendar-modal__empty">В этот день списаний нет</div>
-        ) : (
-          selectedCharges.map((sub) => (
-            <div className="calendar-modal__charge" key={sub.id} onClick={() => onOpenSubscription?.(sub.id)}>
-              <SubscriptionLogo
-                name={sub.title}
-                color={sub.color_hex ?? 'var(--accent)'}
-                className="calendar-modal__charge-logo"
-              />
-              <div className="calendar-modal__charge-info">
-                <b>{sub.title}</b>
-                <small>{periodLabel(sub.period)}</small>
-              </div>
-              <div className="calendar-modal__charge-amount">
-                {convert(sub.amount).toLocaleString('ru-RU', { useGrouping: false })} {currency}
-              </div>
-            </div>
-          ))
-        )}
       </div>
     </>
   )

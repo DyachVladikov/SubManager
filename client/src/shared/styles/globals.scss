@@ -10,10 +10,6 @@
 @forward '@a1rth/css-normalize';
 @forward './utils.scss';
 
-@use 'swiper/css/pagination';
-@use 'swiper/css/navigation';
-@use 'swiper/css';
-
 html {
   &.is-lock {
     overflow: hidden;
@@ -124,10 +120,6 @@ a {
 
 :focus-visible {
   @include focus-visible;
-}
-
-:has(.swiper) {
-  min-width: 0;
 }
 
 .container {

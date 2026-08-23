@@ -7,8 +7,8 @@
   background: var(--bg);
   position: relative;
   overflow: hidden;
-  border-left: 1px solid rgba(255, 255, 255, 0.04);
-  border-right: 1px solid rgba(255, 255, 255, 0.04);
+  border-left: 1px solid var(--row-border);
+  border-right: 1px solid var(--row-border);
   padding-bottom: calc(112px + env(safe-area-inset-bottom));
 
   @include tablet-above {

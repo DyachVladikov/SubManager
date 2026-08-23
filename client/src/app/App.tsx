@@ -1,14 +1,15 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { useAuth, useTmaAuth } from '@/features/auth'
 import { AuthPage } from '@/features/auth'
 import { useTheme } from '@/shared/lib/useTheme'
 import { Loader } from '@/shared/ui/Loader'
 import { DashboardPage } from '@/pages/DashboardPage'
-import { AnalyticsPage } from '@/pages/AnalyticsPage'
-import { FriendsPage } from '@/pages/FriendsPage'
-import { ProfilePage } from '@/pages/ProfilePage'
 import type { TabKey } from '@/widgets/TabBar'
 import './App.scss'
+
+const AnalyticsPage = lazy(() => import('@/pages/AnalyticsPage').then((module) => ({ default: module.AnalyticsPage })))
+const FriendsPage = lazy(() => import('@/pages/FriendsPage').then((module) => ({ default: module.FriendsPage })))
+const ProfilePage = lazy(() => import('@/pages/ProfilePage').then((module) => ({ default: module.ProfilePage })))
 
 function App() {
   const { session, loading } = useAuth()
@@ -33,15 +34,27 @@ function App() {
   }
 
   if (tab === 'analytics') {
-    return <AnalyticsPage onNavigate={setTab} />
+    return (
+      <Suspense fallback={<Loader fullscreen />}>
+        <AnalyticsPage onNavigate={setTab} />
+      </Suspense>
+    )
   }
 
   if (tab === 'friends') {
-    return <FriendsPage onNavigate={setTab} />
+    return (
+      <Suspense fallback={<Loader fullscreen />}>
+        <FriendsPage onNavigate={setTab} />
+      </Suspense>
+    )
   }
 
   if (tab === 'profile') {
-    return <ProfilePage onNavigate={setTab} />
+    return (
+      <Suspense fallback={<Loader fullscreen />}>
+        <ProfilePage onNavigate={setTab} />
+      </Suspense>
+    )
   }
 
   return <DashboardPage onNavigate={setTab} />

@@ -1,0 +1,93 @@
+@use '@/shared/styles/helpers/index.scss' as *;
+
+.profile-install {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 18px;
+  margin: 16px 20px 0;
+
+  @include tablet-above {
+    margin: 16px 0 0;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    cursor: pointer;
+  }
+
+  &__name {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+  }
+
+  &__icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    flex: 0 0 auto;
+  }
+
+  &__text {
+    font-size: 13px;
+    font-weight: 700;
+
+    small {
+      display: block;
+      margin-top: 2px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--dim);
+    }
+  }
+
+  &__btn {
+    flex: 0 0 auto;
+    padding: 8px 14px;
+    border-radius: 99px;
+    background: rgba(167, 139, 250, 0.14);
+    border: 1px solid rgba(167, 139, 250, 0.5);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 700;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
+
+  &__help {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--dim);
+    animation: swap 0.3s cubic-bezier(0.2, 0.7, 0.3, 1);
+
+    svg {
+      flex: 0 0 auto;
+      color: var(--accent);
+    }
+
+    b {
+      color: var(--text);
+    }
+  }
+}

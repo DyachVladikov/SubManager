@@ -9,6 +9,7 @@ import { TabBar, type TabKey } from '@/widgets/TabBar'
 import { ProfileAccount } from '@/widgets/ProfileAccount'
 import { ProfileTelegram } from '@/widgets/ProfileTelegram'
 import { ProfileSettings } from '@/widgets/ProfileSettings'
+import { ProfileInstall } from '@/widgets/ProfileInstall'
 import { ProfileNotifications } from '@/widgets/ProfileNotifications'
 import { ProfileData } from '@/widgets/ProfileData'
 import { AddSubscriptionSheet } from '@/widgets/AddSubscriptionSheet'
@@ -52,6 +53,7 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
         </div>
         <div className="profile-page__column">
           <ProfileSettings />
+          <ProfileInstall />
           <ProfileData onNotify={() => showToast('success')} />
         </div>
         <button className="profile-page__logout rise" style={{ animationDelay: '0.3s' }} onClick={() => setLogoutConfirm(true)}>

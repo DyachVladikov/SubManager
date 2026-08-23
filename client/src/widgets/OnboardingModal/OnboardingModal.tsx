@@ -5,7 +5,7 @@ import {
   useState,
   type CSSProperties,
 } from "react";
-import { LuBell, LuCalendarDays, LuSparkles, LuUsers } from "react-icons/lu";
+import { LuBell, LuCalendarDays, LuDownload, LuSparkles, LuUsers } from "react-icons/lu";
 import type { IconType } from "react-icons";
 import "./OnboardingModal.scss";
 
@@ -40,6 +40,12 @@ const SLIDES: Slide[] = [
     color: "#8fe3b0",
     title: "Календарь и аналитика",
     text: "Иконка календаря в шапке покажет списания на любой месяц, а «Аналитика» — куда уходят деньги.",
+  },
+  {
+    icon: LuDownload,
+    color: "#f472b6",
+    title: "Установи на экран «Домой»",
+    text: "Приложение можно установить как обычное — кнопка есть в профиле. И оно работает без интернета: всё сохранится и досинхронизируется при появлении сети.",
   },
 ];
 

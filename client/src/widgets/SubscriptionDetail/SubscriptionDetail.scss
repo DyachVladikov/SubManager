@@ -12,7 +12,7 @@
   overflow-y: auto;
   padding-bottom: calc(44px + env(safe-area-inset-bottom));
   scrollbar-width: none;
-  border-left: 1px solid rgba(255, 255, 255, 0.06);
+  border-left: 1px solid var(--row-border);
   touch-action: pan-y;
 
   &::-webkit-scrollbar {
@@ -249,7 +249,7 @@
     align-items: center;
     gap: 11px;
     padding: 11px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--row-border);
 
     &:last-of-type {
       border-bottom: 0;
@@ -318,7 +318,7 @@
     justify-content: space-between;
     margin-top: 12px;
     padding-top: 12px;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    border-top: 1px solid var(--row-border);
   }
 
   &__split-label {
@@ -408,7 +408,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 10px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--row-border);
     font-size: 12px;
     font-weight: 600;
 
@@ -458,7 +458,7 @@
     width: 42px;
     height: 24px;
     border-radius: 99px;
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--switch-off);
     position: relative;
     cursor: pointer;
     transition: background 0.2s;

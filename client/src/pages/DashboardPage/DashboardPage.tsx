@@ -39,13 +39,13 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
   const { data: dbSubscriptions = [], isLoading, error: subsError } = useGetSubscriptionsQuery()
 
   useEffect(() => {
-    if (!isLoading && localStorage.getItem('submanager_onboarding_v1') !== '1') {
+    if (!isLoading && localStorage.getItem('submanager_onboarding_v2') !== '1') {
       setOnboardingOpen(true)
     }
   }, [isLoading])
 
   const closeOnboarding = () => {
-    localStorage.setItem('submanager_onboarding_v1', '1')
+    localStorage.setItem('submanager_onboarding_v2', '1')
     setOnboardingOpen(false)
   }
   const { data: splits = [] } = useGetSplitsQuery()

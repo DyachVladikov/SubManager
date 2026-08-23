@@ -51,7 +51,7 @@
   &__segctl {
     position: relative;
     display: flex;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--surface2);
     border: 1px solid var(--border);
     border-radius: 99px;
     padding: 3px;
@@ -147,7 +147,7 @@
 
   &__progress {
     margin-top: 16px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid var(--row-border);
     padding-top: 14px;
   }
 

@@ -67,13 +67,13 @@
     align-items: center;
     gap: 11px;
     padding: 12px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--row-border);
     cursor: pointer;
     border-radius: 10px;
     transition: background 0.2s ease, padding 0.2s ease;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.03);
+      background: var(--surface2);
       padding-left: 8px;
       padding-right: 8px;
     }

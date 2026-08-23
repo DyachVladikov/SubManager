@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useAuth, useTmaAuth } from '@/features/auth'
 import { AuthPage } from '@/features/auth'
 import { useTheme } from '@/shared/lib/useTheme'
+import { Loader } from '@/shared/ui/Loader'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { AnalyticsPage } from '@/pages/AnalyticsPage'
 import { FriendsPage } from '@/pages/FriendsPage'
@@ -24,13 +25,7 @@ function App() {
   }, [tab])
 
   if (loading || tmaAuth === 'signing') {
-    return (
-      <div className="app-page">
-        <div className="app-page__card">
-          <p className="app-page__text">Загрузка...</p>
-        </div>
-      </div>
-    )
+    return <Loader fullscreen />
   }
 
   if (!session) {

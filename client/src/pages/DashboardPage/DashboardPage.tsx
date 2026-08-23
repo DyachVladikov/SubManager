@@ -7,6 +7,7 @@ import { useToast } from '@/shared/lib/useToast'
 import { useBodyScrollLock } from '@/shared/lib/useBodyScrollLock'
 import { Toast } from '@/shared/ui/Toast'
 import { DashboardHeader } from '@/widgets/DashboardHeader'
+import { Loader } from '@/shared/ui/Loader'
 import { HeroCard } from '@/widgets/HeroCard'
 import { CategoriesCard } from '@/widgets/CategoriesCard'
 import { UpcomingRail } from '@/widgets/UpcomingRail'
@@ -90,9 +91,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
     return (
       <div className="dashboard-page">
         <div className="dashboard-page__glow"></div>
-        <div style={{ padding: '40px 20px', textAlign: 'center' }}>
-          <p>Загрузка...</p>
-        </div>
+        <Loader />
       </div>
     )
   }

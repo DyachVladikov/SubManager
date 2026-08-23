@@ -7,6 +7,7 @@ import { useRemoveSubscription } from '@/features/subscription/delete'
 import { useToast } from '@/shared/lib/useToast'
 import { useBodyScrollLock } from '@/shared/lib/useBodyScrollLock'
 import { Toast } from '@/shared/ui/Toast'
+import { Loader } from '@/shared/ui/Loader'
 import { DashboardHeader } from '@/widgets/DashboardHeader'
 import { TabBar, type TabKey } from '@/widgets/TabBar'
 import { AnalyticsChart } from '@/widgets/AnalyticsChart'
@@ -89,9 +90,7 @@ export function AnalyticsPage({ onNavigate }: AnalyticsPageProps) {
     return (
       <div className="analytics-page">
         <div className="analytics-page__glow"></div>
-        <div style={{ padding: '40px 20px', textAlign: 'center' }}>
-          <p>Загрузка...</p>
-        </div>
+        <Loader />
       </div>
     )
   }

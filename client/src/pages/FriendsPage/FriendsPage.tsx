@@ -5,6 +5,7 @@ import { useToast } from '@/shared/lib/useToast'
 import { useBodyScrollLock } from '@/shared/lib/useBodyScrollLock'
 import { Toast } from '@/shared/ui/Toast'
 import { DashboardHeader } from '@/widgets/DashboardHeader'
+import { Loader } from '@/shared/ui/Loader'
 import { TabBar, type TabKey } from '@/widgets/TabBar'
 import { FriendsSummary } from '@/widgets/FriendsSummary'
 import { FriendsPending } from '@/widgets/FriendsPending'
@@ -40,9 +41,7 @@ export function FriendsPage({ onNavigate }: FriendsPageProps) {
     return (
       <div className="friends-page">
         <div className="friends-page__glow"></div>
-        <div style={{ padding: '40px 20px', textAlign: 'center' }}>
-          <p>Загрузка...</p>
-        </div>
+        <Loader />
       </div>
     )
   }

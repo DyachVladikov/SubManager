@@ -6,6 +6,7 @@ import { Bot } from "grammy";
 const token = process.env.BOT_TOKEN;
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
+const serviceKey = process.env.SUPABASE_SERVICE_KEY;
 const appUrl = process.env.APP_URL;
 
 console.log("Environment variables:");
@@ -119,8 +120,8 @@ async function sendLoginLink(ctx) {
       {
         method: "POST",
         headers: {
-          apikey: supabaseKey,
-          Authorization: `Bearer ${supabaseKey}`,
+          apikey: serviceKey,
+          Authorization: `Bearer ${serviceKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({

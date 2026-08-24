@@ -103,7 +103,7 @@ export function FriendsPage({ onNavigate }: FriendsPageProps) {
           <FriendsPending
             splits={pendingSplits}
             subscriptions={subscriptionById}
-            onRemind={() => handleRemind}
+            onRemind={handleRemind}
             onPaid={handlePaid}
           />
         </div>

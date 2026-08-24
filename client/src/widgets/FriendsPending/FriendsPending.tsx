@@ -108,6 +108,7 @@ export function FriendsPending({
                   <button
                     className="friends-pending__remind"
                     onClick={() => onRemind(split)}
+                    disabled={Boolean(remindedRecently)}
                     title={
                       remindedRecently
                         ? "Напоминание уже отправлено, повторное будет доступно позже"

@@ -373,9 +373,20 @@ app.post("/api/remind", async (req, res) => {
     if (!debtor?.telegram_id)
       return res.status(404).json({ error: "debtor_no_telegram" });
 
+    const ownerRes = await fetch(
+      `${supabaseUrl}/rest/v1/profiles?id=eq.${user.id}&select=telegram_username,name`,
+      {
+        headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
+      },
+    );
+    const owner = (await ownerRes.json())?.[0];
+    const ownerLabel = owner?.telegram_username
+      ? `@${owner.telegram_username}`
+      : owner?.name || "Друг";
+
     await bot.api.sendMessage(
       debtor.telegram_id,
-      `💸 @${user.email?.split("@")[0] ?? "друг"} напоминает: ты должен(на) ${split.amount} ${split.currency ?? "₽"} за «${sub.title}». Закинь, когда будет минутка.`,
+      `💸 ${ownerLabel} напоминает о долге: ${split.amount} ₽ за «${sub.title}». Закинь, когда будет минутка.`,
     );
 
     await fetch(`${supabaseUrl}/rest/v1/splits?id=eq.${split.id}`, {

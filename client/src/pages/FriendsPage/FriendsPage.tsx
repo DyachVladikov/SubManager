@@ -25,7 +25,11 @@ interface FriendsPageProps {
 export function FriendsPage({ onNavigate }: FriendsPageProps) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const { toast, showToast } = useToast();
-  const { data: splits = [], isLoading } = useGetSplitsQuery();
+  const {
+    data: splits = [],
+    isLoading,
+    refetch: refetchSplits,
+  } = useGetSplitsQuery();
   const { data: subscriptions = [] } = useGetSubscriptionsQuery();
   const [updateSplitStatus] = useUpdateSplitStatusMutation();
   useBodyScrollLock(sheetOpen);
@@ -43,31 +47,48 @@ export function FriendsPage({ onNavigate }: FriendsPageProps) {
     await updateSplitStatus({ id: split.id, status: "paid" });
     showToast("success");
   };
+  const remindErrors: Record<string, string> = {
+    debtor_no_telegram:
+      "Этот пользователь ещё не запускал бота — напомнить некуда",
+    too_often: "Напоминание уже отправлено, повторное будет доступно позже",
+    split_not_found: "Доля не найдена",
+    not_yours: "Это не твой сплит",
+    no_token: "Перезайди в аккаунт",
+    bad_token: "Сессия устарела — перезайди",
+  };
+
   const handleRemind = async (split: Split) => {
     try {
-      console.log("remind: click, split =", split.id);
       const { data } = await supabase.auth.getSession();
       const token = data.session?.access_token;
       if (!token) {
-        console.log("remind: нет сессии");
-        showToast("error");
+        showToast("error", "Перезайди в аккаунт");
         return;
       }
-      const url = `${import.meta.env.VITE_BOT_API_URL}/api/remind`;
-      console.log("remind: шлю на", url);
-      const res = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const res = await fetch(
+        `${import.meta.env.VITE_BOT_API_URL}/api/remind`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ split_id: split.id }),
         },
-        body: JSON.stringify({ split_id: split.id }),
-      });
-      console.log("remind: ответ", res.status);
-      showToast(res.ok ? "success" : "error");
+      );
+      if (res.ok) {
+        showToast("success", "Напоминание отправлено");
+        refetchSplits();
+        return;
+      }
+      const body = await res.json().catch(() => null);
+      showToast(
+        "error",
+        remindErrors[body?.error] ?? "Не удалось отправить. Попробуй позже",
+      );
     } catch (err) {
-      console.error("remind: упал", err);
-      showToast("error");
+      console.error("remind:", err);
+      showToast("error", "Нет соединения с сервером");
     }
   };
 
@@ -125,7 +146,7 @@ export function FriendsPage({ onNavigate }: FriendsPageProps) {
         />
       )}
 
-      {toast && <Toast type={toast} />}
+      {toast && <Toast type={toast.type} text={toast.text} />}
     </div>
   );
 }

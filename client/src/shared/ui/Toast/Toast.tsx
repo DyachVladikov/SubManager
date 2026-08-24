@@ -4,6 +4,7 @@ import "./Toast.scss";
 
 interface ToastProps {
   type: ToastType;
+  text?: string;
 }
 
 const config = {
@@ -12,13 +13,13 @@ const config = {
   error: { icon: <LuX size={30} />, text: "Ошибка" },
 } as const;
 
-export function Toast({ type }: ToastProps) {
-  const { icon, text } = config[type];
+export function Toast({ type, text }: ToastProps) {
+  const current = config[type];
   return (
     <div className="toast-overlay">
       <div className="toast">
-        <div className={`toast__icon toast__icon--${type}`}>{icon}</div>
-        <span className="toast__text">{text}</span>
+        <div className={`toast__icon toast__icon--${type}`}>{current.icon}</div>
+        <span className="toast__text">{text ?? current.text}</span>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-@use '@/shared/styles/helpers/index.scss' as *;
+@use "@/shared/styles/helpers/index.scss" as *;
 
 .friends-pending {
   &__header {
@@ -120,10 +120,16 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: transform 0.12s, background 0.25s;
+    transition:
+      transform 0.12s,
+      background 0.25s;
 
     &:active {
       transform: scale(0.88);
+    }
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
     }
 
     &--ok {

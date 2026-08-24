@@ -44,18 +44,31 @@ export function FriendsPage({ onNavigate }: FriendsPageProps) {
     showToast("success");
   };
   const handleRemind = async (split: Split) => {
-    const { data } = await supabase.auth.getSession();
-    const token = data.session?.access_token;
-    if (!token) return;
-    const res = await fetch(`${import.meta.env.VITE_BOT_API_URL}/api/remind`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ split_id: split.id }),
-    });
-    showToast(res.ok ? "success" : "delete");
+    try {
+      console.log("remind: click, split =", split.id);
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token;
+      if (!token) {
+        console.log("remind: нет сессии");
+        showToast("delete");
+        return;
+      }
+      const url = `${import.meta.env.VITE_BOT_API_URL}/api/remind`;
+      console.log("remind: шлю на", url);
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ split_id: split.id }),
+      });
+      console.log("remind: ответ", res.status);
+      showToast(res.ok ? "success" : "delete");
+    } catch (err) {
+      console.error("remind: упал", err);
+      showToast("delete");
+    }
   };
 
   if (isLoading) {

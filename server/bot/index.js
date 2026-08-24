@@ -386,7 +386,7 @@ app.post("/api/remind", async (req, res) => {
 
     await bot.api.sendMessage(
       debtor.telegram_id,
-      `💸 ${ownerLabel} напоминает о долге: ${split.amount} ₽ за «${sub.title}». Закинь, когда будет минутка.`,
+      `💸 ${ownerLabel} напоминает о доле: ${split.amount} ₽ за «${sub.title}». Закинь, когда будет минутка.`,
     );
 
     await fetch(`${supabaseUrl}/rest/v1/splits?id=eq.${split.id}`, {

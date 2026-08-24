@@ -25,6 +25,8 @@
     font-weight: 600;
     outline: none;
     transition: border-color 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
 
     &:focus {
       border-color: rgba(167, 139, 250, 0.55);
@@ -36,7 +38,7 @@
       margin: 0;
     }
 
-    &[type='number'] {
+    &[type="number"] {
       -moz-appearance: textfield;
       appearance: textfield;
     }

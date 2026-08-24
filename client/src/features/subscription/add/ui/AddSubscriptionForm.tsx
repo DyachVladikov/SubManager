@@ -12,6 +12,7 @@ import { FormField } from "@/shared/ui/FormField";
 import { Select } from "@/shared/ui/Select";
 import { supabase } from "@/shared/config/supabase";
 import { useMoney } from "@/shared/lib/useCurrency";
+import { toHumanError } from "@/shared/lib/toHumanError";
 import "./AddSubscriptionForm.scss";
 
 const presetColors = [
@@ -235,8 +236,7 @@ export function AddSubscriptionForm({
       onClose();
     } catch (error) {
       console.error("Failed to save subscription:", error);
-      const detail = (error as { message?: string })?.message ?? String(error);
-      setSubmitError(`Не удалось сохранить: ${detail}`);
+      setSubmitError(toHumanError(error));
     } finally {
       setSubmitting(false);
     }

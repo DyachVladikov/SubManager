@@ -313,6 +313,88 @@ bot.catch((err) => {
 const app = express();
 app.use(express.json());
 
+const corsHeaders = (res) => {
+  res.set("Access-Control-Allow-Origin", appUrl || "*");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+};
+
+app.options("/api/remind", (req, res) => {
+  corsHeaders(res);
+  res.sendStatus(204);
+});
+
+app.post("/api/remind", async (req, res) => {
+  corsHeaders(res);
+  try {
+    const userToken = req.headers.authorization?.replace("Bearer ", "");
+    if (!userToken) return res.status(401).json({ error: "no_token" });
+
+    const userRes = await fetch(`${supabaseUrl}/auth/v1/user`, {
+      headers: { apikey: supabaseKey, Authorization: `Bearer ${userToken}` },
+    });
+    if (!userRes.ok) return res.status(401).json({ error: "bad_token" });
+    const user = await userRes.json();
+
+    const splitRes = await fetch(
+      `${supabaseUrl}/rest/v1/splits?id=eq.${req.body.split_id}&select=*`,
+      {
+        headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
+      },
+    );
+    const split = (await splitRes.json())?.[0];
+    if (!split) return res.status(404).json({ error: "split_not_found" });
+
+    const subRes = await fetch(
+      `${supabaseUrl}/rest/v1/subscriptions?id=eq.${split.subscription_id}&select=user_id,title`,
+      {
+        headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
+      },
+    );
+    const sub = (await subRes.json())?.[0];
+    if (!sub || sub.user_id !== user.id)
+      return res.status(403).json({ error: "not_yours" });
+
+    if (
+      split.last_reminded_at &&
+      Date.now() - new Date(split.last_reminded_at).getTime() <
+        4 * 60 * 60 * 1000
+    ) {
+      return res.status(429).json({ error: "too_often" });
+    }
+
+    const debtorRes = await fetch(
+      `${supabaseUrl}/rest/v1/profiles?telegram_username=eq.${encodeURIComponent(split.debtor_username.replace(/^@/, ""))}&select=telegram_id`,
+      {
+        headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
+      },
+    );
+    const debtor = (await debtorRes.json())?.[0];
+    if (!debtor?.telegram_id)
+      return res.status(404).json({ error: "debtor_no_telegram" });
+
+    await bot.api.sendMessage(
+      debtor.telegram_id,
+      `💸 @${user.email?.split("@")[0] ?? "друг"} напоминает: ты должен(на) ${split.amount} ${split.currency ?? "₽"} за «${sub.title}». Закинь, когда будет минутка.`,
+    );
+
+    await fetch(`${supabaseUrl}/rest/v1/splits?id=eq.${split.id}`, {
+      method: "PATCH",
+      headers: {
+        apikey: serviceKey,
+        Authorization: `Bearer ${serviceKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ last_reminded_at: new Date().toISOString() }),
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error("remind:", err);
+    res.status(500).json({ error: "server_error" });
+  }
+});
+
 app.post("/webhook", async (req, res) => {
   try {
     await bot.handleUpdate(req.body);

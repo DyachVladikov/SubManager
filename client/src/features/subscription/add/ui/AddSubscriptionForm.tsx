@@ -3,6 +3,7 @@ import {
   useCreateSubscriptionMutation,
   useUpdateSubscriptionMutation,
   useGetCategoriesQuery,
+  useCreateSubscriptionWithSplitMutation,
 } from "@/entities/subscription/api/subscriptionApi";
 import { useCreateSplitMutation } from "@/entities/split/api/splitApi";
 import { presetCatalog } from "@/entities/subscription/model/presetCatalog";
@@ -83,6 +84,10 @@ export function AddSubscriptionForm({
     useCreateSubscriptionMutation();
   const [updateSubscription, { isLoading: isUpdating }] =
     useUpdateSubscriptionMutation();
+  const [createSubscriptionWithSplit] =
+    useCreateSubscriptionWithSplitMutation();
+  const [submitting, setSubmitting] = useState(false);
+  const [sessionReady, setSessionReady] = useState(false);
   const { data: categories = [] } = useGetCategoriesQuery();
   const [createSplit] = useCreateSplitMutation();
   const { symbol: currencySymbol, unconvert } = useMoney();
@@ -147,6 +152,7 @@ export function AddSubscriptionForm({
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       setUserId(data.session?.user?.id || null);
+      setSessionReady(true);
     });
   }, []);
 
@@ -182,7 +188,9 @@ export function AddSubscriptionForm({
       setSubmitError("Сессия не найдена — перезайди в аккаунт");
       return;
     }
+    if (submitting) return;
 
+    setSubmitting(true);
     try {
       const splitAmountValue =
         splitMode === "pct"
@@ -209,7 +217,7 @@ export function AddSubscriptionForm({
           }).unwrap();
         }
       } else {
-        const subscription = await createSubscription({
+        await createSubscriptionWithSplit({
           title: name,
           amount: Number(price),
           currency: "RUB",
@@ -219,15 +227,11 @@ export function AddSubscriptionForm({
           user_id: userId,
           remind_before_days: Number(remindDays),
           period: inferPeriod(date),
+          split_username:
+            isSplit && splitUsername.trim() ? splitUsername.trim() : null,
+          split_amount:
+            isSplit && splitUsername.trim() ? splitAmountValue : null,
         }).unwrap();
-
-        if (isSplit && subscription) {
-          await createSplit({
-            subscription_id: subscription.id,
-            debtor_username: splitUsername,
-            amount: splitAmountValue,
-          }).unwrap();
-        }
       }
 
       onSuccess?.();
@@ -236,6 +240,8 @@ export function AddSubscriptionForm({
       console.error("Failed to save subscription:", error);
       const detail = (error as { message?: string })?.message ?? String(error);
       setSubmitError(`Не удалось сохранить: ${detail}`);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -403,13 +409,17 @@ export function AddSubscriptionForm({
       <button
         className="add-form__submit"
         type="submit"
-        disabled={isLoading || !userId}
+        disabled={submitting || isLoading || !sessionReady}
       >
-        {isLoading
-          ? "Сохранение..."
-          : editingId
-            ? "Сохранить"
-            : "Добавить подписку"}
+        {!sessionReady
+          ? "Загрузка сессии..."
+          : submitting || isLoading
+            ? editingId
+              ? "Сохраняю..."
+              : "Добавляю подписку..."
+            : editingId
+              ? "Сохранить"
+              : "Добавить подписку"}
       </button>
     </form>
   );

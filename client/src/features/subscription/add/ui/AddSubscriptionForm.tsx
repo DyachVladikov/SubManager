@@ -80,8 +80,6 @@ export function AddSubscriptionForm({
   const [userId, setUserId] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState("");
-  const [createSubscription, { isLoading: isCreating }] =
-    useCreateSubscriptionMutation();
   const [updateSubscription, { isLoading: isUpdating }] =
     useUpdateSubscriptionMutation();
   const [createSubscriptionWithSplit] =
@@ -91,7 +89,7 @@ export function AddSubscriptionForm({
   const { data: categories = [] } = useGetCategoriesQuery();
   const [createSplit] = useCreateSplitMutation();
   const { symbol: currencySymbol, unconvert } = useMoney();
-  const isLoading = isCreating || isUpdating;
+  const isLoading = isUpdating;
 
   const nameToCategoryId = categories.reduce<Record<string, string>>(
     (acc, cat) => {

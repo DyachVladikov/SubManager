@@ -314,7 +314,7 @@ const app = express();
 app.use(express.json());
 
 const corsHeaders = (res) => {
-  res.set("Access-Control-Allow-Origin", appUrl || "*");
+  res.set("Access-Control-Allow-Origin", (appUrl || "*").replace(/\/+$/, ""));
   res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
 };

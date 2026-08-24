@@ -50,7 +50,7 @@ export function FriendsPage({ onNavigate }: FriendsPageProps) {
       const token = data.session?.access_token;
       if (!token) {
         console.log("remind: нет сессии");
-        showToast("delete");
+        showToast("error");
         return;
       }
       const url = `${import.meta.env.VITE_BOT_API_URL}/api/remind`;
@@ -64,10 +64,10 @@ export function FriendsPage({ onNavigate }: FriendsPageProps) {
         body: JSON.stringify({ split_id: split.id }),
       });
       console.log("remind: ответ", res.status);
-      showToast(res.ok ? "success" : "delete");
+      showToast(res.ok ? "success" : "error");
     } catch (err) {
       console.error("remind: упал", err);
-      showToast("delete");
+      showToast("error");
     }
   };
 

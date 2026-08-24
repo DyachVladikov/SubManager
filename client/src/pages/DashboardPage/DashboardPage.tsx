@@ -1,106 +1,126 @@
-import { useEffect, useState } from 'react'
-import { useGetSubscriptionsQuery, useGetCategoriesQuery } from '@/entities/subscription/api/subscriptionApi'
-import { useGetSplitsQuery } from '@/entities/split/api/splitApi'
-import { mapSubscription } from '@/entities/subscription/lib/mapSubscription'
-import { useRemoveSubscription } from '@/features/subscription/delete'
-import { useToast } from '@/shared/lib/useToast'
-import { useBodyScrollLock } from '@/shared/lib/useBodyScrollLock'
-import { Toast } from '@/shared/ui/Toast'
-import { DashboardHeader } from '@/widgets/DashboardHeader'
-import { Loader } from '@/shared/ui/Loader'
-import { HeroCard } from '@/widgets/HeroCard'
-import { CategoriesCard } from '@/widgets/CategoriesCard'
-import { UpcomingRail } from '@/widgets/UpcomingRail'
-import { SubscriptionsGrid } from '@/widgets/SubscriptionsGrid'
-import { TabBar, type TabKey } from '@/widgets/TabBar'
-import { SubscriptionDetail } from '@/widgets/SubscriptionDetail'
-import { AddSubscriptionSheet } from '@/widgets/AddSubscriptionSheet'
-import { CalendarModal } from '@/widgets/CalendarModal'
-import { OnboardingModal } from '@/widgets/OnboardingModal'
-import './DashboardPage.scss'
+import { useEffect, useState } from "react";
+import {
+  useGetSubscriptionsQuery,
+  useGetCategoriesQuery,
+} from "@/entities/subscription/api/subscriptionApi";
+import { useGetSplitsQuery } from "@/entities/split/api/splitApi";
+import { mapSubscription } from "@/entities/subscription/lib/mapSubscription";
+import { useRemoveSubscription } from "@/features/subscription/delete";
+import { useToast } from "@/shared/lib/useToast";
+import { useBodyScrollLock } from "@/shared/lib/useBodyScrollLock";
+import { Toast } from "@/shared/ui/Toast";
+import { DashboardHeader } from "@/widgets/DashboardHeader";
+import { Loader } from "@/shared/ui/Loader";
+import { HeroCard } from "@/widgets/HeroCard";
+import { CategoriesCard } from "@/widgets/CategoriesCard";
+import { UpcomingRail } from "@/widgets/UpcomingRail";
+import { SubscriptionsGrid } from "@/widgets/SubscriptionsGrid";
+import { TabBar, type TabKey } from "@/widgets/TabBar";
+import { SubscriptionDetail } from "@/widgets/SubscriptionDetail";
+import { AddSubscriptionSheet } from "@/widgets/AddSubscriptionSheet";
+import { CalendarModal } from "@/widgets/CalendarModal";
+import { OnboardingModal } from "@/widgets/OnboardingModal";
+import "./DashboardPage.scss";
 
 interface DashboardPageProps {
-  onNavigate: (tab: TabKey) => void
+  onNavigate: (tab: TabKey) => void;
 }
 
 export function DashboardPage({ onNavigate }: DashboardPageProps) {
-  const [mode, setMode] = useState<'month' | 'year'>('month')
-  const [detailOpen, setDetailOpen] = useState(false)
-  const [selectedSub, setSelectedSub] = useState<string | null>(null)
-  const [sheetOpen, setSheetOpen] = useState(false)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [calendarOpen, setCalendarOpen] = useState(false)
-  const [onboardingOpen, setOnboardingOpen] = useState(false)
-  const { toast, showToast } = useToast()
+  const [mode, setMode] = useState<"month" | "year">("month");
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [selectedSub, setSelectedSub] = useState<string | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [onboardingOpen, setOnboardingOpen] = useState(false);
+  const { toast, showToast } = useToast();
   const { removingIds, removeSubscription } = useRemoveSubscription({
-    onDeleted: () => showToast('delete'),
-  })
+    onDeleted: () => showToast("delete"),
+  });
 
-  const { data: dbSubscriptions = [], isLoading, error: subsError } = useGetSubscriptionsQuery()
+  const {
+    data: dbSubscriptions = [],
+    isLoading,
+    error: subsError,
+  } = useGetSubscriptionsQuery();
 
   useEffect(() => {
-    if (!isLoading && localStorage.getItem('submanager_onboarding_v2') !== '1') {
-      setOnboardingOpen(true)
+    if (
+      !isLoading &&
+      localStorage.getItem("submanager_onboarding_v2") !== "1"
+    ) {
+      setOnboardingOpen(true);
     }
-  }, [isLoading])
+  }, [isLoading]);
 
   const closeOnboarding = () => {
-    localStorage.setItem('submanager_onboarding_v2', '1')
-    setOnboardingOpen(false)
-  }
-  const { data: splits = [] } = useGetSplitsQuery()
-  const { data: categories = [] } = useGetCategoriesQuery()
-  const categoryNames = categories.reduce<Record<string, string>>((acc, cat) => {
-    acc[cat.id] = cat.name
-    return acc
-  }, {})
-  const subscriptions = dbSubscriptions.map((sub) => mapSubscription(sub, sub.category_id ? categoryNames[sub.category_id] : undefined))
+    localStorage.setItem("submanager_onboarding_v2", "1");
+    setOnboardingOpen(false);
+  };
+  const { data: splits = [] } = useGetSplitsQuery();
+  const { data: categories = [] } = useGetCategoriesQuery();
+  const categoryNames = categories.reduce<Record<string, string>>(
+    (acc, cat) => {
+      acc[cat.id] = cat.name;
+      return acc;
+    },
+    {},
+  );
+  const subscriptions = dbSubscriptions.map((sub) =>
+    mapSubscription(
+      sub,
+      sub.category_id ? categoryNames[sub.category_id] : undefined,
+    ),
+  );
   const splitCounts = splits.reduce<Record<string, number>>((acc, split) => {
-    acc[split.subscription_id] = (acc[split.subscription_id] || 0) + 1
-    return acc
-  }, {})
+    acc[split.subscription_id] = (acc[split.subscription_id] || 0) + 1;
+    return acc;
+  }, {});
 
   const openDetail = (id: string) => {
-    setSelectedSub(id)
-    setDetailOpen(true)
-  }
+    setSelectedSub(id);
+    setDetailOpen(true);
+  };
 
   const closeDetail = () => {
-    setDetailOpen(false)
-    setSelectedSub(null)
-  }
+    setDetailOpen(false);
+    setSelectedSub(null);
+  };
 
   const handleDelete = (id: string) => {
-    closeDetail()
-    removeSubscription(id)
-  }
+    closeDetail();
+    removeSubscription(id);
+  };
 
   const handleEdit = (id: string) => {
-    closeDetail()
-    setEditingId(id)
-    setSheetOpen(true)
-  }
+    closeDetail();
+    setEditingId(id);
+    setSheetOpen(true);
+  };
 
   const closeSheet = () => {
-    setSheetOpen(false)
-    setEditingId(null)
-  }
+    setSheetOpen(false);
+    setEditingId(null);
+  };
 
-  const selected = subscriptions.find((s) => s.id === selectedSub)
-  useBodyScrollLock(sheetOpen || selectedSub !== null || calendarOpen || onboardingOpen)
-  const editingRaw = dbSubscriptions.find((s) => s.id === editingId)
+  const selected = subscriptions.find((s) => s.id === selectedSub);
+  useBodyScrollLock(
+    sheetOpen || selectedSub !== null || calendarOpen || onboardingOpen,
+  );
+  const editingRaw = dbSubscriptions.find((s) => s.id === editingId);
   const editing = editingRaw
     ? {
         id: editingRaw.id,
         name: editingRaw.title,
         price: String(editingRaw.amount),
         date: editingRaw.next_payment_date,
-        color: editingRaw.color_hex || '#a78bfa',
+        color: editingRaw.color_hex || "#a78bfa",
         categoryId: editingRaw.category_id,
         remindDays: editingRaw.remind_before_days,
         period: editingRaw.period,
       }
-    : null
+    : null;
 
   if (isLoading) {
     return (
@@ -108,22 +128,36 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
         <div className="dashboard-page__glow"></div>
         <Loader />
       </div>
-    )
+    );
   }
 
   return (
     <div className="dashboard-page">
       <div className="dashboard-page__glow"></div>
 
-      <DashboardHeader onBrandClick={() => onNavigate('profile')} onCalendarClick={() => setCalendarOpen(true)} />
+      <DashboardHeader
+        onBrandClick={() => onNavigate("profile")}
+        onCalendarClick={() => setCalendarOpen(true)}
+      />
       {subsError !== undefined && (
         <div className="dashboard-page__error">
-          Не удалось загрузить подписки: {String((subsError as { message?: string })?.message ?? JSON.stringify(subsError))}
+          Не удалось загрузить подписки:{" "}
+          {String(
+            (subsError as { message?: string })?.message ??
+              JSON.stringify(subsError),
+          )}
         </div>
       )}
       <div className="dashboard-page__top">
-        <HeroCard mode={mode} onModeChange={setMode} subscriptions={dbSubscriptions} />
-        <CategoriesCard subscriptions={dbSubscriptions} categoryNames={categoryNames} />
+        <HeroCard
+          mode={mode}
+          onModeChange={setMode}
+          subscriptions={dbSubscriptions}
+        />
+        <CategoriesCard
+          subscriptions={dbSubscriptions}
+          categoryNames={categoryNames}
+        />
       </div>
       <UpcomingRail subscriptions={subscriptions} onOpen={openDetail} />
       <SubscriptionsGrid
@@ -133,7 +167,11 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
         onOpen={openDetail}
         onAdd={() => setSheetOpen(true)}
       />
-      <TabBar active="home" onNavigate={onNavigate} onAdd={() => setSheetOpen(true)} />
+      <TabBar
+        active="home"
+        onNavigate={onNavigate}
+        onAdd={() => setSheetOpen(true)}
+      />
 
       {selected && (
         <SubscriptionDetail
@@ -146,7 +184,11 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
       )}
 
       {sheetOpen && (
-        <AddSubscriptionSheet onClose={closeSheet} onSuccess={() => showToast('success')} editing={editing} />
+        <AddSubscriptionSheet
+          onClose={closeSheet}
+          onSuccess={() => showToast("success")}
+          editing={editing}
+        />
       )}
 
       {calendarOpen && (
@@ -154,15 +196,15 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
           subscriptions={dbSubscriptions}
           onClose={() => setCalendarOpen(false)}
           onOpenSubscription={(id) => {
-            setCalendarOpen(false)
-            openDetail(id)
+            setCalendarOpen(false);
+            openDetail(id);
           }}
         />
       )}
 
       {onboardingOpen && <OnboardingModal onClose={closeOnboarding} />}
 
-      {toast && <Toast type={toast} />}
+      {toast && <Toast type={toast.type} />}
     </div>
-  )
+  );
 }

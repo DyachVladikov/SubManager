@@ -344,6 +344,10 @@ app.post("/api/remind", async (req, res) => {
     );
     const split = (await splitRes.json())?.[0];
     if (!split) return res.status(404).json({ error: "split_not_found" });
+    if (split.status === "declined")
+      return res.status(400).json({ error: "split_declined" });
+    if (split.status === "paid")
+      return res.status(400).json({ error: "already_paid" });
 
     const subRes = await fetch(
       `${supabaseUrl}/rest/v1/subscriptions?id=eq.${split.subscription_id}&select=user_id,title`,

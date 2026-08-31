@@ -9,10 +9,11 @@ interface FriendsSummaryProps {
 
 export function FriendsSummary({ splits, onRemindAll }: FriendsSummaryProps) {
   const { symbol: currency, convert } = useMoney()
-  const total = splits.reduce((acc, split) => acc + split.amount, 0)
-  const pending = splits.filter((split) => split.status === 'pending').reduce((acc, split) => acc + split.amount, 0)
-  const friendsCount = new Set(splits.map((split) => split.debtor_username)).size
-  const subscriptionsCount = new Set(splits.map((split) => split.subscription_id)).size
+  const active = splits.filter((split) => split.status !== 'declined')
+  const total = active.reduce((acc, split) => acc + split.amount, 0)
+  const pending = active.filter((split) => split.status === 'pending').reduce((acc, split) => acc + split.amount, 0)
+  const friendsCount = new Set(active.map((split) => split.debtor_username)).size
+  const subscriptionsCount = new Set(active.map((split) => split.subscription_id)).size
 
   return (
     <div className="friends-summary rise" style={{ animationDelay: '0.1s' }}>

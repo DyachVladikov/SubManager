@@ -310,6 +310,12 @@
       background: rgba(143, 227, 176, 0.1);
       border: 1px solid rgba(143, 227, 176, 0.3);
     }
+
+    &--declined {
+      color: var(--dim);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+    }
   }
 
   &__split-footer {

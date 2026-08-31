@@ -7,6 +7,7 @@ import "./FriendsPending.scss";
 
 interface FriendsPendingProps {
   splits: Split[];
+  declinedSplits?: Split[];
   subscriptions: Record<string, Subscription>;
   onRemind: (split: Split) => void;
   onPaid: (split: Split) => void;
@@ -14,6 +15,7 @@ interface FriendsPendingProps {
 
 export function FriendsPending({
   splits,
+  declinedSplits = [],
   subscriptions,
   onRemind,
   onPaid,
@@ -21,7 +23,7 @@ export function FriendsPending({
   const { symbol: currency, convert } = useMoney();
   const total = splits.reduce((acc, split) => acc + split.amount, 0);
 
-  if (splits.length === 0) {
+  if (splits.length === 0 && declinedSplits.length === 0) {
     return (
       <div
         className="friends-pending__empty rise"
@@ -121,6 +123,43 @@ export function FriendsPending({
                     </svg>
                   </button>
                 </div>
+              </div>
+            </div>
+          );
+        })}
+        {declinedSplits.map((split) => {
+          const username = split.debtor_username.replace(/^@/, "");
+          const gradient = gradientForName(username);
+          const subscription = subscriptions[split.subscription_id];
+          return (
+            <div
+              className="friends-pending__card friends-pending__card--declined"
+              key={split.id}
+            >
+              <div
+                className="friends-pending__avatar"
+                style={{
+                  background: `linear-gradient(135deg, ${gradient[0]}, ${gradient[1]})`,
+                }}
+              >
+                {username[0]?.toUpperCase()}
+              </div>
+              <div className="friends-pending__info">
+                <b>@{username}</b>
+                <div className="friends-pending__sub">
+                  {subscription ? subscription.title : "Подписка удалена"}
+                </div>
+              </div>
+              <div className="friends-pending__right">
+                <b>
+                  {convert(split.amount).toLocaleString("ru-RU", {
+                    useGrouping: false,
+                  })}{" "}
+                  {currency}
+                </b>
+                <span className="friends-pending__declined-badge">
+                  отклонил(а)
+                </span>
               </div>
             </div>
           );

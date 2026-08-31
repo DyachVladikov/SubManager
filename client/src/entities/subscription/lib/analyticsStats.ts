@@ -31,8 +31,9 @@ export function computeAnalyticsStats(subs: Subscription[], splits: Split[]): An
   }
 
   const monthTotal = subs.reduce((acc, sub) => acc + sub.amount, 0)
-  const splitReturn = splits.reduce((acc, split) => acc + split.amount, 0)
-  const splitFriends = new Set(splits.map((split) => split.debtor_username)).size
+  const activeSplits = splits.filter((split) => split.status !== 'declined')
+  const splitReturn = activeSplits.reduce((acc, split) => acc + split.amount, 0)
+  const splitFriends = new Set(activeSplits.map((split) => split.debtor_username)).size
 
   return {
     monthlyTotals,

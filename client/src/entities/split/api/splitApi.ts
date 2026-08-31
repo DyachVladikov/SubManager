@@ -16,9 +16,19 @@ export interface Split {
   debtor_username: string;
   last_reminded_at: string | null;
   amount: number;
-  status: "pending" | "paid";
+  status: "pending" | "paid" | "declined";
   created_at: string;
   updated_at: string;
+}
+
+export interface MySplitDebt {
+  split_id: string;
+  subscription_id: string;
+  subscription_title: string;
+  amount: number;
+  currency: string;
+  status: "pending" | "paid" | "declined";
+  owner_username: string | null;
 }
 
 export interface CreateSplitInput {
@@ -148,6 +158,38 @@ export const splitApi = baseApi.injectEndpoints({
       invalidatesTags: ["Subscription"],
     }),
 
+    getMySplitDebts: builder.query<MySplitDebt[], void>({
+      queryFn: async () => {
+        try {
+          const { data, error } = await supabase.rpc("get_my_split_debts");
+          if (error) throw error;
+          return { data: (data ?? []) as MySplitDebt[] };
+        } catch (error) {
+          return { error: error as { message: string } };
+        }
+      },
+      providesTags: ["Subscription"],
+    }),
+
+    setSplitDeclined: builder.mutation<
+      string,
+      { splitId: string; declined: boolean }
+    >({
+      queryFn: async ({ splitId, declined }) => {
+        try {
+          const { data, error } = await supabase.rpc("set_split_declined", {
+            p_split_id: splitId,
+            p_declined: declined,
+          });
+          if (error) throw error;
+          return { data: data as string };
+        } catch (error) {
+          return { error: error as { message: string } };
+        }
+      },
+      invalidatesTags: ["Subscription"],
+    }),
+
     deleteSplit: builder.mutation<void, string>({
       queryFn: async (id) => {
         try {
@@ -172,5 +214,7 @@ export const {
   useGetSplitsBySubscriptionQuery,
   useCreateSplitMutation,
   useUpdateSplitStatusMutation,
+  useGetMySplitDebtsQuery,
+  useSetSplitDeclinedMutation,
   useDeleteSplitMutation,
 } = splitApi;

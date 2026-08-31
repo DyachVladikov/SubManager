@@ -204,15 +204,15 @@ export function SubscriptionDetail({ subscription, open, onClose, onDelete, onEd
                 </div>
                 <div className="subscription-detail__amount">
                   {convert(p.amount).toLocaleString('ru-RU', { useGrouping: false })} {currency}<br />
-                  <span className={`subscription-detail__status ${p.status === 'paid' ? 'subscription-detail__status--paid' : 'subscription-detail__status--pending'}`}>
-                    {p.status === 'paid' ? 'оплатил' : 'ждём'}
+                  <span className={`subscription-detail__status ${p.status === 'paid' ? 'subscription-detail__status--paid' : p.status === 'declined' ? 'subscription-detail__status--declined' : 'subscription-detail__status--pending'}`}>
+                    {p.status === 'paid' ? 'оплатил' : p.status === 'declined' ? 'отклонил' : 'ждём'}
                   </span>
                 </div>
               </div>
             ))}
             <div className="subscription-detail__split-footer">
               <span className="subscription-detail__split-label">Твоя доля</span>
-              <b>{convert(subscription.price - splits.reduce((a, p) => a + p.amount, 0)).toLocaleString('ru-RU', { useGrouping: false })} {currency}/мес</b>
+              <b>{convert(subscription.price - splits.filter((p) => p.status !== 'declined').reduce((a, p) => a + p.amount, 0)).toLocaleString('ru-RU', { useGrouping: false })} {currency}/мес</b>
             </div>
           </>
         ) : (

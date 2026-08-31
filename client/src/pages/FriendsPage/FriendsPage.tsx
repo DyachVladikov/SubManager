@@ -14,6 +14,7 @@ import { TabBar, type TabKey } from "@/widgets/TabBar";
 import { FriendsSummary } from "@/widgets/FriendsSummary";
 import { FriendsPending } from "@/widgets/FriendsPending";
 import { FriendsPaid } from "@/widgets/FriendsPaid";
+import { FriendsDebts } from "@/widgets/FriendsDebts";
 import { AddSubscriptionSheet } from "@/widgets/AddSubscriptionSheet";
 import "./FriendsPage.scss";
 import { supabase } from "@/shared/config/supabase";
@@ -42,6 +43,7 @@ export function FriendsPage({ onNavigate }: FriendsPageProps) {
   }, {});
   const pendingSplits = splits.filter((split) => split.status === "pending");
   const paidSplits = splits.filter((split) => split.status === "paid");
+  const declinedSplits = splits.filter((split) => split.status === "declined");
 
   const handlePaid = async (split: Split) => {
     await updateSplitStatus({ id: split.id, status: "paid" });
@@ -52,6 +54,8 @@ export function FriendsPage({ onNavigate }: FriendsPageProps) {
       "Этот пользователь ещё не запускал бота — напомнить некуда",
     too_often: "Напоминание уже отправлено, повторное будет доступно позже",
     split_not_found: "Доля не найдена",
+    split_declined: "Друг отклонил эту долю",
+    already_paid: "Доля уже оплачена",
     not_yours: "Это не твой сплит",
     no_token: "Перезайди в аккаунт",
     bad_token: "Сессия устарела — перезайди",
@@ -123,6 +127,7 @@ export function FriendsPage({ onNavigate }: FriendsPageProps) {
         <div className="friends-page__column">
           <FriendsPending
             splits={pendingSplits}
+            declinedSplits={declinedSplits}
             subscriptions={subscriptionById}
             onRemind={handleRemind}
             onPaid={handlePaid}
@@ -130,6 +135,9 @@ export function FriendsPage({ onNavigate }: FriendsPageProps) {
         </div>
         <div className="friends-page__column">
           <FriendsPaid splits={paidSplits} subscriptions={subscriptionById} />
+        </div>
+        <div className="friends-page__column">
+          <FriendsDebts onNotify={showToast} />
         </div>
       </div>
 
